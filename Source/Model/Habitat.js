@@ -6,19 +6,22 @@ class Habitat extends Entity {
                 Constraint_Gravity.fromAccelerationPerTick(Coords.fromXY(0, .03)),
                 Constraint_ContainInHemispace.fromHemispace(Hemispace.fromPlane(Plane.fromNormalAndDistanceFromOrigin(Coords.fromXY(0, 1), 250)))
             ]),
-            Drawable.fromVisual(VisualPolygon.fromVerticesAndColorFill([
-                Coords.fromXY(4, 0),
-                Coords.fromXY(-4, 0),
-                Coords.fromXY(-4, -4),
-                Coords.fromXY(0, -8),
-                Coords.fromXY(4, -4)
-            ], Color.byName("Brown"))).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
+            Drawable.fromVisual(Habitat.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
             Locatable.fromPos(pos)
         ]);
         this.propertyAdd(this);
     }
     static fromPos(pos) {
         return new Habitat(pos);
+    }
+    static visualBuild() {
+        return VisualPolygon.fromVerticesAndColorFill([
+            Coords.fromXY(4, 0),
+            Coords.fromXY(-4, 0),
+            Coords.fromXY(-4, -4),
+            Coords.fromXY(0, -8),
+            Coords.fromXY(4, -4)
+        ], Color.byName("Brown"));
     }
     // Clonable.
     clone() {

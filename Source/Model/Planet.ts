@@ -1,23 +1,23 @@
 
 class Planet extends Entity
 {
-    constructor(size: Coords, horizonHeight: number)
-    {
-        super
-        (
+	constructor(size: Coords, horizonHeight: number)
+	{
+		super
+		(
 			Planet.name,
-            [
-                Drawable.fromVisual
-                (
+			[
+				Drawable.fromVisual
+				(
 					Planet.visual(size, horizonHeight)
-                ).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
+				).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
 
-                Locatable.create(),
+				Locatable.create(),
 
 				Planet.triggerable()
-            ]
-        );
-    }
+			]
+		);
+	}
 
 	static fromSizeAndHorizonHeight
 	(
@@ -71,14 +71,14 @@ class Planet extends Entity
 	): void
 	{
 		var universe = uwpe.universe;
-		universe.venueNextSet
+		universe.venueTransitionTo
 		(
 			VenueMessage.fromTextAndAcknowledge
 			(
 				"You lose!",
 				() => // acknowledge
 				{
-					universe.venueNextSet
+					universe.venueTransitionTo
 					(
 						universe.controlBuilder.title
 						(
@@ -115,14 +115,14 @@ class Planet extends Entity
 	): void
 	{
 		var universe = uwpe.universe;
-		universe.venueNextSet
+		universe.venueTransitionTo
 		(
-			VenueMessage.fromTextAndAcknowledge
+			VenueMessage.fromTextAndAcknowledgeNoButtons
 			(
 				"You win!",
 				() => // acknowledge
 				{
-					universe.venueNextSet
+					universe.venueTransitionTo
 					(
 						universe.controlBuilder.title
 						(

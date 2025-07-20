@@ -22,7 +22,4 @@ class WorldGame extends World {
             ]
         ]);
     }
-    toControl() {
-        return new ControlNone();
-    }
 }

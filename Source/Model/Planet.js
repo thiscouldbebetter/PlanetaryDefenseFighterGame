@@ -26,9 +26,9 @@ class Planet extends Entity {
     }
     static triggerLoseReactToBeingTriggered(uwpe) {
         var universe = uwpe.universe;
-        universe.venueNextSet(VenueMessage.fromTextAndAcknowledge("You lose!", () => // acknowledge
+        universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledge("You lose!", () => // acknowledge
          {
-            universe.venueNextSet(universe.controlBuilder.title(universe, universe.display.sizeInPixels).toVenue());
+            universe.venueTransitionTo(universe.controlBuilder.title(universe, universe.display.sizeInPixels).toVenue());
         }));
     }
     static triggerWinIsTriggered(uwpe) {
@@ -43,9 +43,9 @@ class Planet extends Entity {
     }
     static triggerWinReactToBeingTriggered(uwpe) {
         var universe = uwpe.universe;
-        universe.venueNextSet(VenueMessage.fromTextAndAcknowledge("You win!", () => // acknowledge
+        universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledgeNoButtons("You win!", () => // acknowledge
          {
-            universe.venueNextSet(universe.controlBuilder.title(universe, universe.display.sizeInPixels).toVenue());
+            universe.venueTransitionTo(universe.controlBuilder.title(universe, universe.display.sizeInPixels).toVenue());
         }));
     }
     // Visual.

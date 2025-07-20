@@ -5,7 +5,7 @@ class PlaceDefault extends PlaceBase {
         var entities = [
             PlaceDefault.cameraEntity(Coords.fromXY(800, 300)),
             Planet.fromSizeAndHorizonHeight(Coords.fromXY(800, 300), 50),
-            Ship.fromPos(Coords.fromXY(100, 100))
+            Player.fromPos(Coords.fromXY(100, 100))
         ];
         var habitats = [];
         var habitatsCount = 4;
@@ -31,7 +31,7 @@ class PlaceDefault extends PlaceBase {
         Disposition.fromPosAndOrientation(Coords.zeroes(), Orientation.fromForwardAndDown(Coords.fromXYZ(0, 0, 1), // forward
         Coords.fromXYZ(0, 1, 0) // down
         )));
-        var cameraEntity = camera.toEntityFollowingEntityWithName(Ship.name);
+        var cameraEntity = camera.toEntityFollowingEntityWithName(Player.name);
         var constraintContainInBox = camera.constraintContainInBoxForPlaceSizeWrapped(placeSize);
         var constrainable = Constrainable.of(cameraEntity);
         constrainable.constraintAdd(constraintContainInBox);
@@ -53,20 +53,20 @@ class PlaceDefault extends PlaceBase {
         var actions = [
             actionDisplayRecorderStartStop,
             actionShowMenu,
-            Movable.actionAccelerateDown(),
-            Movable.actionAccelerateLeft(),
-            Movable.actionAccelerateRight(),
-            Movable.actionAccelerateUp(),
+            Movable.actionAccelerateAndFaceLeft(),
+            Movable.actionAccelerateAndFaceRight(),
+            Movable.actionAccelerateWithoutFacingUp(),
+            Movable.actionAccelerateWithoutFacingDown(),
             ProjectileGenerator.actionFire()
         ];
         var inputs = Input.Instances();
         var actionToInputsMappings = [
             ActionToInputsMapping.fromActionNameAndInputName(actionDisplayRecorderStartStop.name, inputs.Tilde.name),
             ActionToInputsMapping.fromActionNameAndInputName(actionShowMenu.name, inputs.Escape.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateDown().name, inputs.ArrowDown.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateLeft().name, inputs.ArrowLeft.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateRight().name, inputs.ArrowRight.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateUp().name, inputs.ArrowUp.name),
+            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateAndFaceLeft().name, inputs.ArrowLeft.name),
+            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateAndFaceRight().name, inputs.ArrowRight.name),
+            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateWithoutFacingDown().name, inputs.ArrowDown.name),
+            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateWithoutFacingUp().name, inputs.ArrowUp.name),
             ActionToInputsMapping.fromActionNameAndInputName(ProjectileGenerator.actionFire().name, inputs.Space.name).inactivateInputWhenActionPerformedSet(true)
         ];
         var entityPropertyNamesToProcess = [
@@ -82,6 +82,7 @@ class PlaceDefault extends PlaceBase {
         return PlaceDefn.fromNameMusicActionsMappingsAndPropertyNames(PlaceDefault.name, "Music_Music", // soundForMusicName
         actions, actionToInputsMappings, entityPropertyNamesToProcess);
     }
+    // Entities.
     habitats() {
         return this.entitiesByPropertyName(Habitat.name);
     }

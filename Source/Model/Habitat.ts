@@ -27,17 +27,7 @@ class Habitat extends Entity implements EntityProperty<Habitat>
 
 				Drawable.fromVisual
 				(
-					VisualPolygon.fromVerticesAndColorFill
-					(
-						[
-							Coords.fromXY(4, 0),
-							Coords.fromXY(-4, 0),
-							Coords.fromXY(-4, -4),
-							Coords.fromXY(0, -8),
-							Coords.fromXY(4, -4)
-						],
-						Color.byName("Brown")
-					)
+					Habitat.visualBuild()
 				).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
 
 				Locatable.fromPos(pos)
@@ -52,6 +42,20 @@ class Habitat extends Entity implements EntityProperty<Habitat>
 		return new Habitat(pos);
 	}
 
+	static visualBuild(): VisualBase
+	{
+		return VisualPolygon.fromVerticesAndColorFill
+		(
+			[
+				Coords.fromXY(4, 0),
+				Coords.fromXY(-4, 0),
+				Coords.fromXY(-4, -4),
+				Coords.fromXY(0, -8),
+				Coords.fromXY(4, -4)
+			],
+			Color.byName("Brown")
+		);
+	}
 
 	// Clonable.
 

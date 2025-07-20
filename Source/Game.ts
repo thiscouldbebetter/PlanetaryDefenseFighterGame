@@ -12,10 +12,6 @@ class Game
 
 	start(): void
 	{
-		// It may be necessary to clear local storage to prevent errors on
-		// deserialization of existing saved items after the schema changes.
-		// localStorage.clear();
-
 		var mediaFilePaths = this.mediaFilePathsBuild();
 
 		var mediaLibrary =

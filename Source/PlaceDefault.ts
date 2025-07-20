@@ -12,7 +12,7 @@ class PlaceDefault extends PlaceBase
 			(
 				Coords.fromXY(800, 300), 50
 			),
-			Ship.fromPos(Coords.fromXY(100, 100) )
+			Player.fromPos(Coords.fromXY(100, 100) )
 		];
 
 		var habitats: Habitat[] = [];
@@ -69,7 +69,7 @@ class PlaceDefault extends PlaceBase
 		);
 
 		var cameraEntity =
-			camera.toEntityFollowingEntityWithName(Ship.name);
+			camera.toEntityFollowingEntityWithName(Player.name);
 
 		var constraintContainInBox =
 			camera.constraintContainInBoxForPlaceSizeWrapped
@@ -126,10 +126,11 @@ class PlaceDefault extends PlaceBase
 			actionDisplayRecorderStartStop,
 			actionShowMenu,
 
-			Movable.actionAccelerateDown(),
-			Movable.actionAccelerateLeft(),
-			Movable.actionAccelerateRight(),
-			Movable.actionAccelerateUp(),
+			Movable.actionAccelerateAndFaceLeft(),
+			Movable.actionAccelerateAndFaceRight(),
+
+			Movable.actionAccelerateWithoutFacingUp(),
+			Movable.actionAccelerateWithoutFacingDown(),
 
 			ProjectileGenerator.actionFire()
 		];
@@ -151,22 +152,23 @@ class PlaceDefault extends PlaceBase
 
 			ActionToInputsMapping.fromActionNameAndInputName
 			(
-				Movable.actionAccelerateDown().name,
-				inputs.ArrowDown.name
-			),
-			ActionToInputsMapping.fromActionNameAndInputName
-			(
-				Movable.actionAccelerateLeft().name,
+				Movable.actionAccelerateAndFaceLeft().name,
 				inputs.ArrowLeft.name
 			),
 			ActionToInputsMapping.fromActionNameAndInputName
 			(
-				Movable.actionAccelerateRight().name,
+				Movable.actionAccelerateAndFaceRight().name,
 				inputs.ArrowRight.name
+			),
+
+			ActionToInputsMapping.fromActionNameAndInputName
+			(
+				Movable.actionAccelerateWithoutFacingDown().name,
+				inputs.ArrowDown.name
 			),
 			ActionToInputsMapping.fromActionNameAndInputName
 			(
-				Movable.actionAccelerateUp().name,
+				Movable.actionAccelerateWithoutFacingUp().name,
 				inputs.ArrowUp.name
 			),
 
@@ -198,6 +200,8 @@ class PlaceDefault extends PlaceBase
 			entityPropertyNamesToProcess
 		);
 	}
+
+	// Entities.
 
 	habitats(): Habitat[]
 	{
