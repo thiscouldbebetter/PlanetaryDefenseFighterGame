@@ -188,6 +188,7 @@ class PlaceDefault extends PlaceBase
 			Ephemeral.name,
 			Killable.name,
 			Locatable.name,
+			Movable.name,
 			Triggerable.name
 		];
 
@@ -206,6 +207,11 @@ class PlaceDefault extends PlaceBase
 	habitats(): Habitat[]
 	{
 		return this.entitiesByPropertyName(Habitat.name) as Habitat[];
+	}
+
+	player(): Player
+	{
+		return this.entitiesByPropertyName(Playable.name)[0] as Player;
 	}
 
 	raiderGenerator(): EntityGenerator

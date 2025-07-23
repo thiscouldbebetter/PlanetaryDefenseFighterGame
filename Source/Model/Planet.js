@@ -21,12 +21,15 @@ class Planet extends Entity {
     }
     static triggerLoseIsTriggered(uwpe) {
         var level = uwpe.place;
+        var playerShipIsGone = (level.player() == null);
         var habitatsAreAllGone = (level.habitats().length == 0);
-        return habitatsAreAllGone;
+        var playerHasLost = playerShipIsGone
+            || habitatsAreAllGone;
+        return playerHasLost;
     }
     static triggerLoseReactToBeingTriggered(uwpe) {
         var universe = uwpe.universe;
-        universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledge("You lose!", () => // acknowledge
+        universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledgeNoButtons("GAME OVER", () => // acknowledge
          {
             universe.venueTransitionTo(universe.controlBuilder.title(universe, universe.display.sizeInPixels).toVenue());
         }));

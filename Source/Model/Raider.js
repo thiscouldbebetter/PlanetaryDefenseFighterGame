@@ -3,7 +3,14 @@ class Raider extends Entity {
     constructor(pos) {
         super(Raider.name, [
             Actor.fromActivityDefnName(Raider.activityDefnBuild().name),
-            Collidable.fromCollider(Sphere.fromRadius(4)),
+            Collidable.fromColliderPropertyNameToCollideWithAndCollide(Sphere.fromRadius(4), Player.name, (uwpe, c) => {
+                var entityOther = uwpe.entity2;
+                if (entityOther.name == Player.name) {
+                    var playerEntity = entityOther;
+                    var playerKillable = Killable.of(playerEntity);
+                    playerKillable.kill();
+                }
+            }),
             Constrainable.fromConstraint(Constraint_WrapToPlaceSizeX.create()),
             Drawable.fromVisual(Raider.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
             Killable.fromDie(Raider.killableDie),

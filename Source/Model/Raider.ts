@@ -12,7 +12,21 @@ class Raider extends Entity
 					Raider.activityDefnBuild().name
 				),
 
-				Collidable.fromCollider(Sphere.fromRadius(4) ),
+				Collidable.fromColliderPropertyNameToCollideWithAndCollide
+				(
+					Sphere.fromRadius(4),
+					Player.name,
+					(uwpe: UniverseWorldPlaceEntities, c: Collision) =>
+					{
+						var entityOther = uwpe.entity2;
+						if (entityOther.name == Player.name)
+						{
+							var playerEntity = entityOther as Player;
+							var playerKillable = Killable.of(playerEntity);
+							playerKillable.kill();
+						}
+					}
+				),
 
 				Constrainable.fromConstraint
 				(

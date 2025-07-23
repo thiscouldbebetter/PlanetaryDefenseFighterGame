@@ -1,8 +1,6 @@
 
 class Player extends Entity
 {
-	shipsInReserve: number;
-
 	constructor(pos: Coords)
 	{
 		super
@@ -13,6 +11,8 @@ class Player extends Entity
 				(
 					UserInputListener.activityDefn().name
 				),
+
+				Collidable.fromCollider(Sphere.fromRadius(4) ),
 
 				Constrainable.fromConstraints
 				([
@@ -40,6 +40,11 @@ class Player extends Entity
 					Player.visualBuild()
 				),
 
+				Killable.fromTicksOfImmunityDieAndLives
+				(
+					40, Player.killableDie, 2
+				),
+
 				Locatable.fromDisposition
 				(
 					Disposition.fromPosAndVel
@@ -49,7 +54,7 @@ class Player extends Entity
 					)
 				),
 
-				Movable.fromAccelerationAndSpeedMax(0.2, 2),
+				Movable.fromAccelerationAndSpeedMax(0.2, 8),
 
 				Playable.create(),
 
@@ -61,8 +66,8 @@ class Player extends Entity
 						(
 							2, // radius
 							5, // distanceInitial
-							4, // speed
-							32, // ticksToLive
+							16, // speed
+							8, // ticksToLive
 							Damage.fromAmount(1),
 							VisualGroup.fromChildren
 							([
@@ -94,13 +99,65 @@ class Player extends Entity
 
 			]
 		);
-
-		this.shipsInReserve = 0;
 	}
 
 	static fromPos(pos: Coords): Player
 	{
 		return new Player(pos);
+	}
+
+	static killableDie(uwpe: UniverseWorldPlaceEntities): void
+	{
+		var playerEntity = uwpe.entity as Player;
+
+		var playerLoc = Locatable.of(playerEntity).loc;
+		var playerPos = playerLoc.pos;
+
+		var place = uwpe.place;
+
+		var playerExplosionAndRespawner = Entity.fromNameAndProperties
+		(
+			"PlayerExplosionAndRespawner",
+			[
+				Drawable.fromVisual
+				(
+					VisualGroup.fromChildren
+					([
+						VisualSound.default(),
+
+						VisualCircle.fromRadiusAndColorFill
+						(
+							10,
+							Color.Instances().Yellow
+						)
+					])
+				),
+
+				Ephemeral.fromTicksAndExpire
+				(
+					60, // 3 seconds.
+					uwpe =>
+					{
+						var playerKillable = Killable.of(playerEntity);
+						if (playerKillable.livesInReserve > 0)
+						{
+							playerKillable.livesInReserve--;
+							playerLoc.clear();
+							var placeSizeHalf = place.size().clone().half();
+							playerPos.overwriteWith(placeSizeHalf);
+							playerKillable.integritySetToMax();
+							place.entityToSpawnAdd(playerEntity);
+						}
+					}
+				),
+
+				Locatable.fromPos(playerPos.clone() ),
+
+				Playable.create()
+			]
+		);
+
+		place.entityToSpawnAdd(playerExplosionAndRespawner);
 	}
 
 	static toControl(uwpe: UniverseWorldPlaceEntities): ControlBase
@@ -118,7 +175,7 @@ class Player extends Entity
 				ControlLabel.fromPosAndText
 				(
 					Coords.fromXY(20, 4),
-					DataBinding.fromGet(() => "" + (uwpe.entity as Player).shipsInReserve),
+					DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve),
 				),
 
 				ControlVisual.fromPosAndVisual

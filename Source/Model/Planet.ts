@@ -60,9 +60,14 @@ class Planet extends Entity
 	): boolean
 	{
 		var level = uwpe.place as PlaceDefault;
+		var playerShipIsGone =
+			(level.player() == null);
 		var habitatsAreAllGone =
 			(level.habitats().length == 0);
-		return habitatsAreAllGone;
+		var playerHasLost =
+			playerShipIsGone
+			|| habitatsAreAllGone;
+		return playerHasLost;
 	}
 
 	static triggerLoseReactToBeingTriggered
@@ -73,9 +78,9 @@ class Planet extends Entity
 		var universe = uwpe.universe;
 		universe.venueTransitionTo
 		(
-			VenueMessage.fromTextAndAcknowledge
+			VenueMessage.fromTextAndAcknowledgeNoButtons
 			(
-				"You lose!",
+				"GAME OVER",
 				() => // acknowledge
 				{
 					universe.venueTransitionTo

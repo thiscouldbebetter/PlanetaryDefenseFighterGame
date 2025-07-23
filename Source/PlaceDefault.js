@@ -77,6 +77,7 @@ class PlaceDefault extends PlaceBase {
             Ephemeral.name,
             Killable.name,
             Locatable.name,
+            Movable.name,
             Triggerable.name
         ];
         return PlaceDefn.fromNameMusicActionsMappingsAndPropertyNames(PlaceDefault.name, "Music_Music", // soundForMusicName
@@ -85,6 +86,9 @@ class PlaceDefault extends PlaceBase {
     // Entities.
     habitats() {
         return this.entitiesByPropertyName(Habitat.name);
+    }
+    player() {
+        return this.entitiesByPropertyName(Playable.name)[0];
     }
     raiderGenerator() {
         var entity = this._entities.find(x => x.propertyByName(EntityGenerator.name) != null);
