@@ -13,24 +13,43 @@ class Game {
     }
     mediaFilePathsBuild() {
         var contentDirectoryPath = this.contentDirectoryPath;
+        var imageTitlesDirectoryPath = contentDirectoryPath + "Images/Titles/";
+        // For everything but the titles, use built-in content from the Framework.
+        contentDirectoryPath = "../Source/Framework/Content/" + contentDirectoryPath;
         var fontDirectoryPath = contentDirectoryPath + "Fonts/";
-        var imageDirectoryPath = contentDirectoryPath + "Images/";
-        var imageTitlesDirectoryPath = imageDirectoryPath + "Titles/";
+        // var imageDirectoryPath = contentDirectoryPath + "Images/";
         var soundEffectDirectoryPath = contentDirectoryPath + "Audio/Effects/";
         var soundMusicDirectoryPath = contentDirectoryPath + "Audio/Music/";
         var textStringDirectoryPath = contentDirectoryPath + "Text/";
         var videoDirectoryPath = contentDirectoryPath + "Video/";
+        var title = (x) => imageTitlesDirectoryPath + x;
+        // var image = (x: string) => imageDirectoryPath + x;
+        var effect = (x) => soundEffectDirectoryPath + x;
+        var music = (x) => soundMusicDirectoryPath + x;
+        var video = (x) => videoDirectoryPath + x;
+        var font = (x) => fontDirectoryPath + x;
+        var text = (x) => textStringDirectoryPath + x;
         var mediaFilePaths = [
-            imageTitlesDirectoryPath + "Opening.png",
-            imageTitlesDirectoryPath + "Producer.png",
-            imageTitlesDirectoryPath + "Title.png",
-            soundEffectDirectoryPath + "Sound.wav",
-            soundMusicDirectoryPath + "Music.mp3",
-            soundMusicDirectoryPath + "Producer.mp3",
-            soundMusicDirectoryPath + "Title.mp3",
-            videoDirectoryPath + "Movie.webm",
-            fontDirectoryPath + "Font.ttf",
-            textStringDirectoryPath + "Instructions.txt",
+            title("Opening.png"),
+            title("Producer.png"),
+            title("Title.png"),
+            effect("_Default.wav"),
+            effect("_Silence.wav"),
+            effect("Bading.wav"),
+            effect("Blip.wav"),
+            effect("Boom.wav"),
+            effect("Buzz.wav"),
+            effect("Chirp.wav"),
+            effect("Chirp-Reversed.wav"),
+            effect("Clank.wav"),
+            effect("Pluck.wav"),
+            effect("Slap.wav"),
+            music("_Default.mp3"),
+            music("Producer.wav"),
+            music("Title.mp3"),
+            video("Movie.webm"),
+            font("Font.ttf"),
+            text("Instructions.txt"),
         ];
         return mediaFilePaths;
     }

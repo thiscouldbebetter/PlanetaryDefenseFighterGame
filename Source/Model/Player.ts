@@ -71,7 +71,7 @@ class Player extends Entity
 							Damage.fromAmount(1),
 							VisualGroup.fromChildren
 							([
-								VisualSound.default(),
+								VisualSound.fromSoundName("Effects_Blip"),
 
 								VisualCircle.fromRadiusAndColorFill
 								(
@@ -115,90 +115,95 @@ class Player extends Entity
 
 		var place = uwpe.place;
 
-		var playerExplosionAndRespawner = Entity.fromNameAndProperties
+		var playerExplosionAndRespawner = uwpe.universe.entityBuilder.explosion
 		(
-			"PlayerExplosionAndRespawner",
-			[
-				Drawable.fromVisual
-				(
-					VisualGroup.fromChildren
-					([
-						VisualSound.default(),
-
-						VisualCircle.fromRadiusAndColorFill
-						(
-							10,
-							Color.Instances().Yellow
-						)
-					])
-				),
-
-				Ephemeral.fromTicksAndExpire
-				(
-					60, // 3 seconds.
-					uwpe =>
-					{
-						var playerKillable = Killable.of(playerEntity);
-						if (playerKillable.livesInReserve > 0)
-						{
-							playerKillable.livesInReserve--;
-							playerLoc.clear();
-							var placeSizeHalf = place.size().clone().half();
-							playerPos.overwriteWith(placeSizeHalf);
-							playerKillable.integritySetToMax();
-							place.entityToSpawnAdd(playerEntity);
-						}
-					}
-				),
-
-				Locatable.fromPos(playerPos.clone() ),
-
-				Playable.create()
-			]
+			playerPos.clone(),
+			10,
+			"Effects_Boom",
+			60, // 3 seconds.
+			uwpe =>
+			{
+				var playerKillable = Killable.of(playerEntity);
+				if (playerKillable.livesInReserve > 0)
+				{
+					playerKillable.livesInReserve--;
+					playerLoc.clear();
+					var placeSizeHalf = place.size().clone().half();
+					playerPos.overwriteWith(placeSizeHalf);
+					playerKillable.integritySetToMax();
+					place.entityToSpawnAdd(playerEntity);
+				}
+			}
 		);
+
+		playerExplosionAndRespawner.propertyAdd(Playable.create())
 
 		place.entityToSpawnAdd(playerExplosionAndRespawner);
 	}
 
 	static toControl(uwpe: UniverseWorldPlaceEntities): ControlBase
 	{
+		var place = uwpe.place as PlaceDefault;
+		var placeSize = place.size();
+
 		return ControlContainer.fromPosSizeAndChildren
 		(
-			Coords.fromXY(0, 0), // pos
+			Coords.fromXY(0, placeSize.y - 20), // pos
 			Coords.fromXY(40, 50), // size
 			[
 				ControlVisual.fromPosAndVisual
 				(
-					Coords.fromXY(8, 10),
+					Coords.fromXY(10, 10),
 					DataBinding.fromContext(Player.visualBuild())
 				),
 				ControlLabel.fromPosAndText
 				(
 					Coords.fromXY(20, 4),
-					DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve),
+					DataBinding.fromGet
+					(
+						() => "" + Killable.of(uwpe.entity).livesInReserve
+					)
 				),
 
 				ControlVisual.fromPosAndVisual
 				(
-					Coords.fromXY(8, 30),
+					Coords.fromXY(40, 15),
 					DataBinding.fromContext(Habitat.visualBuild())
 				),
 				ControlLabel.fromPosAndText
 				(
-					Coords.fromXY(20, 20),
-					DataBinding.fromGet(() => "" + (uwpe.place as PlaceDefault).habitats().length)
+					Coords.fromXY(50, 4),
+					DataBinding.fromGet
+					(
+						() => "" + place.habitats().length
+					)
 				),
 
 				ControlVisual.fromPosAndVisual
 				(
-					Coords.fromXY(8, 42),
-					DataBinding.fromContext(Raider.visualBuild())
+					Coords.fromXY(70, 10),
+					DataBinding.fromContext(Enemy.visualBuild())
 				),
 				ControlLabel.fromPosAndText
 				(
-					Coords.fromXY(20, 35),
-					DataBinding.fromGet(() => "" + (uwpe.place as PlaceDefault).raiders().length)
+					Coords.fromXY(80, 4),
+					DataBinding.fromGet(() => "" + place.enemies().length)
+				),
+
+				ControlVisual.fromPosAndVisual
+				(
+					Coords.fromXY(100, 10),
+					DataBinding.fromContext(VisualBuilder.Instance().archeryTarget(6) )
+				),
+				ControlLabel.fromPosAndText
+				(
+					Coords.fromXY(110, 4),
+					DataBinding.fromGet
+					(
+						() => "" + (uwpe.world as WorldGame).statsKeeper.kills()
+					)
 				)
+
 			]
 		).toControlContainerTransparent()
 	}

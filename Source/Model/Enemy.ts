@@ -1,18 +1,18 @@
 
-class Raider extends Entity
+class Enemy extends Entity
 {
 	constructor(pos: Coords)
 	{
 		super
 		(
-			Raider.name,
+			Enemy.name,
 			[
 				Actor.fromActivityDefnName
 				(
-					Raider.activityDefnBuild().name
+					Enemy.activityDefnBuild().name
 				),
 
-				Collidable.fromColliderPropertyNameToCollideWithAndCollide
+				Collidable.fromColliderPropertyNameAndCollide
 				(
 					Sphere.fromRadius(4),
 					Player.name,
@@ -35,30 +35,30 @@ class Raider extends Entity
 
 				Drawable.fromVisual
 				(
-					Raider.visualBuild()
+					Enemy.visualBuild()
 				).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
 
-				Killable.fromDie(Raider.killableDie),
+				Killable.fromDie(Enemy.killableDie),
 
 				Locatable.fromPos(pos),
 
 				Movable.fromAccelerationAndSpeedMax(2, 1),
 
-				RaiderProperty.create()
+				EnemyProperty.create()
 			]
 		);
 	}
 
-	static fromPos(pos: Coords): Raider
+	static fromPos(pos: Coords): Enemy
 	{
-		return new Raider(pos);
+		return new Enemy(pos);
 	}
 
 	static activityDefnBuild(): ActivityDefn
 	{
 		return new ActivityDefn
 		(
-			Raider.name, Raider.activityDefnPerform
+			Enemy.name, Enemy.activityDefnPerform
 		);
 	}
 
@@ -68,13 +68,13 @@ class Raider extends Entity
 		var place = uwpe.place;
 		var entity = uwpe.entity;
 
-		var raider = entity as Raider;
+		var enemy = entity as Enemy;
 
-		var raiderPos = Locatable.of(raider).loc.pos;
+		var enemyPos = Locatable.of(enemy).loc.pos;
 
-		var raiderActor = Actor.of(raider);
-		var raiderActivity = raiderActor.activity;
-		var targetEntity = raiderActivity.targetEntity();
+		var enemyActor = Actor.of(enemy);
+		var enemyActivity = enemyActor.activity;
+		var targetEntity = enemyActivity.targetEntity();
 
 		if (targetEntity == null)
 		{
@@ -90,36 +90,36 @@ class Raider extends Entity
 				(
 					habitats, universe.randomizer
 				);
-				raiderActivity.targetEntitySet(targetEntity);
+				enemyActivity.targetEntitySet(targetEntity);
 			}
 		}
 
 		var targetPos = Locatable.of(targetEntity).loc.pos;
 		var displacementToTarget =
-			Raider.displacement()
+			Enemy.displacement()
 			.overwriteWith(targetPos)
-			.subtract(raiderPos);
+			.subtract(enemyPos);
 		var distanceToTarget = displacementToTarget.magnitude();
-		var raiderMovable = Movable.of(raider);
-		var raiderAccelerationPerTick =
-			raiderMovable.accelerationPerTick(uwpe);
-		if (distanceToTarget >= raiderAccelerationPerTick)
+		var enemyMovable = Movable.of(enemy);
+		var enemyAccelerationPerTick =
+			enemyMovable.accelerationPerTick(uwpe);
+		if (distanceToTarget >= enemyAccelerationPerTick)
 		{
-			var raiderSpeedMax =
-				raiderMovable.speedMax(uwpe);
+			var enemySpeedMax =
+				enemyMovable.speedMax(uwpe);
 			var displacementToMove =
 				displacementToTarget
 					.divideScalar(distanceToTarget)
-					.multiplyScalar(raiderSpeedMax);
-			raiderPos.add(displacementToMove);
+					.multiplyScalar(enemySpeedMax);
+			enemyPos.add(displacementToMove);
 		}
 		else
 		{
-			raiderPos.overwriteWith(targetPos);
-			var raiderProperty = RaiderProperty.of(raider);
-			if (raiderProperty.habitatCaptured == null)
+			enemyPos.overwriteWith(targetPos);
+			var enemyProperty = EnemyProperty.of(enemy);
+			if (enemyProperty.habitatCaptured == null)
 			{
-				raiderProperty.habitatCaptured = targetEntity as Habitat;
+				enemyProperty.habitatCaptured = targetEntity as Habitat;
 
 				var targetConstrainable =
 					Constrainable.of(targetEntity);
@@ -127,7 +127,7 @@ class Raider extends Entity
 				var constraintToAddToTarget = Constraint_Multiple.fromChildren
 				([
 					Constraint_AttachToEntityWithId
-						.fromTargetEntityId(raider.id),
+						.fromTargetEntityId(enemy.id),
 					Constraint_Transform.fromTransform
 					(
 						Transform_Translate.fromDisplacement
@@ -146,19 +146,19 @@ class Raider extends Entity
 					[
 						Locatable.fromPos
 						(
-							raiderPos.clone().addXY
+							enemyPos.clone().addXY
 							(
 								0, 0 - place.size().y
 							)
 						)
 					]
 				);
-				raiderActivity.targetEntitySet(targetEntity);
+				enemyActivity.targetEntitySet(targetEntity);
 			}
 			else
 			{
-				place.entityToRemoveAdd(raiderProperty.habitatCaptured);
-				place.entityToRemoveAdd(raider);
+				place.entityToRemoveAdd(enemyProperty.habitatCaptured);
+				place.entityToRemoveAdd(enemy);
 			}
 		}
 	}
@@ -175,14 +175,29 @@ class Raider extends Entity
 
 	static killableDie(uwpe: UniverseWorldPlaceEntities)
 	{
-		var raider = uwpe.entity as Raider;
-		var raiderProperty = RaiderProperty.of(raider);
-		var habitatCaptured = raiderProperty.habitatCaptured;
+		var enemy = uwpe.entity as Enemy;
+		var enemyProperty = EnemyProperty.of(enemy);
+		var habitatCaptured = enemyProperty.habitatCaptured;
 		if (habitatCaptured != null)
 		{
 			var constrainable = Constrainable.of(habitatCaptured);
 			constrainable.constraintRemoveFinal();
 		}
+
+		var world = uwpe.world as WorldGame;
+		world.statsKeeper.killsIncrement();
+
+		var entityExplosion =
+			uwpe.universe.entityBuilder.explosion
+			(
+				Locatable.of(enemy).loc.pos,
+				10, // radius
+				"Effects_Boom",
+				40, // ticksToLive
+				(uwpe) => {}
+			);
+
+		uwpe.place.entityToSpawnAdd(entityExplosion);
 	}
 
 	static visualBuild(): VisualBase
@@ -207,28 +222,28 @@ class Raider extends Entity
 	}
 }
 
-class RaiderProperty implements EntityProperty<RaiderProperty>
+class EnemyProperty implements EntityProperty<EnemyProperty>
 {
 	habitatCaptured: Habitat;
 
 	static create()
 	{
-		return new RaiderProperty();
+		return new EnemyProperty();
 	}
 
 	static of(entity: Entity)
 	{
-		return entity.propertyByName(RaiderProperty.name) as RaiderProperty;
+		return entity.propertyByName(EnemyProperty.name) as EnemyProperty;
 	}
 
 	// EntityProperty.
 
-	clone(): RaiderProperty
+	clone(): EnemyProperty
 	{
-		return new RaiderProperty();
+		return new EnemyProperty();
 	}
 
-	equals(other: RaiderProperty): boolean
+	equals(other: EnemyProperty): boolean
 	{
 		return (this.habitatCaptured == other.habitatCaptured);
 	}
@@ -243,7 +258,7 @@ class RaiderProperty implements EntityProperty<RaiderProperty>
 		// Do nothing.
 	}
 
-	overwriteWith(other: RaiderProperty): RaiderProperty
+	overwriteWith(other: EnemyProperty): EnemyProperty
 	{
 		this.habitatCaptured = other.habitatCaptured;
 		return this;
@@ -251,7 +266,7 @@ class RaiderProperty implements EntityProperty<RaiderProperty>
 
 	propertyName(): string
 	{
-		return RaiderProperty.name;
+		return EnemyProperty.name;
 	}
 
 	updateForTimerTick(uwpe: UniverseWorldPlaceEntities): void

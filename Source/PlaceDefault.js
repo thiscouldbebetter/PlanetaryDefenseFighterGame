@@ -15,14 +15,14 @@ class PlaceDefault extends PlaceBase {
             habitats.push(habitat);
         }
         entities.push(...habitats);
-        var raidersCount = habitatsCount * 2;
-        var raiderGenerationZone = BoxAxisAligned.fromMinAndMax(Coords.fromXY(0, 0), Coords.fromXY(size.x, 0));
-        var raiderGenerator = EntityGenerator.fromEntityTicksBatchMaxesAndPosBox(Raider.fromPos(Coords.create()), 100, // ticksPerGeneration
+        var enemiesCount = habitatsCount * 2;
+        var enemyGenerationZone = BoxAxisAligned.fromMinAndMax(Coords.fromXY(0, 0), Coords.fromXY(size.x, 0));
+        var enemyGenerator = EntityGenerator.fromEntityTicksBatchMaxesAndPosBox(Enemy.fromPos(Coords.create()), 100, // ticksPerGeneration
         1, // entitiesPerGeneration
-        raidersCount, // concurrent
-        raidersCount, // all-time
-        raiderGenerationZone);
-        entities.push(raiderGenerator.toEntity());
+        enemiesCount, // concurrent
+        enemiesCount, // all-time
+        enemyGenerationZone);
+        entities.push(enemyGenerator.toEntity());
         super(PlaceDefault.name, PlaceDefault.defnBuild().name, null, // parentName
         size, entities);
     }
@@ -39,7 +39,7 @@ class PlaceDefault extends PlaceBase {
         var colliderCenter = collidable.collider;
         var colliderLeft = ShapeTransformed.fromTransformAndChild(Transform_Translate.fromDisplacement(Coords.fromXY(0 - placeSize.x, 0)), colliderCenter.clone());
         var colliderRight = ShapeTransformed.fromTransformAndChild(Transform_Translate.fromDisplacement(Coords.fromXY(placeSize.x, 0)), colliderCenter.clone());
-        var colliderAfterWrapping = ShapeGroupAny.fromShapes([
+        var colliderAfterWrapping = ShapeGroupAny.fromChildren([
             colliderLeft,
             colliderCenter,
             colliderRight
@@ -80,22 +80,25 @@ class PlaceDefault extends PlaceBase {
             Movable.name,
             Triggerable.name
         ];
-        return PlaceDefn.fromNameMusicActionsMappingsAndPropertyNames(PlaceDefault.name, "Music_Music", // soundForMusicName
+        return PlaceDefn.fromNameMusicActionsMappingsAndPropertyNames(PlaceDefault.name, "Music__Default", // soundForMusicName
         actions, actionToInputsMappings, entityPropertyNamesToProcess);
     }
     // Entities.
+    enemies() {
+        return this.entitiesByPropertyName(EnemyProperty.name);
+    }
+    enemyGenerator() {
+        var entity = this._entities.find(x => x.propertyByName(EntityGenerator.name) != null);
+        var entityGenerator = EntityGenerator.of(entity);
+        return entityGenerator;
+    }
     habitats() {
         return this.entitiesByPropertyName(Habitat.name);
     }
     player() {
         return this.entitiesByPropertyName(Playable.name)[0];
     }
-    raiderGenerator() {
-        var entity = this._entities.find(x => x.propertyByName(EntityGenerator.name) != null);
-        var entityGenerator = EntityGenerator.of(entity);
-        return entityGenerator;
-    }
-    raiders() {
-        return this.entitiesByPropertyName(RaiderProperty.name);
+    statsKeeper() {
+        return this.entitiesByPropertyName(StatsKeeper.name)[0];
     }
 }

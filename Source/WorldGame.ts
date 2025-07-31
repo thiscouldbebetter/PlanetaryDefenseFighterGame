@@ -1,6 +1,8 @@
 
 class WorldGame extends World
 {
+	statsKeeper: StatsKeeper;
+
 	constructor(name: string)
 	{
 		var name = name;
@@ -17,6 +19,8 @@ class WorldGame extends World
 		(
 			name, timeCreated, defn, placeGetByName, placeInitialName
 		);
+
+		this.statsKeeper = StatsKeeper.create();
 	}
 
 	static defnBuild(): WorldDefn
@@ -25,7 +29,7 @@ class WorldGame extends World
 		([
 			[
 				UserInputListener.activityDefn(),
-				Raider.activityDefnBuild()
+				Enemy.activityDefnBuild()
 			],
 			[
 				PlaceDefault.defnBuild()

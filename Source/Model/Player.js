@@ -23,7 +23,7 @@ class Player extends Entity {
                 16, // speed
                 8, // ticksToLive
                 Damage.fromAmount(1), VisualGroup.fromChildren([
-                    VisualSound.default(),
+                    VisualSound.fromSoundName("Effects_Blip"),
                     VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
                 ]), (entity) => {
                     entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
@@ -40,39 +40,36 @@ class Player extends Entity {
         var playerLoc = Locatable.of(playerEntity).loc;
         var playerPos = playerLoc.pos;
         var place = uwpe.place;
-        var playerExplosionAndRespawner = Entity.fromNameAndProperties("PlayerExplosionAndRespawner", [
-            Drawable.fromVisual(VisualGroup.fromChildren([
-                VisualSound.default(),
-                VisualCircle.fromRadiusAndColorFill(10, Color.Instances().Yellow)
-            ])),
-            Ephemeral.fromTicksAndExpire(60, // 3 seconds.
-            // 3 seconds.
-            uwpe => {
-                var playerKillable = Killable.of(playerEntity);
-                if (playerKillable.livesInReserve > 0) {
-                    playerKillable.livesInReserve--;
-                    playerLoc.clear();
-                    var placeSizeHalf = place.size().clone().half();
-                    playerPos.overwriteWith(placeSizeHalf);
-                    playerKillable.integritySetToMax();
-                    place.entityToSpawnAdd(playerEntity);
-                }
-            }),
-            Locatable.fromPos(playerPos.clone()),
-            Playable.create()
-        ]);
+        var playerExplosionAndRespawner = uwpe.universe.entityBuilder.explosion(playerPos.clone(), 10, "Effects_Boom", 60, // 3 seconds.
+        // 3 seconds.
+        uwpe => {
+            var playerKillable = Killable.of(playerEntity);
+            if (playerKillable.livesInReserve > 0) {
+                playerKillable.livesInReserve--;
+                playerLoc.clear();
+                var placeSizeHalf = place.size().clone().half();
+                playerPos.overwriteWith(placeSizeHalf);
+                playerKillable.integritySetToMax();
+                place.entityToSpawnAdd(playerEntity);
+            }
+        });
+        playerExplosionAndRespawner.propertyAdd(Playable.create());
         place.entityToSpawnAdd(playerExplosionAndRespawner);
     }
     static toControl(uwpe) {
-        return ControlContainer.fromPosSizeAndChildren(Coords.fromXY(0, 0), // pos
+        var place = uwpe.place;
+        var placeSize = place.size();
+        return ControlContainer.fromPosSizeAndChildren(Coords.fromXY(0, placeSize.y - 20), // pos
         Coords.fromXY(40, 50), // size
         [
-            ControlVisual.fromPosAndVisual(Coords.fromXY(8, 10), DataBinding.fromContext(Player.visualBuild())),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(10, 10), DataBinding.fromContext(Player.visualBuild())),
             ControlLabel.fromPosAndText(Coords.fromXY(20, 4), DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve)),
-            ControlVisual.fromPosAndVisual(Coords.fromXY(8, 30), DataBinding.fromContext(Habitat.visualBuild())),
-            ControlLabel.fromPosAndText(Coords.fromXY(20, 20), DataBinding.fromGet(() => "" + uwpe.place.habitats().length)),
-            ControlVisual.fromPosAndVisual(Coords.fromXY(8, 42), DataBinding.fromContext(Raider.visualBuild())),
-            ControlLabel.fromPosAndText(Coords.fromXY(20, 35), DataBinding.fromGet(() => "" + uwpe.place.raiders().length))
+            ControlVisual.fromPosAndVisual(Coords.fromXY(40, 15), DataBinding.fromContext(Habitat.visualBuild())),
+            ControlLabel.fromPosAndText(Coords.fromXY(50, 4), DataBinding.fromGet(() => "" + place.habitats().length)),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(70, 10), DataBinding.fromContext(Enemy.visualBuild())),
+            ControlLabel.fromPosAndText(Coords.fromXY(80, 4), DataBinding.fromGet(() => "" + place.enemies().length)),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(100, 10), DataBinding.fromContext(VisualBuilder.Instance().archeryTarget(6))),
+            ControlLabel.fromPosAndText(Coords.fromXY(110, 4), DataBinding.fromGet(() => "" + uwpe.world.statsKeeper.kills()))
         ]).toControlContainerTransparent();
     }
     static visualBuild() {

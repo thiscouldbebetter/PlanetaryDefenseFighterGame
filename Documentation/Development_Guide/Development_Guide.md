@@ -337,9 +337,9 @@ This guide illustrates the creation of a new game from scratch using the This Co
 		}
 	}
 
-8.3. Next, we'll create the villain, which we'll call a "Raider".  Still in the Model directory, create a new file named Raider.ts, containing the following text.  This class is quite a bit more complex than the previous one, since the raider has to actually move around and kidnap people and stuff, while all the Habitat has to do is sit there looking vulnerable.
+8.3. Next, we'll create the villain, which we'll call a "Enemy".  Still in the Model directory, create a new file named Enemy.ts, containing the following text.  This class is quite a bit more complex than the previous one, since the enemy has to actually move around and kidnap people and stuff, while all the Habitat has to do is sit there looking vulnerable.
 
-	class Raider extends Entity
+	class Enemy extends Entity
 	{
 		habitatCaptured: Habitat;
 
@@ -349,11 +349,11 @@ This guide illustrates the creation of a new game from scratch using the This Co
 		{
 			super
 			(
-				Raider.name,
+				Enemy.name,
 				[
 					Actor.fromActivityDefnName
 					(
-						Raider.activityDefnBuild().name
+						Enemy.activityDefnBuild().name
 					),
 
 					Constrainable.fromConstraint
@@ -395,7 +395,7 @@ This guide illustrates the creation of a new game from scratch using the This Co
 		{
 			return new ActivityDefn
 			(
-				Raider.name, Raider.activityDefnPerform
+				Enemy.name, Enemy.activityDefnPerform
 			);
 		}
 
@@ -405,13 +405,13 @@ This guide illustrates the creation of a new game from scratch using the This Co
 			var place = uwpe.place;
 			var entity = uwpe.entity;
 
-			var raider = entity as Raider;
+			var enemy = entity as Enemy;
 
-			var raiderPos = raider.locatable().loc.pos;
+			var enemyPos = enemy.locatable().loc.pos;
 
-			var raiderActor = raider.actor();
-			var raiderActivity = raiderActor.activity;
-			var targetEntity = raiderActivity.targetEntity();
+			var enemyActor = enemy.actor();
+			var enemyActivity = enemyActor.activity;
+			var targetEntity = enemyActivity.targetEntity();
 
 			if (targetEntity == null)
 			{
@@ -427,43 +427,43 @@ This guide illustrates the creation of a new game from scratch using the This Co
 					(
 						habitats, universe.randomizer
 					);
-					raiderActivity.targetEntitySet(targetEntity);
+					enemyActivity.targetEntitySet(targetEntity);
 				}
 			}
 
 			var targetPos = targetEntity.locatable().loc.pos;
-			var displacementToTarget = raider._displacement.overwriteWith
+			var displacementToTarget = enemy._displacement.overwriteWith
 			(
 				targetPos
 			).subtract
 			(
-				raiderPos
+				enemyPos
 			);
 			var distanceToTarget = displacementToTarget.magnitude();
-			var raiderMovable = raider.movable();
-			if (distanceToTarget >= raiderMovable.accelerationPerTick)
+			var enemyMovable = enemy.movable();
+			if (distanceToTarget >= enemyMovable.accelerationPerTick)
 			{
 				var displacementToMove = displacementToTarget.divideScalar
 				(
 					distanceToTarget
 				).multiplyScalar
 				(
-					raiderMovable.speedMax
+					enemyMovable.speedMax
 				);
-				raiderPos.add(displacementToMove);
+				enemyPos.add(displacementToMove);
 			}
 			else
 			{
-				raiderPos.overwriteWith(targetPos);
-				if (raider.habitatCaptured == null)
+				enemyPos.overwriteWith(targetPos);
+				if (enemy.habitatCaptured == null)
 				{
-					raider.habitatCaptured = targetEntity;
+					enemy.habitatCaptured = targetEntity;
 
 					var targetConstrainable = targetEntity.constrainable();
 
 					var constraintToAddToTarget = new Constraint_Multiple
 					([
-						new Constraint_AttachToEntityWithId(raider.id),
+						new Constraint_AttachToEntityWithId(enemy.id),
 						new Constraint_Transform
 						(
 							new Transform_Translate(Coords.fromXY(0, 10) )
@@ -478,30 +478,30 @@ This guide illustrates the creation of a new game from scratch using the This Co
 						[
 							Locatable.fromPos
 							(
-								raiderPos.clone().addXY
+								enemyPos.clone().addXY
 								(
 									0, 0 - place.size.y
 								)
 							)
 						]
 					);
-					raiderActivity.targetEntitySet(targetEntity);
+					enemyActivity.targetEntitySet(targetEntity);
 				}
 				else
 				{
-					place.entityToRemoveAdd(raider.habitatCaptured);
-					place.entityToRemoveAdd(raider);
+					place.entityToRemoveAdd(enemy.habitatCaptured);
+					place.entityToRemoveAdd(enemy);
 				}
 			}
 		}
 
 	}
 
-8.4. The Raider class uses the Actor property, and defines its very own ActivityDefn to use with it, so we need to register that ActivityDefn with the WorldDefn.  Open WorldGame.ts, locate the .defnBuild() method, and add the new activity definition in the proper place, adjusting commas as necessary:
+8.4. The Enemy class uses the Actor property, and defines its very own ActivityDefn to use with it, so we need to register that ActivityDefn with the WorldDefn.  Open WorldGame.ts, locate the .defnBuild() method, and add the new activity definition in the proper place, adjusting commas as necessary:
 
-	Raider.activityDefnBuild()
+	Enemy.activityDefnBuild()
 
-8.5. The Raider's activity makes use of the method PlaceDefault.habitats() to get a convenient array of all the Habitats on the level.  However, the sharp-eyed observer will note that that method doesn't exist yet.  So open PlaceDefault.ts and add the following lines just before the final close brace of the class:</p>
+8.5. The Enemy's activity makes use of the method PlaceDefault.habitats() to get a convenient array of all the Habitats on the level.  However, the sharp-eyed observer will note that that method doesn't exist yet.  So open PlaceDefault.ts and add the following lines just before the final close brace of the class:</p>
 
 	habitats(): Habitat[]
 	{
@@ -511,19 +511,19 @@ This guide illustrates the creation of a new game from scratch using the This Co
 		) as Habitat[];
 	}
 
-8.6. We also need to add references to the newly declared Habitat and Raider classes in Game.html.  These should be added near the ones previously added for Planet and Ship:
+8.6. We also need to add references to the newly declared Habitat and Enemy classes in Game.html.  These should be added near the ones previously added for Planet and Ship:
 
 	<script type="text/javascript" src="Model/Habitat.js"></script>
-	<script type="text/javascript" src="Model/Raider.js"></script>
+	<script type="text/javascript" src="Model/Enemy.js"></script>
 
-8.7. Now we'll add one habitat and one raider to the level.  Open PlaceDefault.ts, and, in the constructor, add these two lines to bottom of the array of Entities being passed to the super() call.  Make sure to separate all the array elements with commas as appropriate:
+8.7. Now we'll add one habitat and one enemy to the level.  Open PlaceDefault.ts, and, in the constructor, add these two lines to bottom of the array of Entities being passed to the super() call.  Make sure to separate all the array elements with commas as appropriate:
 
 	new Habitat(Coords.fromXY(150, 250) ),
-	new Raider(Coords.fromXY(200, -50) )
+	new Enemy(Coords.fromXY(200, -50) )
 
-8.8. Finally, run the build script and refresh the web browser.  Now a civilian habitat appears on the ground.  An alien raider will descend from the top of the screen, pick up the habitat, carry it back up to the top of the screen, and disappear forever.  Tragic!
+8.8. Finally, run the build script and refresh the web browser.  Now a civilian habitat appears on the ground.  An alien enemy will descend from the top of the screen, pick up the habitat, carry it back up to the top of the screen, and disappear forever.  Tragic!
 
-<img src="Screenshot-8-Raider_Takes_Habitat.gif" />
+<img src="Screenshot-8-Enemy_Takes_Habitat.gif" />
 
 
 9. Adding Weapons
@@ -548,7 +548,7 @@ So let's give this kitten some claws.  (The kitten is your spaceship.  The claws
 				Damage.fromAmount(1),
 				VisualGroup.fromChildren
 				([
-					VisualSound.default(),
+					VisualSound.fromSoundName("Effects_Blip"),
 
 					VisualCircle.fromRadiusAndColorFill
 					(
@@ -581,15 +581,15 @@ So let's give this kitten some claws.  (The kitten is your spaceship.  The claws
 10. Making Weapons Work
 -----------------------
 
-10.1. The bad news is, those bullets don't do anything yet.  Even if you manage to hit the raider with them, they'll just pass harmlessly through it, because right now it's pretty much immortal.  It's too dumb to die!
+10.1. The bad news is, those bullets don't do anything yet.  Even if you manage to hit the enemy with them, they'll just pass harmlessly through it, because right now it's pretty much immortal.  It's too dumb to die!
 
-10.2. So let's make it mortal.  Open Raider.ts and add the following lines to the array of entity properties being declared in the constructor.  You could add them at the end of the array, or make things a bit neater and add them in alphabetical order.  Whichever you choose, be sure to add commas in the proper places.
+10.2. So let's make it mortal.  Open Enemy.ts and add the following lines to the array of entity properties being declared in the constructor.  You could add them at the end of the array, or make things a bit neater and add them in alphabetical order.  Whichever you choose, be sure to add commas in the proper places.
 
 	Collidable.fromCollider(Sphere.fromRadius(4) ),
 
 	Killable.fromIntegrityMax(1),
 
-These lines make the raider collidable, which means that your bullets can hit it, and killable, which means that when you bullets hit it they can hurt it.
+These lines make the enemy collidable, which means that your bullets can hit it, and killable, which means that when you bullets hit it they can hurt it.
 
 10.3. However, in order for Collidables and Killables to be processed correctly, they'll need to be added to the list of property types that PlaceDefault understands.  Open PlaceDefault.ts and replace the existing declaration of the entityPropertyNamesToProcess array with the following:
 
@@ -603,9 +603,9 @@ These lines make the raider collidable, which means that your bullets can hit it
 		Killable.name
 	];
 
-10.4 Re-compile the game and refresh the web browser.  Now your bullets can destroy the Raider, which is good, because otherwise what's the point of bullets, man?
+10.4 Re-compile the game and refresh the web browser.  Now your bullets can destroy the Enemy, which is good, because otherwise what's the point of bullets, man?
 
-<img src="Screenshot-10-Bullet_Destroys_Raider.gif" />
+<img src="Screenshot-10-Bullet_Destroys_Enemy.gif" />
 
 
 11. Giving the Ground Some Weight
@@ -615,21 +615,21 @@ These lines make the raider collidable, which means that your bullets can hit it
 
 First of all, when your ship flies into the ground, nothing happens.  When you fly real spaceships into the ground, they explode.  Just ask NASA.  Actually, you could probably ask anyone.
 
-Second, when you destroy the raider after it picks up the Habitat and lifts it into the air, the habitat, being a massive object in a planetary gravity field, should fall back to the ground.  And actually, it does fall!  Just not on purpose, and not because of gravity.  And it then falls right through the ground and keeps falling forever, which really hurts the fidelity of the simulation.
+Second, when you destroy the enemy after it picks up the Habitat and lifts it into the air, the habitat, being a massive object in a planetary gravity field, should fall back to the ground.  And actually, it does fall!  Just not on purpose, and not because of gravity.  And it then falls right through the ground and keeps falling forever, which really hurts the fidelity of the simulation.
 
-11.2. Before we fix the problem of the habitat not falling when it should, we have to fix the problem of the habitat falling when it shouldn't.  It's falling because of the constraint that the raider set on it when it picked it up isn't cleared when the raider is destroyed.  That constraint basically moves the habitat to wherever the raider is and then moves it a little bit down from there.  Now that the raider's been destroyed, the habitat can't copy the raider's position like before, and so it just keeps moving it down from wherever it currently is.
+11.2. Before we fix the problem of the habitat not falling when it should, we have to fix the problem of the habitat falling when it shouldn't.  It's falling because of the constraint that the enemy set on it when it picked it up isn't cleared when the enemy is destroyed.  That constraint basically moves the habitat to wherever the enemy is and then moves it a little bit down from there.  Now that the enemy's been destroyed, the habitat can't copy the enemy's position like before, and so it just keeps moving it down from wherever it currently is.
 
-To fix it, we need to modify the Killable property on the Raider entity so that it clears the constraint it added on the habitat when it dies.
+To fix it, we need to modify the Killable property on the Enemy entity so that it clears the constraint it added on the habitat when it dies.
 
-Open Raider.ts, locate the place in the constructor where the existing Killable property is being built, replace it with the following, and save:
+Open Enemy.ts, locate the place in the constructor where the existing Killable property is being built, replace it with the following, and save:
 
 	Killable.fromIntegrityMaxAndDie
 	(
 		1, // integrityMax
 		(uwpe: UniverseWorldPlaceEntities) => // die
 		{
-			var raider = uwpe.entity;
-			var habitatCaptured = raider.habitatCaptured;
+			var enemy = uwpe.entity;
+			var habitatCaptured = enemy.habitatCaptured;
 			if (habitatCaptured != null)
 			{
 				var constraints =
@@ -639,7 +639,7 @@ Open Raider.ts, locate the place in the constructor where the existing Killable 
 		}
 	)
 
-Now when you destroy the raider after it's picked up the habitat, the habitat will just float there eerily instead of falling.  This may not seem like progress, but it is, because now at least the habitat's not falling for the wrong reasons.
+Now when you destroy the enemy after it's picked up the habitat, the habitat will just float there eerily instead of falling.  This may not seem like progress, but it is, because now at least the habitat's not falling for the wrong reasons.
 
 11.3. Now let's make the habitat fall for the right reasons.  To do that, we'll add more constraints on it.  One constraint will make it subject to gravity, and another will keep it from passing through the planet surface like a ghost.
 
@@ -689,15 +689,15 @@ And also to the Game.html file:
 	<script type="text/javascript" src="Framework/Source/Geometry/Constraints/Constraint_Gravity.js"></script>
 	<script type="text/javascript" src="Framework/Source/Geometry/Shapes/Hemispace.js"></script>
 
-11.6. Recompile and restart the game.  Let the raider grab the habitat and carry it up a short distance, then shoot the raider.  The habitat will slowly fall back to the planet surface.  Also, you shouldn't be able to fly your ship below the surface of the planet, although you can still smack into it as fast as you want with no consequences.  One thing at a time.
+11.6. Recompile and restart the game.  Let the enemy grab the habitat and carry it up a short distance, then shoot the enemy.  The habitat will slowly fall back to the planet surface.  Also, you shouldn't be able to fly your ship below the surface of the planet, although you can still smack into it as fast as you want with no consequences.  One thing at a time.
 
 
 12. Adding Win and Lose Conditions
 ----------------------------------
 
-12.1. The program we've written so far is closer to being a real game than ever, but it still lacks some things.  For one thing, there's no way to lose, which might appeal to certain people.  But then again, there's no way to win, other than whatever feeling of satisfaction you can derive from a single habitat not being destroyed by alien raiders.  But, having growing up in our modern go-go culture, most players would prefer more external validation.
+12.1. The program we've written so far is closer to being a real game than ever, but it still lacks some things.  For one thing, there's no way to lose, which might appeal to certain people.  But then again, there's no way to win, other than whatever feeling of satisfaction you can derive from a single habitat not being destroyed by alien enemies.  But, having growing up in our modern go-go culture, most players would prefer more external validation.
 
-So let's add some.  We'll add some code that checks each tick to see if there are no more raiders, in which case the player wins, or if there are no more habitats, in which case, the player loses.  In either case, a message will be displayed that explains what just happened, and the game will return to the title screen.
+So let's add some.  We'll add some code that checks each tick to see if there are no more enemies, in which case the player wins, or if there are no more habitats, in which case, the player loses.  In either case, a message will be displayed that explains what just happened, and the game will return to the title screen.
 
 Open Ship.ts, and, in the constructor, at the end of the list of properties, insert the text below (remembering to add a comma at the end of the preceding property declaration) and save:
 
@@ -734,8 +734,8 @@ Open Ship.ts, and, in the constructor, at the end of the list of properties, ins
 			(uwpe: UniverseWorldPlaceEntities) => // isTriggered
 			{
 				var level = uwpe.place as PlaceDefault;
-				var areAllTheRaidersGone = (level.raiders().length == 0);
-				return areAllTheRaidersGone;
+				var areAllTheEnemiesGone = (level.enemies().length == 0);
+				return areAllTheEnemiesGone;
 			}, 
 			(uwpe: UniverseWorldPlaceEntities) => // reactToBeingTriggered
 			{
@@ -778,14 +778,14 @@ And also to Game.html:
 		Triggerable.name
 	];
 
-Also, you'll need to add this method at the end of the PlaceDefault class, right below the existing .habitats() method, so that it can tell how many raiders are left:
+Also, you'll need to add this method at the end of the PlaceDefault class, right below the existing .habitats() method, so that it can tell how many enemies are left:
 
-	raiders(): Raider[]
+	enemies(): Enemy[]
 	{
-		return this.entities.filter(x => x.constructor.name == Raider.name) as Raider[];
+		return this.entities.filter(x => x.constructor.name == Enemy.name) as Enemy[];
 	}
 
-12.4. Save the changes, recompile, and restart.  Now, when you blow up the raider, or when the raider takes the habitat off the top of the screen, you'll see either a win or lose message.  When you click the button to dismiss the message dialog, the game will end and return to the title screen.
+12.4. Save the changes, recompile, and restart.  Now, when you blow up the enemy, or when the enemy takes the habitat off the top of the screen, you'll see either a win or lose message.  When you click the button to dismiss the message dialog, the game will end and return to the title screen.
 
 
 13. Conclusion
@@ -794,15 +794,15 @@ Also, you'll need to add this method at the end of the PlaceDefault class, right
 13.1. Well, it's technically a game at this point, albeit not much of one.  Here's some future features that might make the game more fun:
 
 * Add appropriate visual and sound effects when things happen.
-* Destroy the player's ship when it runs into a raider.
+* Destroy the player's ship when it runs into a enemy.
 * Give the player multiple lives.
-* Let the raiders shoot bullets.
+* Let the enemies shoot bullets.
 * Add more habitats to protect.
 * Require the player to catch a habitat as it falls, or else it explodes on impact.
-* Generate more raiders, on a timer.
+* Generate more enemies, on a timer.
 * Make the planet bigger than a single screen and implement scrolling.
 * Add a minimap to show the parts of the planet that are not currently on screen.
-* Add some on-screen controls to show how many raiders, habitats, bullets, and lives are left.
+* Add some on-screen controls to show how many enemies, habitats, bullets, and lives are left.
 * Transition to a new and harder level when the player wins the current level.
 * Make ammuntion limited and add reloading by picking up bullets.
 * Make the surface of the planet a little less boring to look at.

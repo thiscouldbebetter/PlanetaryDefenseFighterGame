@@ -1,9 +1,9 @@
 "use strict";
-class Raider extends Entity {
+class Enemy extends Entity {
     constructor(pos) {
-        super(Raider.name, [
-            Actor.fromActivityDefnName(Raider.activityDefnBuild().name),
-            Collidable.fromColliderPropertyNameToCollideWithAndCollide(Sphere.fromRadius(4), Player.name, (uwpe, c) => {
+        super(Enemy.name, [
+            Actor.fromActivityDefnName(Enemy.activityDefnBuild().name),
+            Collidable.fromColliderPropertyNameAndCollide(Sphere.fromRadius(4), Player.name, (uwpe, c) => {
                 var entityOther = uwpe.entity2;
                 if (entityOther.name == Player.name) {
                     var playerEntity = entityOther;
@@ -12,28 +12,28 @@ class Raider extends Entity {
                 }
             }),
             Constrainable.fromConstraint(Constraint_WrapToPlaceSizeX.create()),
-            Drawable.fromVisual(Raider.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
-            Killable.fromDie(Raider.killableDie),
+            Drawable.fromVisual(Enemy.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
+            Killable.fromDie(Enemy.killableDie),
             Locatable.fromPos(pos),
             Movable.fromAccelerationAndSpeedMax(2, 1),
-            RaiderProperty.create()
+            EnemyProperty.create()
         ]);
     }
     static fromPos(pos) {
-        return new Raider(pos);
+        return new Enemy(pos);
     }
     static activityDefnBuild() {
-        return new ActivityDefn(Raider.name, Raider.activityDefnPerform);
+        return new ActivityDefn(Enemy.name, Enemy.activityDefnPerform);
     }
     static activityDefnPerform(uwpe) {
         var universe = uwpe.universe;
         var place = uwpe.place;
         var entity = uwpe.entity;
-        var raider = entity;
-        var raiderPos = Locatable.of(raider).loc.pos;
-        var raiderActor = Actor.of(raider);
-        var raiderActivity = raiderActor.activity;
-        var targetEntity = raiderActivity.targetEntity();
+        var enemy = entity;
+        var enemyPos = Locatable.of(enemy).loc.pos;
+        var enemyActor = Actor.of(enemy);
+        var enemyActivity = enemyActor.activity;
+        var targetEntity = enemyActivity.targetEntity();
         if (targetEntity == null) {
             var placeDefault = place;
             var habitats = placeDefault.habitats();
@@ -42,44 +42,44 @@ class Raider extends Entity {
             }
             else {
                 targetEntity = ArrayHelper.random(habitats, universe.randomizer);
-                raiderActivity.targetEntitySet(targetEntity);
+                enemyActivity.targetEntitySet(targetEntity);
             }
         }
         var targetPos = Locatable.of(targetEntity).loc.pos;
-        var displacementToTarget = Raider.displacement()
+        var displacementToTarget = Enemy.displacement()
             .overwriteWith(targetPos)
-            .subtract(raiderPos);
+            .subtract(enemyPos);
         var distanceToTarget = displacementToTarget.magnitude();
-        var raiderMovable = Movable.of(raider);
-        var raiderAccelerationPerTick = raiderMovable.accelerationPerTick(uwpe);
-        if (distanceToTarget >= raiderAccelerationPerTick) {
-            var raiderSpeedMax = raiderMovable.speedMax(uwpe);
+        var enemyMovable = Movable.of(enemy);
+        var enemyAccelerationPerTick = enemyMovable.accelerationPerTick(uwpe);
+        if (distanceToTarget >= enemyAccelerationPerTick) {
+            var enemySpeedMax = enemyMovable.speedMax(uwpe);
             var displacementToMove = displacementToTarget
                 .divideScalar(distanceToTarget)
-                .multiplyScalar(raiderSpeedMax);
-            raiderPos.add(displacementToMove);
+                .multiplyScalar(enemySpeedMax);
+            enemyPos.add(displacementToMove);
         }
         else {
-            raiderPos.overwriteWith(targetPos);
-            var raiderProperty = RaiderProperty.of(raider);
-            if (raiderProperty.habitatCaptured == null) {
-                raiderProperty.habitatCaptured = targetEntity;
+            enemyPos.overwriteWith(targetPos);
+            var enemyProperty = EnemyProperty.of(enemy);
+            if (enemyProperty.habitatCaptured == null) {
+                enemyProperty.habitatCaptured = targetEntity;
                 var targetConstrainable = Constrainable.of(targetEntity);
                 var constraintToAddToTarget = Constraint_Multiple.fromChildren([
                     Constraint_AttachToEntityWithId
-                        .fromTargetEntityId(raider.id),
+                        .fromTargetEntityId(enemy.id),
                     Constraint_Transform.fromTransform(Transform_Translate.fromDisplacement(Coords.fromXY(0, 10)))
                 ]);
                 targetConstrainable
                     .constraintAdd(constraintToAddToTarget);
                 targetEntity = Entity.fromNameAndProperties("EscapePoint", [
-                    Locatable.fromPos(raiderPos.clone().addXY(0, 0 - place.size().y))
+                    Locatable.fromPos(enemyPos.clone().addXY(0, 0 - place.size().y))
                 ]);
-                raiderActivity.targetEntitySet(targetEntity);
+                enemyActivity.targetEntitySet(targetEntity);
             }
             else {
-                place.entityToRemoveAdd(raiderProperty.habitatCaptured);
-                place.entityToRemoveAdd(raider);
+                place.entityToRemoveAdd(enemyProperty.habitatCaptured);
+                place.entityToRemoveAdd(enemy);
             }
         }
     }
@@ -90,13 +90,19 @@ class Raider extends Entity {
         return this._displacement;
     }
     static killableDie(uwpe) {
-        var raider = uwpe.entity;
-        var raiderProperty = RaiderProperty.of(raider);
-        var habitatCaptured = raiderProperty.habitatCaptured;
+        var enemy = uwpe.entity;
+        var enemyProperty = EnemyProperty.of(enemy);
+        var habitatCaptured = enemyProperty.habitatCaptured;
         if (habitatCaptured != null) {
             var constrainable = Constrainable.of(habitatCaptured);
             constrainable.constraintRemoveFinal();
         }
+        var world = uwpe.world;
+        world.statsKeeper.killsIncrement();
+        var entityExplosion = uwpe.universe.entityBuilder.explosion(Locatable.of(enemy).loc.pos, 10, // radius
+        "Effects_Boom", 40, // ticksToLive
+        (uwpe) => { });
+        uwpe.place.entityToSpawnAdd(entityExplosion);
     }
     static visualBuild() {
         return VisualGroup.fromChildren([
@@ -109,16 +115,16 @@ class Raider extends Entity {
         ]);
     }
 }
-class RaiderProperty {
+class EnemyProperty {
     static create() {
-        return new RaiderProperty();
+        return new EnemyProperty();
     }
     static of(entity) {
-        return entity.propertyByName(RaiderProperty.name);
+        return entity.propertyByName(EnemyProperty.name);
     }
     // EntityProperty.
     clone() {
-        return new RaiderProperty();
+        return new EnemyProperty();
     }
     equals(other) {
         return (this.habitatCaptured == other.habitatCaptured);
@@ -134,7 +140,7 @@ class RaiderProperty {
         return this;
     }
     propertyName() {
-        return RaiderProperty.name;
+        return EnemyProperty.name;
     }
     updateForTimerTick(uwpe) {
         // Do nothing.

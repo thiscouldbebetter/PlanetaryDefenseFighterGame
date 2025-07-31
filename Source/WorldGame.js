@@ -10,12 +10,13 @@ class WorldGame extends World {
         var placeGetByName = (placeName) => placesByName.get(placeName);
         var placeInitialName = places[0].name;
         super(name, timeCreated, defn, placeGetByName, placeInitialName);
+        this.statsKeeper = StatsKeeper.create();
     }
     static defnBuild() {
         return new WorldDefn([
             [
                 UserInputListener.activityDefn(),
-                Raider.activityDefnBuild()
+                Enemy.activityDefnBuild()
             ],
             [
                 PlaceDefault.defnBuild()

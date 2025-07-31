@@ -36,11 +36,11 @@ class Planet extends Entity {
     }
     static triggerWinIsTriggered(uwpe) {
         var level = uwpe.place;
-        var raiderGeneratorIsExhausted = level.raiderGenerator().exhausted();
-        var raidersAreAllGone = (level.raiders().length == 0);
+        var enemyGeneratorIsExhausted = level.enemyGenerator().exhausted();
+        var enemiesAreAllGone = (level.enemies().length == 0);
         var habitatIsStillThere = (level.habitats().length > 0);
-        var playerHasWon = raiderGeneratorIsExhausted
-            && raidersAreAllGone
+        var playerHasWon = enemyGeneratorIsExhausted
+            && enemiesAreAllGone
             && habitatIsStillThere;
         return playerHasWon;
     }

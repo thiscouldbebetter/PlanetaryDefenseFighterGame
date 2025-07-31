@@ -26,21 +26,21 @@ class PlaceDefault extends PlaceBase
 		}
 		entities.push(...habitats);
 
-		var raidersCount = habitatsCount * 2;
-		var raiderGenerationZone = BoxAxisAligned.fromMinAndMax
+		var enemiesCount = habitatsCount * 2;
+		var enemyGenerationZone = BoxAxisAligned.fromMinAndMax
 		(
 			Coords.fromXY(0, 0), Coords.fromXY(size.x, 0)
 		);
-		var raiderGenerator = EntityGenerator.fromEntityTicksBatchMaxesAndPosBox
+		var enemyGenerator = EntityGenerator.fromEntityTicksBatchMaxesAndPosBox
 		(
-			Raider.fromPos(Coords.create() ),
+			Enemy.fromPos(Coords.create() ),
 			100, // ticksPerGeneration
 			1, // entitiesPerGeneration
-			raidersCount, // concurrent
-			raidersCount, // all-time
-			raiderGenerationZone
+			enemiesCount, // concurrent
+			enemiesCount, // all-time
+			enemyGenerationZone
 		);
-		entities.push(raiderGenerator.toEntity() );
+		entities.push(enemyGenerator.toEntity() );
 
 		super
 		(
@@ -102,7 +102,7 @@ class PlaceDefault extends PlaceBase
 			colliderCenter.clone()
 		)
 
-		var colliderAfterWrapping = ShapeGroupAny.fromShapes
+		var colliderAfterWrapping = ShapeGroupAny.fromChildren
 		([
 			colliderLeft,
 			colliderCenter,
@@ -195,7 +195,7 @@ class PlaceDefault extends PlaceBase
 		return PlaceDefn.fromNameMusicActionsMappingsAndPropertyNames
 		(
 			PlaceDefault.name,
-			"Music_Music", // soundForMusicName
+			"Music__Default", // soundForMusicName
 			actions,
 			actionToInputsMappings,
 			entityPropertyNamesToProcess
@@ -203,6 +203,21 @@ class PlaceDefault extends PlaceBase
 	}
 
 	// Entities.
+
+	enemies(): Enemy[]
+	{
+		return this.entitiesByPropertyName(EnemyProperty.name) as Enemy[];
+	}
+
+	enemyGenerator(): EntityGenerator
+	{
+		var entity = this._entities.find
+		(
+			x => x.propertyByName(EntityGenerator.name) != null
+		);
+		var entityGenerator = EntityGenerator.of(entity);
+		return entityGenerator;
+	}
 
 	habitats(): Habitat[]
 	{
@@ -214,19 +229,8 @@ class PlaceDefault extends PlaceBase
 		return this.entitiesByPropertyName(Playable.name)[0] as Player;
 	}
 
-	raiderGenerator(): EntityGenerator
+	statsKeeper(): Entity
 	{
-		var entity = this._entities.find
-		(
-			x => x.propertyByName(EntityGenerator.name) != null
-		);
-		var entityGenerator = EntityGenerator.of(entity);
-		return entityGenerator;
+		return this.entitiesByPropertyName(StatsKeeper.name)[0];
 	}
-
-	raiders(): Raider[]
-	{
-		return this.entitiesByPropertyName(RaiderProperty.name) as Raider[];
-	}
-
 }
