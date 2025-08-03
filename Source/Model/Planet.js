@@ -4,7 +4,8 @@ class Planet extends Entity {
         super(Planet.name, [
             Drawable.fromVisual(Planet.visual(size, horizonHeight)).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
             Locatable.create(),
-            Planet.triggerable()
+            Planet.triggerable(),
+            StatsKeeper.create()
         ]);
     }
     static fromSizeAndHorizonHeight(size, horizonHeight) {
@@ -46,9 +47,39 @@ class Planet extends Entity {
     }
     static triggerWinReactToBeingTriggered(uwpe) {
         var universe = uwpe.universe;
-        universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledgeNoButtons("You win!", () => // acknowledge
+        var place = uwpe.place;
+        var player = place.player();
+        var playerStatsKeeper = StatsKeeper.of(player);
+        var enemiesKilled = playerStatsKeeper.kills();
+        var enemiesTotal = place.enemiesCountInitial();
+        var habitatsRemaining = place.habitats().length;
+        var habitatsTotal = place.habitatsCountInitial();
+        var shotsHit = playerStatsKeeper.hits();
+        var shotsFired = playerStatsKeeper.shots();
+        var timerTicksToComplete = place.timerTicksSoFar();
+        var secondsToComplete = universe.timerHelper.ticksToSeconds(timerTicksToComplete);
+        var statLengthMax = 8;
+        var messageAsLines = [
+            place.name + " complete!",
+            "",
+            "Enemies killed: " + (enemiesKilled + "/" + enemiesTotal).padStart(statLengthMax, " "),
+            "Habitats saved: " + (habitatsRemaining + "/" + habitatsTotal).padStart(statLengthMax, " "),
+            "Hits/Shots:     " + (shotsHit + "/" + shotsFired).padStart(statLengthMax, " "),
+            "Seconds taken:  " + ("" + secondsToComplete).padStart(statLengthMax, " "),
+            "",
+            "Press Enter to start the next level."
+        ];
+        var newline = "\n";
+        var messageAsString = messageAsLines.join(newline);
+        universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledgeNoButtons(messageAsString, () => // acknowledge
          {
-            universe.venueTransitionTo(universe.controlBuilder.title(universe, universe.display.sizeInPixels).toVenue());
+            playerStatsKeeper.killsClear();
+            playerStatsKeeper.shotsClear();
+            playerStatsKeeper.hitsClear();
+            var levelNextIndex = place.levelIndex + 1;
+            var placeNext = PlacePlanet.fromLevelIndexAndPlayer(levelNextIndex, player);
+            universe.world.placeNextSet(placeNext);
+            universe.venuePrevTransitionTo();
         }));
     }
     // Visual.

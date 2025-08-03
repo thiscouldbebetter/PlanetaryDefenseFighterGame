@@ -13,10 +13,11 @@ class Enemy extends Entity {
             }),
             Constrainable.fromConstraint(Constraint_WrapToPlaceSizeX.create()),
             Drawable.fromVisual(Enemy.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
+            EnemyProperty.create(),
             Killable.fromDie(Enemy.killableDie),
             Locatable.fromPos(pos),
             Movable.fromAccelerationAndSpeedMax(2, 1),
-            EnemyProperty.create()
+            Scorable.fromPoints(100)
         ]);
     }
     static fromPos(pos) {
@@ -35,8 +36,8 @@ class Enemy extends Entity {
         var enemyActivity = enemyActor.activity;
         var targetEntity = enemyActivity.targetEntity();
         if (targetEntity == null) {
-            var placeDefault = place;
-            var habitats = placeDefault.habitats();
+            var placePlanet = place;
+            var habitats = placePlanet.habitats();
             if (habitats.length == 0) {
                 return; // todo
             }
@@ -97,20 +98,27 @@ class Enemy extends Entity {
             var constrainable = Constrainable.of(habitatCaptured);
             constrainable.constraintRemoveFinal();
         }
-        var world = uwpe.world;
-        world.statsKeeper.killsIncrement();
         var entityExplosion = uwpe.universe.entityBuilder.explosion(Locatable.of(enemy).loc.pos, 10, // radius
         "Effects_Boom", 40, // ticksToLive
         (uwpe) => { });
-        uwpe.place.entityToSpawnAdd(entityExplosion);
+        var place = uwpe.place;
+        place.entityToSpawnAdd(entityExplosion);
+        // Stats.
+        var player = place.player();
+        var playerStatsKeeper = StatsKeeper.of(player);
+        playerStatsKeeper.killsIncrement();
+        var scorable = Scorable.of(enemy);
+        var scoreForKillingEnemy = scorable.scoreGet(uwpe);
+        playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
     }
     static visualBuild() {
+        var colors = Color.Instances();
         return VisualGroup.fromChildren([
-            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(6, 4, Color.Instances().Green),
-            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(4, 3, Color.Instances().Red),
+            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(6, 4, colors.Green),
+            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(4, 3, colors.Red),
             VisualFan.fromRadiusAnglesStartAndSpannedAndColorsFillAndBorder(4, // radius
             .5, .5, // angleStart-, angleSpannedInTurns
-            Color.Instances().Red, null // colorFill, colorBorder
+            colors.Red, null // colorFill, colorBorder
             )
         ]);
     }

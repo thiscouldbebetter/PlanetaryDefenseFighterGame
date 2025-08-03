@@ -1,14 +1,13 @@
 
 class WorldGame extends World
 {
-	statsKeeper: StatsKeeper;
-
 	constructor(name: string)
 	{
 		var name = name;
 		var timeCreated = DateTime.now();
 		var defn = WorldGame.defnBuild();
-		var place = new PlaceDefault();
+		var player = Player.fromPos(Coords.fromXY(100, 100) );
+		var place = PlacePlanet.fromLevelIndexAndPlayer(0, player);
 		var places = [ place ];
 		var placesByName = new Map(places.map(x => [x.name, x]) );
 		var placeGetByName =
@@ -19,8 +18,6 @@ class WorldGame extends World
 		(
 			name, timeCreated, defn, placeGetByName, placeInitialName
 		);
-
-		this.statsKeeper = StatsKeeper.create();
 	}
 
 	static defnBuild(): WorldDefn
@@ -32,7 +29,7 @@ class WorldGame extends World
 				Enemy.activityDefnBuild()
 			],
 			[
-				PlaceDefault.defnBuild()
+				PlacePlanet.defnBuild()
 			]
 		]);
 	}

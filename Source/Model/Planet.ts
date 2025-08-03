@@ -14,7 +14,9 @@ class Planet extends Entity
 
 				Locatable.create(),
 
-				Planet.triggerable()
+				Planet.triggerable(),
+
+				StatsKeeper.create()
 			]
 		);
 	}
@@ -59,7 +61,7 @@ class Planet extends Entity
 		uwpe: UniverseWorldPlaceEntities
 	): boolean
 	{
-		var level = uwpe.place as PlaceDefault;
+		var level = uwpe.place as PlacePlanet;
 		var playerShipIsGone =
 			(level.player() == null);
 		var habitatsAreAllGone =
@@ -100,7 +102,7 @@ class Planet extends Entity
 		uwpe: UniverseWorldPlaceEntities
 	): boolean
 	{
-		var level = uwpe.place as PlaceDefault;
+		var level = uwpe.place as PlacePlanet;
 		var enemyGeneratorIsExhausted =
 			level.enemyGenerator().exhausted();
 		var enemiesAreAllGone =
@@ -120,20 +122,56 @@ class Planet extends Entity
 	): void
 	{
 		var universe = uwpe.universe;
+		var place = uwpe.place as PlacePlanet;
+		var player = place.player();
+
+		var playerStatsKeeper = StatsKeeper.of(player);
+		var enemiesKilled = playerStatsKeeper.kills();
+		var enemiesTotal = place.enemiesCountInitial();
+
+		var habitatsRemaining = place.habitats().length;
+		var habitatsTotal = place.habitatsCountInitial();
+
+		var shotsHit = playerStatsKeeper.hits();
+		var shotsFired = playerStatsKeeper.shots();
+
+		var timerTicksToComplete = place.timerTicksSoFar();
+		var secondsToComplete =
+			universe.timerHelper.ticksToSeconds(timerTicksToComplete);
+
+		var statLengthMax = 8;
+		var messageAsLines =
+		[
+			place.name + " complete!",
+			"",
+			"Enemies killed: " + (enemiesKilled + "/" + enemiesTotal).padStart(statLengthMax, " "),
+			"Habitats saved: " + (habitatsRemaining + "/" + habitatsTotal).padStart(statLengthMax, " "),
+			"Hits/Shots:     " + (shotsHit + "/" + shotsFired).padStart(statLengthMax, " "),
+			"Seconds taken:  " + ("" + secondsToComplete).padStart(statLengthMax, " "),
+			"",
+			"Press Enter to start the next level."
+		];
+
+		var newline = "\n";
+		var messageAsString = messageAsLines.join(newline);
+
 		universe.venueTransitionTo
 		(
 			VenueMessage.fromTextAndAcknowledgeNoButtons
 			(
-				"You win!",
+				messageAsString,
 				() => // acknowledge
 				{
-					universe.venueTransitionTo
+					playerStatsKeeper.killsClear();
+					playerStatsKeeper.shotsClear();
+					playerStatsKeeper.hitsClear();
+					var levelNextIndex = place.levelIndex + 1;
+					var placeNext = PlacePlanet.fromLevelIndexAndPlayer
 					(
-						universe.controlBuilder.title
-						(
-							universe, universe.display.sizeInPixels,
-						).toVenue()
+						levelNextIndex, player
 					);
+					universe.world.placeNextSet(placeNext);
+					universe.venuePrevTransitionTo();
 				}
 			)
 		)

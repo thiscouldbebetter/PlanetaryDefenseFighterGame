@@ -17,19 +17,8 @@ class Player extends Entity {
             )),
             Movable.fromAccelerationAndSpeedMax(0.2, 8),
             Playable.create(),
-            ProjectileGenerator.fromNameAndGenerations("Bullet", [
-                ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualAndInit(2, // radius
-                5, // distanceInitial
-                16, // speed
-                8, // ticksToLive
-                Damage.fromAmount(1), VisualGroup.fromChildren([
-                    VisualSound.fromSoundName("Effects_Blip"),
-                    VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
-                ]), (entity) => {
-                    entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
-                    Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
-                })
-            ])
+            Player.projectileGenerator(),
+            StatsKeeper.create()
         ]);
     }
     static fromPos(pos) {
@@ -56,9 +45,45 @@ class Player extends Entity {
         playerExplosionAndRespawner.propertyAdd(Playable.create());
         place.entityToSpawnAdd(playerExplosionAndRespawner);
     }
+    static projectileGenerator() {
+        return ProjectileGenerator.fromNameFireAndGenerations("Bullet", uwpe => {
+            var place = uwpe.place;
+            var player = place.player();
+            var playerStatsKeeper = StatsKeeper.of(player);
+            playerStatsKeeper.shotsIncrement();
+            ProjectileGenerator.fireDefault(uwpe);
+        }, [
+            ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit(2, // radius
+            5, // distanceInitial
+            16, // speed
+            8, // ticksToLive
+            // ticksToLive
+            uwpe => // hit
+             {
+                var place = uwpe.place;
+                var player = place.player();
+                var playerStatsKeeper = StatsKeeper.of(player);
+                playerStatsKeeper.hitsIncrement();
+            }, Damage.fromAmount(1), VisualGroup.fromChildren([
+                VisualSound.fromSoundName("Effects_Blip"),
+                VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
+            ]), (entity) => {
+                entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
+                Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
+            })
+        ]);
+    }
     static toControl(uwpe) {
         var place = uwpe.place;
+        var player = place.player();
         var placeSize = place.size();
+        var playerStatsKeeper = StatsKeeper.of(player);
+        var visualBuilder = VisualBuilder.Instance();
+        var visualKills = visualBuilder.explosionStarburstOfRadius(8);
+        var visualScore = visualBuilder.starburstWithPointsRatioRadiusAndColor(5, // points
+        .5, // radiusInnerAsFractionOfOuter
+        6, // radiusOuter
+        Color.Instances().Yellow);
         return ControlContainer.fromPosSizeAndChildren(Coords.fromXY(0, placeSize.y - 20), // pos
         Coords.fromXY(40, 50), // size
         [
@@ -68,8 +93,10 @@ class Player extends Entity {
             ControlLabel.fromPosAndText(Coords.fromXY(50, 4), DataBinding.fromGet(() => "" + place.habitats().length)),
             ControlVisual.fromPosAndVisual(Coords.fromXY(70, 10), DataBinding.fromContext(Enemy.visualBuild())),
             ControlLabel.fromPosAndText(Coords.fromXY(80, 4), DataBinding.fromGet(() => "" + place.enemies().length)),
-            ControlVisual.fromPosAndVisual(Coords.fromXY(100, 10), DataBinding.fromContext(VisualBuilder.Instance().archeryTarget(6))),
-            ControlLabel.fromPosAndText(Coords.fromXY(110, 4), DataBinding.fromGet(() => "" + uwpe.world.statsKeeper.kills()))
+            ControlVisual.fromPosAndVisual(Coords.fromXY(100, 10), DataBinding.fromContext(visualKills)),
+            ControlLabel.fromPosAndText(Coords.fromXY(110, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.kills())),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(130, 10), DataBinding.fromContext(visualScore)),
+            ControlLabel.fromPosAndText(Coords.fromXY(140, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.score()))
         ]).toControlContainerTransparent();
     }
     static visualBuild() {

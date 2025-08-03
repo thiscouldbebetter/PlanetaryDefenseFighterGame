@@ -38,13 +38,15 @@ class Enemy extends Entity
 					Enemy.visualBuild()
 				).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
 
+				EnemyProperty.create(),
+
 				Killable.fromDie(Enemy.killableDie),
 
 				Locatable.fromPos(pos),
 
 				Movable.fromAccelerationAndSpeedMax(2, 1),
 
-				EnemyProperty.create()
+				Scorable.fromPoints(100)
 			]
 		);
 	}
@@ -78,8 +80,8 @@ class Enemy extends Entity
 
 		if (targetEntity == null)
 		{
-			var placeDefault = place as PlaceDefault;
-			var habitats = placeDefault.habitats();
+			var placePlanet = place as PlacePlanet;
+			var habitats = placePlanet.habitats();
 			if (habitats.length == 0)
 			{
 				return; // todo
@@ -184,9 +186,6 @@ class Enemy extends Entity
 			constrainable.constraintRemoveFinal();
 		}
 
-		var world = uwpe.world as WorldGame;
-		world.statsKeeper.killsIncrement();
-
 		var entityExplosion =
 			uwpe.universe.entityBuilder.explosion
 			(
@@ -197,26 +196,41 @@ class Enemy extends Entity
 				(uwpe) => {}
 			);
 
-		uwpe.place.entityToSpawnAdd(entityExplosion);
+		var place = uwpe.place as PlacePlanet;
+
+		place.entityToSpawnAdd(entityExplosion);
+
+		// Stats.
+
+		var player = place.player();
+		var playerStatsKeeper = StatsKeeper.of(player);
+
+		playerStatsKeeper.killsIncrement();
+
+		var scorable = Scorable.of(enemy);
+		var scoreForKillingEnemy = scorable.scoreGet(uwpe);
+		playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
 	}
 
 	static visualBuild(): VisualBase
 	{
+		var colors = Color.Instances();
+
 		return VisualGroup.fromChildren
 		([
 			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
 			(
-				6, 4, Color.Instances().Green
+				6, 4, colors.Green
 			),
 			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
 			(
-				4, 3, Color.Instances().Red
+				4, 3, colors.Red
 			),
 			VisualFan.fromRadiusAnglesStartAndSpannedAndColorsFillAndBorder
 			(
 				4, // radius
 				.5, .5, // angleStart-, angleSpannedInTurns
-				Color.Instances().Red, null // colorFill, colorBorder
+				colors.Red, null // colorFill, colorBorder
 			)
 		]);
 	}

@@ -7,9 +7,9 @@ class Habitat extends Entity {
                 Constraint_ContainInHemispace.fromHemispace(Hemispace.fromPlane(Plane.fromNormalAndDistanceFromOrigin(Coords.fromXY(0, 1), 250)))
             ]),
             Drawable.fromVisual(Habitat.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
+            HabitatProperty.create(),
             Locatable.fromPos(pos)
         ]);
-        this.propertyAdd(this);
     }
     static fromPos(pos) {
         return new Habitat(pos);
@@ -23,6 +23,11 @@ class Habitat extends Entity {
             Coords.fromXY(4, -4)
         ], Color.byName("Brown"));
     }
+}
+class HabitatProperty {
+    static create() {
+        return new HabitatProperty();
+    }
     // Clonable.
     clone() {
         throw new Error("Not implemented!");
@@ -34,7 +39,16 @@ class Habitat extends Entity {
     equals(other) {
         return (this == other);
     }
+    finalize(uwpe) {
+        // Do nothing.
+    }
+    initialize(uwpe) {
+        // Do nothing.
+    }
     propertyName() {
-        return Habitat.name;
+        return HabitatProperty.name;
+    }
+    updateForTimerTick(uwpe) {
+        // Do nothing.
     }
 }

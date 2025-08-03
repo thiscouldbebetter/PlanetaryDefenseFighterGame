@@ -58,45 +58,9 @@ class Player extends Entity
 
 				Playable.create(),
 
-				ProjectileGenerator.fromNameAndGenerations
-				(
-					"Bullet",
-					[
-						ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualAndInit
-						(
-							2, // radius
-							5, // distanceInitial
-							16, // speed
-							8, // ticksToLive
-							Damage.fromAmount(1),
-							VisualGroup.fromChildren
-							([
-								VisualSound.fromSoundName("Effects_Blip"),
+				Player.projectileGenerator(),
 
-								VisualCircle.fromRadiusAndColorFill
-								(
-									2, Color.Instances().Yellow
-								)
-							]),
-							(entity) =>
-							{
-								entity.propertyAdd
-								(
-									Constrainable.fromConstraint
-									(
-										Constraint_WrapToPlaceSizeXTrimY.create()
-									)
-								);
-
-								Drawable.of(entity).sizeInWrappedInstancesSet
-								(
-									Coords.fromXYZ(3, 1, 1)
-								)
-							}
-						)
-					]
-				)
-
+				StatsKeeper.create()
 			]
 		);
 	}
@@ -141,10 +105,85 @@ class Player extends Entity
 		place.entityToSpawnAdd(playerExplosionAndRespawner);
 	}
 
+	static projectileGenerator(): ProjectileGenerator
+	{
+		return ProjectileGenerator.fromNameFireAndGenerations
+		(
+			"Bullet",
+			uwpe =>
+			{
+				var place = uwpe.place as PlacePlanet;
+				var player = place.player();
+				var playerStatsKeeper = StatsKeeper.of(player);
+				playerStatsKeeper.shotsIncrement();
+				ProjectileGenerator.fireDefault(uwpe);
+			},
+			[
+				ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
+				(
+					2, // radius
+					5, // distanceInitial
+					16, // speed
+					8, // ticksToLive
+					uwpe => // hit
+					{
+						var place = uwpe.place as PlacePlanet;
+						var player = place.player();
+						var playerStatsKeeper = StatsKeeper.of(player);
+						playerStatsKeeper.hitsIncrement();
+					},
+					Damage.fromAmount(1),
+					VisualGroup.fromChildren
+					([
+						VisualSound.fromSoundName("Effects_Blip"),
+
+						VisualCircle.fromRadiusAndColorFill
+						(
+							2, Color.Instances().Yellow
+						)
+					]),
+					(entity) =>
+					{
+						entity.propertyAdd
+						(
+							Constrainable.fromConstraint
+							(
+								Constraint_WrapToPlaceSizeXTrimY.create()
+							)
+						);
+
+						Drawable.of(entity).sizeInWrappedInstancesSet
+						(
+							Coords.fromXYZ(3, 1, 1)
+						)
+					}
+				)
+			]
+		);
+	}
+
 	static toControl(uwpe: UniverseWorldPlaceEntities): ControlBase
 	{
-		var place = uwpe.place as PlaceDefault;
+		var place = uwpe.place as PlacePlanet;
+		var player = place.player();
+
 		var placeSize = place.size();
+
+		var playerStatsKeeper = StatsKeeper.of(player);
+
+		var visualBuilder = VisualBuilder.Instance();
+
+		var visualKills =
+			visualBuilder.explosionStarburstOfRadius(8);
+
+		var visualScore =
+			visualBuilder.starburstWithPointsRatioRadiusAndColor
+			(
+				5, // points
+				.5, // radiusInnerAsFractionOfOuter
+				6, // radiusOuter
+				Color.Instances().Yellow
+			);
 
 		return ControlContainer.fromPosSizeAndChildren
 		(
@@ -193,16 +232,37 @@ class Player extends Entity
 				ControlVisual.fromPosAndVisual
 				(
 					Coords.fromXY(100, 10),
-					DataBinding.fromContext(VisualBuilder.Instance().archeryTarget(6) )
+					DataBinding.fromContext
+					(
+						visualKills
+					)
 				),
 				ControlLabel.fromPosAndText
 				(
 					Coords.fromXY(110, 4),
 					DataBinding.fromGet
 					(
-						() => "" + (uwpe.world as WorldGame).statsKeeper.kills()
+						() => "" + playerStatsKeeper.kills()
+					)
+				),
+
+				ControlVisual.fromPosAndVisual
+				(
+					Coords.fromXY(130, 10),
+					DataBinding.fromContext
+					(
+						visualScore
+					)
+				),
+				ControlLabel.fromPosAndText
+				(
+					Coords.fromXY(140, 4),
+					DataBinding.fromGet
+					(
+						() => "" + playerStatsKeeper.score()
 					)
 				)
+
 
 			]
 		).toControlContainerTransparent()

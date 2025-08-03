@@ -1,5 +1,5 @@
 
-class Habitat extends Entity implements EntityProperty<Habitat>
+class Habitat extends Entity
 {
 	constructor(pos: Coords)
 	{
@@ -30,11 +30,11 @@ class Habitat extends Entity implements EntityProperty<Habitat>
 					Habitat.visualBuild()
 				).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
 
+				HabitatProperty.create(),
+
 				Locatable.fromPos(pos)
 			]
 		);
-
-		this.propertyAdd(this);
 	}
 
 	static fromPos(pos: Coords): Habitat
@@ -56,28 +56,51 @@ class Habitat extends Entity implements EntityProperty<Habitat>
 			Color.byName("Brown")
 		);
 	}
+}
+
+class HabitatProperty implements EntityProperty<HabitatProperty>
+{
+	static create(): HabitatProperty
+	{
+		return new HabitatProperty();
+	}
 
 	// Clonable.
 
-	clone(): Habitat
+	clone(): HabitatProperty
 	{
 		throw new Error("Not implemented!");
 	}
 
-	overwriteWith(other: Habitat): Habitat
+	overwriteWith(other: HabitatProperty): HabitatProperty
 	{
 		throw new Error("Not implemented!");
 	}
 
 	// EntityProperty.
 
-	equals(other: Habitat): boolean
+	equals(other: HabitatProperty): boolean
 	{
 		return (this == other);
 	}
 
+	finalize(uwpe: UniverseWorldPlaceEntities): void
+	{
+		// Do nothing.
+	}
+
+	initialize(uwpe: UniverseWorldPlaceEntities): void
+	{
+		// Do nothing.
+	}
+
 	propertyName(): string
 	{
-		return Habitat.name;
+		return HabitatProperty.name;
+	}
+
+	updateForTimerTick(uwpe: UniverseWorldPlaceEntities): void
+	{
+		// Do nothing.
 	}
 }
