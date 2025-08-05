@@ -123,34 +123,15 @@ class Enemy extends Entity {
         ]);
     }
 }
-class EnemyProperty {
+class EnemyProperty extends EntityPropertyBase {
     static create() {
         return new EnemyProperty();
     }
     static of(entity) {
         return entity.propertyByName(EnemyProperty.name);
     }
-    // EntityProperty.
+    // Clonable.
     clone() {
-        return new EnemyProperty();
-    }
-    equals(other) {
-        return (this.habitatCaptured == other.habitatCaptured);
-    }
-    finalize(uwpe) {
-        // Do nothing.
-    }
-    initialize(uwpe) {
-        // Do nothing.
-    }
-    overwriteWith(other) {
-        this.habitatCaptured = other.habitatCaptured;
         return this;
-    }
-    propertyName() {
-        return EnemyProperty.name;
-    }
-    updateForTimerTick(uwpe) {
-        // Do nothing.
     }
 }

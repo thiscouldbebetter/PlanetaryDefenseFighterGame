@@ -58,49 +58,10 @@ class Habitat extends Entity
 	}
 }
 
-class HabitatProperty implements EntityProperty<HabitatProperty>
+class HabitatProperty extends EntityPropertyBase<HabitatProperty>
 {
 	static create(): HabitatProperty
 	{
 		return new HabitatProperty();
-	}
-
-	// Clonable.
-
-	clone(): HabitatProperty
-	{
-		throw new Error("Not implemented!");
-	}
-
-	overwriteWith(other: HabitatProperty): HabitatProperty
-	{
-		throw new Error("Not implemented!");
-	}
-
-	// EntityProperty.
-
-	equals(other: HabitatProperty): boolean
-	{
-		return (this == other);
-	}
-
-	finalize(uwpe: UniverseWorldPlaceEntities): void
-	{
-		// Do nothing.
-	}
-
-	initialize(uwpe: UniverseWorldPlaceEntities): void
-	{
-		// Do nothing.
-	}
-
-	propertyName(): string
-	{
-		return HabitatProperty.name;
-	}
-
-	updateForTimerTick(uwpe: UniverseWorldPlaceEntities): void
-	{
-		// Do nothing.
 	}
 }

@@ -24,31 +24,8 @@ class Habitat extends Entity {
         ], Color.byName("Brown"));
     }
 }
-class HabitatProperty {
+class HabitatProperty extends EntityPropertyBase {
     static create() {
         return new HabitatProperty();
-    }
-    // Clonable.
-    clone() {
-        throw new Error("Not implemented!");
-    }
-    overwriteWith(other) {
-        throw new Error("Not implemented!");
-    }
-    // EntityProperty.
-    equals(other) {
-        return (this == other);
-    }
-    finalize(uwpe) {
-        // Do nothing.
-    }
-    initialize(uwpe) {
-        // Do nothing.
-    }
-    propertyName() {
-        return HabitatProperty.name;
-    }
-    updateForTimerTick(uwpe) {
-        // Do nothing.
     }
 }

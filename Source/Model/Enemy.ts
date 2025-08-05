@@ -236,7 +236,7 @@ class Enemy extends Entity
 	}
 }
 
-class EnemyProperty implements EntityProperty<EnemyProperty>
+class EnemyProperty extends EntityPropertyBase<EnemyProperty>
 {
 	habitatCaptured: Habitat;
 
@@ -250,43 +250,11 @@ class EnemyProperty implements EntityProperty<EnemyProperty>
 		return entity.propertyByName(EnemyProperty.name) as EnemyProperty;
 	}
 
-	// EntityProperty.
+	// Clonable.
 
 	clone(): EnemyProperty
 	{
-		return new EnemyProperty();
-	}
-
-	equals(other: EnemyProperty): boolean
-	{
-		return (this.habitatCaptured == other.habitatCaptured);
-	}
-
-	finalize(uwpe: UniverseWorldPlaceEntities): void
-	{
-		// Do nothing.
-	}
-
-	initialize(uwpe: UniverseWorldPlaceEntities): void
-	{
-		// Do nothing.
-	}
-
-	overwriteWith(other: EnemyProperty): EnemyProperty
-	{
-		this.habitatCaptured = other.habitatCaptured;
 		return this;
 	}
-
-	propertyName(): string
-	{
-		return EnemyProperty.name;
-	}
-
-	updateForTimerTick(uwpe: UniverseWorldPlaceEntities): void
-	{
-		// Do nothing.
-	}
-
 }
 
