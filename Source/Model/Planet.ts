@@ -1,6 +1,8 @@
 
 class Planet extends Entity
 {
+	horizonHeight: number;
+
 	constructor(size: Coords, horizonHeight: number)
 	{
 		super
@@ -19,6 +21,8 @@ class Planet extends Entity
 				StatsKeeper.create()
 			]
 		);
+
+		this.horizonHeight = horizonHeight;
 	}
 
 	static fromSizeAndHorizonHeight
@@ -85,13 +89,11 @@ class Planet extends Entity
 				"GAME OVER",
 				() => // acknowledge
 				{
-					universe.venueTransitionTo
-					(
-						universe.controlBuilder.title
-						(
-							universe, universe.display.sizeInPixels,
-						).toVenue()
-					);
+					var leaderboard =
+						Leaderboard.createWithFakeScores();
+					var leaderboardAsVenue = leaderboard.toVenue(uwpe);
+					var venueNext = leaderboardAsVenue;
+					universe.venueTransitionTo(venueNext);
 				}
 			)
 		)

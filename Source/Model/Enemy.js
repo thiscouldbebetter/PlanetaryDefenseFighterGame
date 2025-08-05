@@ -28,6 +28,7 @@ class Enemy extends Entity {
     }
     static activityDefnPerform(uwpe) {
         var universe = uwpe.universe;
+        var randomizer = universe.randomizer;
         var place = uwpe.place;
         var entity = uwpe.entity;
         var enemy = entity;
@@ -38,14 +39,22 @@ class Enemy extends Entity {
         if (targetEntity == null) {
             var placePlanet = place;
             var habitats = placePlanet.habitats();
-            if (habitats.length == 0) {
-                return; // todo
+            var enemies = placePlanet.enemies();
+            var habitatsNotAlreadyCapturedOrTargeted = habitats.filter(h => (enemies.some(e => EnemyProperty.of(e).habitatCaptured == h) == false)
+                &&
+                    (enemies.some(e => Actor.of(e).activity.targetEntity() == h) == false));
+            if (habitatsNotAlreadyCapturedOrTargeted.length == 0) {
+                var planet = place.planet();
+                var placeSize = place.size();
+                var placeSizeMinusGround = placeSize.clone().subtract(Coords.fromXY(0, planet.horizonHeight));
+                var posRandom = Coords.random(randomizer).multiply(placeSizeMinusGround);
+                targetEntity = Entity.fromNameAndProperty("RandomPoint", Locatable.fromPos(posRandom));
             }
             else {
-                targetEntity = ArrayHelper.random(habitats, universe.randomizer);
-                enemyActivity.targetEntitySet(targetEntity);
+                targetEntity = ArrayHelper.random(habitatsNotAlreadyCapturedOrTargeted, randomizer);
             }
         }
+        enemyActivity.targetEntitySet(targetEntity);
         var targetPos = Locatable.of(targetEntity).loc.pos;
         var displacementToTarget = Enemy.displacement()
             .overwriteWith(targetPos)
@@ -63,8 +72,10 @@ class Enemy extends Entity {
         else {
             enemyPos.overwriteWith(targetPos);
             var enemyProperty = EnemyProperty.of(enemy);
-            if (enemyProperty.habitatCaptured == null) {
-                enemyProperty.habitatCaptured = targetEntity;
+            var targetIsHabitat = (targetEntity.constructor.name == Habitat.name);
+            if (targetIsHabitat) {
+                var targetHabitat = targetEntity;
+                enemyProperty.habitatCaptured = targetHabitat;
                 var targetConstrainable = Constrainable.of(targetEntity);
                 var constraintToAddToTarget = Constraint_Multiple.fromChildren([
                     Constraint_AttachToEntityWithId
@@ -73,12 +84,15 @@ class Enemy extends Entity {
                 ]);
                 targetConstrainable
                     .constraintAdd(constraintToAddToTarget);
-                targetEntity = Entity.fromNameAndProperties("EscapePoint", [
-                    Locatable.fromPos(enemyPos.clone().addXY(0, 0 - place.size().y))
-                ]);
+                targetEntity = Entity.fromNameAndProperty("EscapePoint", Locatable.fromPos(enemyPos.clone().addXY(0, 0 - place.size().y)));
                 enemyActivity.targetEntitySet(targetEntity);
             }
+            else if (enemyPos.y >= 0) {
+                // Choose another random point to wander to.
+                enemyActivity.targetEntityClear();
+            }
             else {
+                // Escape.
                 place.entityToRemoveAdd(enemyProperty.habitatCaptured);
                 place.entityToRemoveAdd(enemy);
             }
@@ -132,6 +146,6 @@ class EnemyProperty extends EntityPropertyBase {
     }
     // Clonable.
     clone() {
-        return this;
+        return new EnemyProperty();
     }
 }

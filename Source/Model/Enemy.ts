@@ -67,7 +67,8 @@ class Enemy extends Entity
 	static activityDefnPerform(uwpe: UniverseWorldPlaceEntities): void
 	{
 		var universe = uwpe.universe;
-		var place = uwpe.place;
+		var randomizer = universe.randomizer;
+		var place = uwpe.place as PlacePlanet;
 		var entity = uwpe.entity;
 
 		var enemy = entity as Enemy;
@@ -82,19 +83,49 @@ class Enemy extends Entity
 		{
 			var placePlanet = place as PlacePlanet;
 			var habitats = placePlanet.habitats();
-			if (habitats.length == 0)
+			var enemies = placePlanet.enemies();
+			var habitatsNotAlreadyCapturedOrTargeted =
+				habitats.filter
+				(
+					h =>
+						(
+							enemies.some
+							(
+								e => EnemyProperty.of(e).habitatCaptured == h
+							) == false
+						)
+						&&
+						(
+							enemies.some
+							(
+								e => Actor.of(e).activity.targetEntity() == h
+							) == false
+						)
+				);
+
+			if (habitatsNotAlreadyCapturedOrTargeted.length == 0)
 			{
-				return; // todo
+				var planet = place.planet();
+				var placeSize = place.size();
+				var placeSizeMinusGround =
+					placeSize.clone().subtract(Coords.fromXY(0, planet.horizonHeight) )
+				var posRandom = Coords.random(randomizer).multiply(placeSizeMinusGround);
+				targetEntity = Entity.fromNameAndProperty
+				(
+					"RandomPoint",
+					Locatable.fromPos(posRandom)
+				);
 			}
 			else
 			{
 				targetEntity = ArrayHelper.random
 				(
-					habitats, universe.randomizer
+					habitatsNotAlreadyCapturedOrTargeted, randomizer
 				);
-				enemyActivity.targetEntitySet(targetEntity);
 			}
 		}
+
+		enemyActivity.targetEntitySet(targetEntity);
 
 		var targetPos = Locatable.of(targetEntity).loc.pos;
 		var displacementToTarget =
@@ -119,9 +150,12 @@ class Enemy extends Entity
 		{
 			enemyPos.overwriteWith(targetPos);
 			var enemyProperty = EnemyProperty.of(enemy);
-			if (enemyProperty.habitatCaptured == null)
+			var targetIsHabitat = (targetEntity.constructor.name == Habitat.name);
+
+			if (targetIsHabitat)
 			{
-				enemyProperty.habitatCaptured = targetEntity as Habitat;
+				var targetHabitat = targetEntity as Habitat;
+				enemyProperty.habitatCaptured = targetHabitat;
 
 				var targetConstrainable =
 					Constrainable.of(targetEntity);
@@ -142,23 +176,29 @@ class Enemy extends Entity
 				targetConstrainable
 					.constraintAdd(constraintToAddToTarget);
 
-				targetEntity = Entity.fromNameAndProperties
+				targetEntity = Entity.fromNameAndProperty
 				(
 					"EscapePoint",
-					[
-						Locatable.fromPos
+					Locatable.fromPos
+					(
+						enemyPos.clone().addXY
 						(
-							enemyPos.clone().addXY
-							(
-								0, 0 - place.size().y
-							)
+							0, 0 - place.size().y
 						)
-					]
+					)
 				);
 				enemyActivity.targetEntitySet(targetEntity);
 			}
+			else if (enemyPos.y >= 0)
+			{
+				// Choose another random point to wander to.
+
+				enemyActivity.targetEntityClear();
+			}
 			else
 			{
+				// Escape.
+
 				place.entityToRemoveAdd(enemyProperty.habitatCaptured);
 				place.entityToRemoveAdd(enemy);
 			}
@@ -254,7 +294,7 @@ class EnemyProperty extends EntityPropertyBase<EnemyProperty>
 
 	clone(): EnemyProperty
 	{
-		return this;
+		return new EnemyProperty();
 	}
 }
 

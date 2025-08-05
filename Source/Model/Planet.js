@@ -7,6 +7,7 @@ class Planet extends Entity {
             Planet.triggerable(),
             StatsKeeper.create()
         ]);
+        this.horizonHeight = horizonHeight;
     }
     static fromSizeAndHorizonHeight(size, horizonHeight) {
         return new Planet(size, horizonHeight);
@@ -32,7 +33,10 @@ class Planet extends Entity {
         var universe = uwpe.universe;
         universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledgeNoButtons("GAME OVER", () => // acknowledge
          {
-            universe.venueTransitionTo(universe.controlBuilder.title(universe, universe.display.sizeInPixels).toVenue());
+            var leaderboard = Leaderboard.createWithFakeScores();
+            var leaderboardAsVenue = leaderboard.toVenue(uwpe);
+            var venueNext = leaderboardAsVenue;
+            universe.venueTransitionTo(venueNext);
         }));
     }
     static triggerWinIsTriggered(uwpe) {
