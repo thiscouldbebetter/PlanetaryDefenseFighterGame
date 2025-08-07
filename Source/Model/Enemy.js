@@ -1,30 +1,88 @@
 "use strict";
 class Enemy extends Entity {
-    constructor(pos) {
-        super(Enemy.name, [
-            Actor.fromActivityDefnName(Enemy.activityDefnBuild().name),
-            Collidable.fromColliderPropertyNameAndCollide(Sphere.fromRadius(4), Player.name, (uwpe, c) => {
-                var entityOther = uwpe.entity2;
-                if (entityOther.name == Player.name) {
-                    var playerEntity = entityOther;
-                    var playerKillable = Killable.of(playerEntity);
-                    playerKillable.kill();
-                }
-            }),
-            Constrainable.fromConstraint(Constraint_WrapToPlaceSizeX.create()),
-            Drawable.fromVisual(Enemy.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
+    constructor(name, pos, properties) {
+        var propertyDrawable = properties.find(x => x.propertyName() == Drawable.name);
+        propertyDrawable.sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
+        var propertiesCommonToAllEnemies = [
+            Enemy.collidableBuild(),
+            Enemy.constrainableBuild(),
             EnemyProperty.create(),
-            Killable.fromDie(Enemy.killableDie),
             Locatable.fromPos(pos),
-            Movable.fromAccelerationAndSpeedMax(2, 1),
+            Movable.fromAccelerationPerTickAndSpeedMax(2, 1)
+        ];
+        properties.push(...propertiesCommonToAllEnemies);
+        super(name, properties);
+    }
+    static collidableBuild() {
+        return Collidable.fromColliderPropertyNameAndCollide(Sphere.fromRadius(4), Player.name, (uwpe, c) => {
+            var entityOther = uwpe.entity2;
+            if (entityOther.name == Player.name) {
+                var playerEntity = entityOther;
+                var playerKillable = Killable.of(playerEntity);
+                playerKillable.kill();
+            }
+        });
+    }
+    static constrainableBuild() {
+        return Constrainable.fromConstraint(Constraint_WrapToPlaceSizeX.create());
+    }
+    static killableDie(uwpe) {
+        var enemy = uwpe.entity;
+        var enemyRaiderProperty = EnemyRaiderProperty.of(enemy);
+        if (enemyRaiderProperty != null) {
+            var habitatCaptured = enemyRaiderProperty.habitatCaptured;
+            if (habitatCaptured != null) {
+                var constrainable = Constrainable.of(habitatCaptured);
+                constrainable.constraintRemoveFinal();
+            }
+        }
+        var entityExplosion = uwpe.universe.entityBuilder.explosion(Locatable.of(enemy).loc.pos, 10, // radius
+        "Effects_Boom", 40, // ticksToLive
+        (uwpe) => { });
+        var place = uwpe.place;
+        place.entityToSpawnAdd(entityExplosion);
+        // Stats.
+        var player = place.player();
+        var playerStatsKeeper = StatsKeeper.of(player);
+        playerStatsKeeper.killsIncrement();
+        var scorable = Scorable.of(enemy);
+        var scoreForKillingEnemy = scorable.scoreGet(uwpe);
+        playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
+    }
+    static displacement() {
+        if (this._displacement == null) {
+            this._displacement = Coords.create();
+        }
+        return this._displacement;
+    }
+}
+class EnemyProperty extends EntityPropertyBase {
+    static create() {
+        return new EnemyProperty();
+    }
+    static of(entity) {
+        return entity.propertyByName(EnemyProperty.name);
+    }
+    // Clonable.
+    clone() {
+        return new EnemyProperty();
+    }
+}
+class EnemyRaider extends Enemy {
+    constructor(pos) {
+        super(EnemyRaider.name, pos, [
+            Actor.fromActivityDefnName(EnemyRaider.activityDefnBuild().name),
+            Drawable.fromVisual(EnemyRaider.visualBuild()),
+            EnemyRaiderProperty.create(),
+            Killable.fromDie(Enemy.killableDie),
             Scorable.fromPoints(100)
         ]);
     }
     static fromPos(pos) {
-        return new Enemy(pos);
+        return new EnemyRaider(pos);
     }
     static activityDefnBuild() {
-        return new ActivityDefn(Enemy.name, Enemy.activityDefnPerform);
+        return new ActivityDefn(EnemyRaider.name, EnemyRaider.activityDefnPerform);
     }
     static activityDefnPerform(uwpe) {
         var universe = uwpe.universe;
@@ -40,7 +98,7 @@ class Enemy extends Entity {
             var placePlanet = place;
             var habitats = placePlanet.habitats();
             var enemies = placePlanet.enemies();
-            var habitatsNotAlreadyCapturedOrTargeted = habitats.filter(h => (enemies.some(e => EnemyProperty.of(e).habitatCaptured == h) == false)
+            var habitatsNotAlreadyCapturedOrTargeted = habitats.filter(h => (enemies.some(e => EnemyRaiderProperty.of(e).habitatCaptured == h) == false)
                 &&
                     (enemies.some(e => Actor.of(e).activity.targetEntity() == h) == false));
             if (habitatsNotAlreadyCapturedOrTargeted.length == 0) {
@@ -60,8 +118,9 @@ class Enemy extends Entity {
             .overwriteWith(targetPos)
             .subtract(enemyPos);
         var distanceToTarget = displacementToTarget.magnitude();
+        var directionToTarget = displacementToTarget.clone().divideScalar(distanceToTarget);
         var enemyMovable = Movable.of(enemy);
-        var enemyAccelerationPerTick = enemyMovable.accelerationPerTick(uwpe);
+        var enemyAccelerationPerTick = enemyMovable.accelerationPerTickInDirection(uwpe, directionToTarget);
         if (distanceToTarget >= enemyAccelerationPerTick) {
             var enemySpeedMax = enemyMovable.speedMax(uwpe);
             var displacementToMove = displacementToTarget
@@ -71,11 +130,11 @@ class Enemy extends Entity {
         }
         else {
             enemyPos.overwriteWith(targetPos);
-            var enemyProperty = EnemyProperty.of(enemy);
+            var enemyRaiderProperty = EnemyRaiderProperty.of(enemy);
             var targetIsHabitat = (targetEntity.constructor.name == Habitat.name);
             if (targetIsHabitat) {
                 var targetHabitat = targetEntity;
-                enemyProperty.habitatCaptured = targetHabitat;
+                enemyRaiderProperty.habitatCaptured = targetHabitat;
                 var targetConstrainable = Constrainable.of(targetEntity);
                 var constraintToAddToTarget = Constraint_Multiple.fromChildren([
                     Constraint_AttachToEntityWithId
@@ -93,37 +152,10 @@ class Enemy extends Entity {
             }
             else {
                 // Escape.
-                place.entityToRemoveAdd(enemyProperty.habitatCaptured);
+                place.entityToRemoveAdd(enemyRaiderProperty.habitatCaptured);
                 place.entityToRemoveAdd(enemy);
             }
         }
-    }
-    static displacement() {
-        if (this._displacement == null) {
-            this._displacement = Coords.create();
-        }
-        return this._displacement;
-    }
-    static killableDie(uwpe) {
-        var enemy = uwpe.entity;
-        var enemyProperty = EnemyProperty.of(enemy);
-        var habitatCaptured = enemyProperty.habitatCaptured;
-        if (habitatCaptured != null) {
-            var constrainable = Constrainable.of(habitatCaptured);
-            constrainable.constraintRemoveFinal();
-        }
-        var entityExplosion = uwpe.universe.entityBuilder.explosion(Locatable.of(enemy).loc.pos, 10, // radius
-        "Effects_Boom", 40, // ticksToLive
-        (uwpe) => { });
-        var place = uwpe.place;
-        place.entityToSpawnAdd(entityExplosion);
-        // Stats.
-        var player = place.player();
-        var playerStatsKeeper = StatsKeeper.of(player);
-        playerStatsKeeper.killsIncrement();
-        var scorable = Scorable.of(enemy);
-        var scoreForKillingEnemy = scorable.scoreGet(uwpe);
-        playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
     }
     static visualBuild() {
         var colors = Color.Instances();
@@ -137,15 +169,15 @@ class Enemy extends Entity {
         ]);
     }
 }
-class EnemyProperty extends EntityPropertyBase {
+class EnemyRaiderProperty extends EntityPropertyBase {
     static create() {
-        return new EnemyProperty();
+        return new EnemyRaiderProperty();
     }
     static of(entity) {
-        return entity.propertyByName(EnemyProperty.name);
+        return entity.propertyByName(EnemyRaiderProperty.name);
     }
     // Clonable.
     clone() {
-        return new EnemyProperty();
+        return new EnemyRaiderProperty();
     }
 }

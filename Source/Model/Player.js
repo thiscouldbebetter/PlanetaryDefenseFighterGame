@@ -7,7 +7,8 @@ class Player extends Entity {
             Constrainable.fromConstraints([
                 Constraint_WrapToPlaceSizeXTrimY.create(),
                 Constraint_ContainInHemispace.fromHemispace(Hemispace.fromPlane(Plane.fromNormalAndDistanceFromOrigin(Coords.fromXY(0, 1), 250))),
-                Constraint_OrientationRound.fromHeadingsCount(2)
+                Constraint_OrientationRound.fromHeadingsCount(2),
+                Constraint_FrictionY.fromCoefficient(0.1)
             ]),
             Controllable.fromToControl(uwpe => Player.toControl(uwpe)),
             Drawable.fromVisual(Player.visualBuild()),
@@ -15,7 +16,12 @@ class Player extends Entity {
             Locatable.fromDisposition(Disposition.fromPosAndVel(Coords.fromXY(100, 100), // pos
             Coords.fromXY(1, 0) // vel
             )),
-            Movable.fromAccelerationAndSpeedMax(0.2, 8),
+            Movable.fromAccelerationPerTickAndSpeedMax(.2, 8
+            /*
+            (uwpe: UniverseWorldPlaceEntities, direction: Coords) =>
+                direction.y == 0 || Math.abs(Locatable.of(uwpe.entity).loc.vel.y) < 4
+            */
+            ),
             Playable.create(),
             Player.projectileGenerator(),
             StatsKeeper.create()
@@ -26,7 +32,8 @@ class Player extends Entity {
     }
     static killableDie(uwpe) {
         var playerEntity = uwpe.entity;
-        var playerLoc = Locatable.of(playerEntity).loc;
+        var playerLocatable = Locatable.of(playerEntity);
+        var playerLoc = playerLocatable.loc;
         var playerPos = playerLoc.pos;
         var place = uwpe.place;
         var playerExplosionAndRespawner = uwpe.universe.entityBuilder.explosion(playerPos.clone(), 10, "Effects_Boom", 60, // 3 seconds.
@@ -91,7 +98,7 @@ class Player extends Entity {
             ControlLabel.fromPosAndText(Coords.fromXY(20, 4), DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve)),
             ControlVisual.fromPosAndVisual(Coords.fromXY(40, 15), DataBinding.fromContext(Habitat.visualBuild())),
             ControlLabel.fromPosAndText(Coords.fromXY(50, 4), DataBinding.fromGet(() => "" + place.habitats().length)),
-            ControlVisual.fromPosAndVisual(Coords.fromXY(70, 10), DataBinding.fromContext(Enemy.visualBuild())),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(70, 10), DataBinding.fromContext(EnemyRaider.visualBuild())),
             ControlLabel.fromPosAndText(Coords.fromXY(80, 4), DataBinding.fromGet(() => "" + place.enemies().length)),
             ControlVisual.fromPosAndVisual(Coords.fromXY(100, 10), DataBinding.fromContext(visualKills)),
             ControlLabel.fromPosAndText(Coords.fromXY(110, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.kills())),
@@ -100,10 +107,22 @@ class Player extends Entity {
         ]).toControlContainerTransparent();
     }
     static visualBuild() {
-        return VisualPolygon.fromVerticesAndColorFill([
-            Coords.fromXY(-5, -5),
-            Coords.fromXY(5, 0),
-            Coords.fromXY(-5, 5),
-        ], Color.Instances().Gray);
+        var dimension = 5;
+        var visualBuilder = VisualBuilder.Instance();
+        var colors = Color.Instances();
+        var transformTranslate = Transform_Translate.fromDisplacement(Coords.fromXY(0 - dimension, 0));
+        var bodySize = Coords.ones().multiplyScalar(dimension * 2);
+        var visualBody = visualBuilder
+            .triangleIsocelesOfSizeAndColorPointingRight(bodySize, colors.Gray)
+            .transform(transformTranslate);
+        var visualThrusterFlame = visualBuilder.flame(dimension * .75);
+        transformTranslate =
+            Transform_Translate.fromDisplacement(Coords.fromXY(0, 0 - dimension * 1.25));
+        var visualThrusterFlameOffset = visualThrusterFlame.transform(transformTranslate);
+        var transformRotate = Transform_RotateLeft.fromQuarterTurnsToRotate(1);
+        var visualThrusterFlameOffsetThenRotated = visualThrusterFlameOffset.transform(transformRotate);
+        var visualThrusterFlameConditional = VisualHidable.fromIsVisibleAndChild(uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0, visualThrusterFlameOffsetThenRotated);
+        var visual = VisualGroup.fromNameAndChildren("Player", [visualThrusterFlameConditional, visualBody]);
+        return visual;
     }
 }

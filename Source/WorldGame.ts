@@ -1,6 +1,8 @@
 
 class WorldGame extends World
 {
+	player: Player;
+
 	constructor(name: string)
 	{
 		var name = name;
@@ -18,6 +20,8 @@ class WorldGame extends World
 		(
 			name, timeCreated, defn, placeGetByName, placeInitialName
 		);
+
+		this.player = player;
 	}
 
 	static defnBuild(): WorldDefn
@@ -26,7 +30,7 @@ class WorldGame extends World
 		([
 			[
 				UserInputListener.activityDefn(),
-				Enemy.activityDefnBuild()
+				EnemyRaider.activityDefnBuild()
 			],
 			[
 				PlacePlanet.defnBuild()

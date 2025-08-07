@@ -4,8 +4,7 @@ class Planet extends Entity {
         super(Planet.name, [
             Drawable.fromVisual(Planet.visual(size, horizonHeight)).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
             Locatable.create(),
-            Planet.triggerable(),
-            StatsKeeper.create()
+            Planet.triggerable()
         ]);
         this.horizonHeight = horizonHeight;
     }
@@ -33,7 +32,12 @@ class Planet extends Entity {
         var universe = uwpe.universe;
         universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledgeNoButtons("GAME OVER", () => // acknowledge
          {
-            var leaderboard = Leaderboard.createWithFakeScores();
+            var leaderboard = Leaderboard.fromStorageHelper(universe.storageHelper);
+            var place = uwpe.place;
+            var player = place.player();
+            var statsKeeper = StatsKeeper.of(player);
+            var score = statsKeeper.score();
+            leaderboard.scoreInsert(score);
             var leaderboardAsVenue = leaderboard.toVenue(uwpe);
             var venueNext = leaderboardAsVenue;
             universe.venueTransitionTo(venueNext);

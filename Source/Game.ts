@@ -12,13 +12,7 @@ class Game
 
 	start(): void
 	{
-		var mediaFilePaths = this.mediaFilePathsBuild();
-
-		var mediaLibrary =
-			MediaLibrary.fromContentDirectoryPathAndMediaFilePaths
-			(
-				this.contentDirectoryPath, mediaFilePaths
-			);
+		var mediaLibrary = this.mediaLibraryBuild()
 
 		var worldCreator = WorldCreator.fromWorldCreate
 		(
@@ -31,13 +25,25 @@ class Game
 			worldCreator
 		);
 
-		universe.initialize
-		(
-			() => { universe.start(); }
-		);
+		universe.initializeAndStart();
 	}
 
-	mediaFilePathsBuild(): string[]
+	mediaLibraryBuild() : MediaLibrary
+	{
+		var mediaFilePaths = this.mediaLibraryBuild_FilePaths();
+
+		var mediaLibrary = MediaLibrary.fromContentDirectoryPathAndMediaFilePaths
+		(
+			this.contentDirectoryPath, mediaFilePaths
+		);
+
+		var soundTest = this.mediaLibraryBuild_SoundTest();
+		mediaLibrary.soundAdd(soundTest);
+
+		return mediaLibrary;
+	}
+
+	mediaLibraryBuild_FilePaths(): string[]
 	{
 		var contentDirectoryPath = this.contentDirectoryPath;
 
@@ -47,19 +53,19 @@ class Game
 		contentDirectoryPath = "../Source/Framework/Content/" + contentDirectoryPath;
 
 		var fontDirectoryPath = contentDirectoryPath + "Fonts/";
-		// var imageDirectoryPath = contentDirectoryPath + "Images/";
+		//var imageDirectoryPath = contentDirectoryPath + "Images/";
 		var soundEffectDirectoryPath = contentDirectoryPath + "Audio/Effects/";
 		var soundMusicDirectoryPath = contentDirectoryPath + "Audio/Music/";
 		var textStringDirectoryPath = contentDirectoryPath + "Text/";
 		var videoDirectoryPath = contentDirectoryPath + "Video/";
 
-		var title = (x: string) => imageTitlesDirectoryPath + x;
-		// var image = (x: string) => imageDirectoryPath + x;
-		var effect = (x: string) => soundEffectDirectoryPath + x;
-		var music = (x: string) => soundMusicDirectoryPath + x;
-		var video = (x: string) => videoDirectoryPath + x;
-		var font = (x: string) => fontDirectoryPath + x;
-		var text = (x: string) => textStringDirectoryPath + x;
+		var title = (a: string) => imageTitlesDirectoryPath + a;
+		// var image = (a: string) => imageDirectoryPath + a;
+		var effect = (a: string) => soundEffectDirectoryPath + a;
+		var music = (a: string) => soundMusicDirectoryPath + a;
+		var video = (a: string) => videoDirectoryPath + a;
+		var font = (a: string) => fontDirectoryPath + a;
+		var text = (a: string) => textStringDirectoryPath + a;
 
 		var mediaFilePaths =
 		[
@@ -68,7 +74,6 @@ class Game
 			title("Title.png"),
 
 			effect("_Default.wav"),
-			effect("_Silence.wav"),
 			effect("Bading.wav"),
 			effect("Blip.wav"),
 			effect("Boom.wav"),
@@ -91,5 +96,26 @@ class Game
 		];
 
 		return mediaFilePaths;
+	}
+
+	mediaLibraryBuild_SoundTest(): Sound
+	{
+		var soundSequenceBading =
+			SoundSequence.fromDurationVoiceAndStringsForPitchesAndDurations
+			(
+				1,
+				SoundSequenceVoice.Instances().Harmonics,
+				"880,1760",
+				"10,10,5,3,1,1,1"
+			);
+
+		var soundSynthesizedBading =
+			SoundFromSoundEffectSynthesizerSequence.fromNameAndSoundSequence
+			(
+				"Bading",
+				soundSequenceBading
+			);
+
+		return soundSynthesizedBading;
 	}
 }

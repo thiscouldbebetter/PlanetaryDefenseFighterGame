@@ -27,7 +27,8 @@ class Player extends Entity
 							)
 						)
 					),
-					Constraint_OrientationRound.fromHeadingsCount(2)
+					Constraint_OrientationRound.fromHeadingsCount(2),
+					Constraint_FrictionY.fromCoefficient(0.1)
 				]),
 
 				Controllable.fromToControl
@@ -54,7 +55,15 @@ class Player extends Entity
 					)
 				),
 
-				Movable.fromAccelerationAndSpeedMax(0.2, 8),
+				Movable.fromAccelerationPerTickAndSpeedMax
+				(
+					.2,
+					8
+					/*
+					(uwpe: UniverseWorldPlaceEntities, direction: Coords) =>
+						direction.y == 0 || Math.abs(Locatable.of(uwpe.entity).loc.vel.y) < 4
+					*/
+				),
 
 				Playable.create(),
 
@@ -74,7 +83,8 @@ class Player extends Entity
 	{
 		var playerEntity = uwpe.entity as Player;
 
-		var playerLoc = Locatable.of(playerEntity).loc;
+		var playerLocatable = Locatable.of(playerEntity);
+		var playerLoc = playerLocatable.loc;
 		var playerPos = playerLoc.pos;
 
 		var place = uwpe.place;
@@ -221,7 +231,7 @@ class Player extends Entity
 				ControlVisual.fromPosAndVisual
 				(
 					Coords.fromXY(70, 10),
-					DataBinding.fromContext(Enemy.visualBuild())
+					DataBinding.fromContext(EnemyRaider.visualBuild())
 				),
 				ControlLabel.fromPosAndText
 				(
@@ -270,15 +280,49 @@ class Player extends Entity
 
 	static visualBuild(): VisualBase
 	{
-		return VisualPolygon.fromVerticesAndColorFill
+		var dimension = 5;
+
+		var visualBuilder = VisualBuilder.Instance();
+
+		var colors = Color.Instances();
+
+		var transformTranslate =
+			Transform_Translate.fromDisplacement(Coords.fromXY(0 - dimension, 0) );
+
+		var bodySize = Coords.ones().multiplyScalar(dimension * 2);
+		var visualBody =
+			visualBuilder
+				.triangleIsocelesOfSizeAndColorPointingRight(bodySize, colors.Gray)
+				.transform(transformTranslate);
+
+		var visualThrusterFlame =
+			visualBuilder.flame(dimension * .75);
+
+		transformTranslate =
+			Transform_Translate.fromDisplacement(Coords.fromXY(0, 0 - dimension * 1.25) );
+
+		var visualThrusterFlameOffset =
+			visualThrusterFlame.transform(transformTranslate);
+
+		var transformRotate = Transform_RotateLeft.fromQuarterTurnsToRotate(1)
+
+		var visualThrusterFlameOffsetThenRotated =
+			visualThrusterFlameOffset.transform(transformRotate);
+
+		var visualThrusterFlameConditional =
+			VisualHidable.fromIsVisibleAndChild
+			(
+				uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0,
+				visualThrusterFlameOffsetThenRotated
+			);
+
+		var visual = VisualGroup.fromNameAndChildren
 		(
-			[
-				Coords.fromXY(-5, -5),
-				Coords.fromXY(5, 0),
-				Coords.fromXY(-5, 5),
-			],
-			Color.Instances().Gray
+			"Player",
+			[visualThrusterFlameConditional, visualBody]
 		);
+
+		return visual;
 	}
 
 }

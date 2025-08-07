@@ -46,7 +46,7 @@ class PlacePlanet extends PlaceBase
 		);
 		var enemyGenerator = EntityGenerator.fromEntityTicksBatchMaxesAndPosBox
 		(
-			Enemy.fromPos(Coords.create() ),
+			EnemyRaider.fromPos(Coords.create() ),
 			100, // ticksPerGeneration
 			1, // entitiesPerGeneration
 			enemiesCount, // concurrent

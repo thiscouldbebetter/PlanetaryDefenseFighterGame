@@ -11,12 +11,13 @@ class WorldGame extends World {
         var placeGetByName = (placeName) => placesByName.get(placeName);
         var placeInitialName = places[0].name;
         super(name, timeCreated, defn, placeGetByName, placeInitialName);
+        this.player = player;
     }
     static defnBuild() {
         return new WorldDefn([
             [
                 UserInputListener.activityDefn(),
-                Enemy.activityDefnBuild()
+                EnemyRaider.activityDefnBuild()
             ],
             [
                 PlacePlanet.defnBuild()

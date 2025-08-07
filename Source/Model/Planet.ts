@@ -16,9 +16,7 @@ class Planet extends Entity
 
 				Locatable.create(),
 
-				Planet.triggerable(),
-
-				StatsKeeper.create()
+				Planet.triggerable()
 			]
 		);
 
@@ -90,7 +88,12 @@ class Planet extends Entity
 				() => // acknowledge
 				{
 					var leaderboard =
-						Leaderboard.createWithFakeScores();
+						Leaderboard.fromStorageHelper(universe.storageHelper);
+					var place = uwpe.place as PlacePlanet;
+					var player = place.player();
+					var statsKeeper = StatsKeeper.of(player);
+					var score = statsKeeper.score();
+					leaderboard.scoreInsert(score);
 					var leaderboardAsVenue = leaderboard.toVenue(uwpe);
 					var venueNext = leaderboardAsVenue;
 					universe.venueTransitionTo(venueNext);
