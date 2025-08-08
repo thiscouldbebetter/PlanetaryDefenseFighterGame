@@ -12,12 +12,116 @@ class Enemy extends Entity
 			Enemy.collidableBuild(),
 			Enemy.constrainableBuild(),
 			EnemyProperty.create(),
-			Locatable.fromPos(pos),
-			Movable.fromAccelerationPerTickAndSpeedMax(2, 1)
+			Locatable.fromPos(pos)
 		];
 		properties.push(...propertiesCommonToAllEnemies);
 
 		super(name, properties);
+	}
+
+	static activityDefnPerform_ChooseTargetEntity_RandomPoint
+	(
+		uwpe: UniverseWorldPlaceEntities
+	): Entity
+	{
+		var place = uwpe.place as PlacePlanet;
+
+		var planet = place.planet();
+		var placeSize = place.size();
+		var placeSizeMinusGround =
+			placeSize
+				.clone()
+				.subtract(Coords.fromXY(0, planet.horizonHeight) );
+		var randomizer = uwpe.universe.randomizer;
+		var posRandom = Coords.random(randomizer).multiply(placeSizeMinusGround);
+		var targetEntity = Entity.fromNameAndProperty
+		(
+			"RandomPoint",
+			Locatable.fromPos(posRandom)
+		);
+		return targetEntity;
+	}
+
+	static activityDefnPerform_FireGunAtPlayerIfCharged(uwpe: UniverseWorldPlaceEntities): void
+	{
+		var enemy = uwpe.entity;
+		var enemyDisp = Locatable.of(enemy).loc;
+		var enemyPos = enemyDisp.pos;
+
+		var place = uwpe.place as PlacePlanet;
+		var player = place.player();
+
+		var deviceGun = Device.of(enemy);
+		uwpe.entity2Set(enemy); // For Device.
+		var deviceGunCanBeUsed = deviceGun.canUse(uwpe);
+		if (deviceGunCanBeUsed)
+		{
+			var playerPos = Locatable.of(player).pos();
+			var displacementToPlayer =
+				playerPos.clone().subtract(enemyPos);
+			var distanceToPlayer = displacementToPlayer.magnitude();
+			var projectileGenerator = ProjectileGenerator.of(enemy);
+			var projectileRange = projectileGenerator.range();
+			if (distanceToPlayer < projectileRange)
+			{
+				var directionToPlayer =
+					displacementToPlayer.normalize();
+				enemyDisp.orientation.forwardSet(directionToPlayer);
+				deviceGun.use(uwpe);
+			}
+		}
+	}
+
+	static activityDefnPerform_MoveTowardTarget
+	(
+		uwpe: UniverseWorldPlaceEntities,
+		targetHasBeenReached: (uwpe: UniverseWorldPlaceEntities) => void
+	): void
+	{
+		var enemy = uwpe.entity;
+
+		var enemyPos = Locatable.of(enemy).pos();
+
+		var enemyActor = Actor.of(enemy);
+		var enemyActivity = enemyActor.activity;
+		var targetEntity = enemyActivity.targetEntity();
+
+		var targetPos = Locatable.of(targetEntity).loc.pos;
+		var displacementToTarget =
+			Enemy
+				.displacement()
+				.overwriteWith(targetPos)
+				.subtract(enemyPos);
+		var distanceToTarget = displacementToTarget.magnitude();
+		var directionToTarget =
+			displacementToTarget.clone().divideScalar(distanceToTarget);
+		var enemyMovable = Movable.of(enemy);
+		var enemyAccelerationPerTick =
+			enemyMovable.accelerationPerTickInDirection(uwpe, directionToTarget);
+		if (distanceToTarget >= enemyAccelerationPerTick)
+		{
+			var enemySpeedMax =
+				enemyMovable.speedMax(uwpe);
+			var displacementToMove =
+				displacementToTarget
+					.divideScalar(distanceToTarget)
+					.multiplyScalar(enemySpeedMax);
+			enemyPos.add(displacementToMove);
+		}
+		else
+		{
+			targetHasBeenReached(uwpe);
+		}
+	}
+
+	static activityDefnPerform_TargetClear
+	(
+		uwpe: UniverseWorldPlaceEntities
+	): void
+	{
+		var enemy = uwpe.entity;
+		var enemyActivity = Actor.of(enemy).activity;
+		enemyActivity.targetEntityClear();
 	}
 
 	static collidableBuild(): Collidable
@@ -49,17 +153,7 @@ class Enemy extends Entity
 
 	static killableDie(uwpe: UniverseWorldPlaceEntities): void
 	{
-		var enemy = uwpe.entity as Enemy;
-		var enemyRaiderProperty = EnemyRaiderProperty.of(enemy);
-		if (enemyRaiderProperty != null)
-		{
-			var habitatCaptured = enemyRaiderProperty.habitatCaptured;
-			if (habitatCaptured != null)
-			{
-				var constrainable = Constrainable.of(habitatCaptured);
-				constrainable.constraintRemoveFinal();
-			}
-		}
+		var enemy = uwpe.entity;
 
 		var entityExplosion =
 			uwpe.universe.entityBuilder.explosion
@@ -85,6 +179,11 @@ class Enemy extends Entity
 		var scorable = Scorable.of(enemy);
 		var scoreForKillingEnemy = scorable.scoreGet(uwpe);
 		playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
+	}
+
+	static projectileGeneratorBuild(): ProjectileGenerator
+	{
+		return ProjectileGenerator.default();
 	}
 
 	static _displacement: Coords;
@@ -115,236 +214,6 @@ class EnemyProperty extends EntityPropertyBase<EnemyProperty>
 	clone(): EnemyProperty
 	{
 		return new EnemyProperty();
-	}
-}
-
-class EnemyRaider extends Enemy
-{
-	constructor(pos: Coords)
-	{
-		super
-		(
-			EnemyRaider.name,
-			pos,
-			[
-				Actor.fromActivityDefnName
-				(
-					EnemyRaider.activityDefnBuild().name
-				),
-
-				Drawable.fromVisual
-				(
-					EnemyRaider.visualBuild()
-				),
-
-				EnemyRaiderProperty.create(),
-
-				Killable.fromDie(Enemy.killableDie),
-
-				Scorable.fromPoints(100)
-			]
-		);
-	}
-
-	static fromPos(pos: Coords): EnemyRaider
-	{
-		return new EnemyRaider(pos);
-	}
-
-	static activityDefnBuild(): ActivityDefn
-	{
-		return new ActivityDefn
-		(
-			EnemyRaider.name, EnemyRaider.activityDefnPerform
-		);
-	}
-
-	static activityDefnPerform(uwpe: UniverseWorldPlaceEntities): void
-	{
-		var universe = uwpe.universe;
-		var randomizer = universe.randomizer;
-		var place = uwpe.place as PlacePlanet;
-		var entity = uwpe.entity;
-
-		var enemy = entity as EnemyRaider;
-
-		var enemyPos = Locatable.of(enemy).loc.pos;
-
-		var enemyActor = Actor.of(enemy);
-		var enemyActivity = enemyActor.activity;
-		var targetEntity = enemyActivity.targetEntity();
-
-		if (targetEntity == null)
-		{
-			var placePlanet = place as PlacePlanet;
-			var habitats = placePlanet.habitats();
-			var enemies = placePlanet.enemies();
-			var habitatsNotAlreadyCapturedOrTargeted =
-				habitats.filter
-				(
-					h =>
-						(
-							enemies.some
-							(
-								e => EnemyRaiderProperty.of(e).habitatCaptured == h
-							) == false
-						)
-						&&
-						(
-							enemies.some
-							(
-								e => Actor.of(e).activity.targetEntity() == h
-							) == false
-						)
-				);
-
-			if (habitatsNotAlreadyCapturedOrTargeted.length == 0)
-			{
-				var planet = place.planet();
-				var placeSize = place.size();
-				var placeSizeMinusGround =
-					placeSize.clone().subtract(Coords.fromXY(0, planet.horizonHeight) )
-				var posRandom = Coords.random(randomizer).multiply(placeSizeMinusGround);
-				targetEntity = Entity.fromNameAndProperty
-				(
-					"RandomPoint",
-					Locatable.fromPos(posRandom)
-				);
-			}
-			else
-			{
-				targetEntity = ArrayHelper.random
-				(
-					habitatsNotAlreadyCapturedOrTargeted, randomizer
-				);
-			}
-		}
-
-		enemyActivity.targetEntitySet(targetEntity);
-
-		var targetPos = Locatable.of(targetEntity).loc.pos;
-		var displacementToTarget =
-			Enemy.displacement()
-			.overwriteWith(targetPos)
-			.subtract(enemyPos);
-		var distanceToTarget = displacementToTarget.magnitude();
-		var directionToTarget =
-			displacementToTarget.clone().divideScalar(distanceToTarget);
-		var enemyMovable = Movable.of(enemy);
-		var enemyAccelerationPerTick =
-			enemyMovable.accelerationPerTickInDirection(uwpe, directionToTarget);
-		if (distanceToTarget >= enemyAccelerationPerTick)
-		{
-			var enemySpeedMax =
-				enemyMovable.speedMax(uwpe);
-			var displacementToMove =
-				displacementToTarget
-					.divideScalar(distanceToTarget)
-					.multiplyScalar(enemySpeedMax);
-			enemyPos.add(displacementToMove);
-		}
-		else
-		{
-			enemyPos.overwriteWith(targetPos);
-			var enemyRaiderProperty = EnemyRaiderProperty.of(enemy);
-			var targetIsHabitat = (targetEntity.constructor.name == Habitat.name);
-
-			if (targetIsHabitat)
-			{
-				var targetHabitat = targetEntity as Habitat;
-				enemyRaiderProperty.habitatCaptured = targetHabitat;
-
-				var targetConstrainable =
-					Constrainable.of(targetEntity);
-
-				var constraintToAddToTarget = Constraint_Multiple.fromChildren
-				([
-					Constraint_AttachToEntityWithId
-						.fromTargetEntityId(enemy.id),
-					Constraint_Transform.fromTransform
-					(
-						Transform_Translate.fromDisplacement
-						(
-							Coords.fromXY(0, 10)
-						)
-					)
-				]);
-
-				targetConstrainable
-					.constraintAdd(constraintToAddToTarget);
-
-				targetEntity = Entity.fromNameAndProperty
-				(
-					"EscapePoint",
-					Locatable.fromPos
-					(
-						enemyPos.clone().addXY
-						(
-							0, 0 - place.size().y
-						)
-					)
-				);
-				enemyActivity.targetEntitySet(targetEntity);
-			}
-			else if (enemyPos.y >= 0)
-			{
-				// Choose another random point to wander to.
-
-				enemyActivity.targetEntityClear();
-			}
-			else
-			{
-				// Escape.
-
-				place.entityToRemoveAdd(enemyRaiderProperty.habitatCaptured);
-				place.entityToRemoveAdd(enemy);
-			}
-		}
-	}
-
-	static visualBuild(): VisualBase
-	{
-		var colors = Color.Instances();
-
-		return VisualGroup.fromChildren
-		([
-			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
-			(
-				6, 4, colors.Green
-			),
-			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
-			(
-				4, 3, colors.Red
-			),
-			VisualFan.fromRadiusAnglesStartAndSpannedAndColorsFillAndBorder
-			(
-				4, // radius
-				.5, .5, // angleStart-, angleSpannedInTurns
-				colors.Red, null // colorFill, colorBorder
-			)
-		]);
-	}
-}
-
-class EnemyRaiderProperty extends EntityPropertyBase<EnemyRaiderProperty>
-{
-	habitatCaptured: Habitat;
-
-	static create()
-	{
-		return new EnemyRaiderProperty();
-	}
-
-	static of(entity: Entity): EnemyRaiderProperty
-	{
-		return entity.propertyByName(EnemyRaiderProperty.name) as EnemyRaiderProperty;
-	}
-
-	// Clonable.
-
-	clone(): EnemyRaiderProperty
-	{
-		return new EnemyRaiderProperty();
 	}
 }
 

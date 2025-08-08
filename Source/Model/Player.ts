@@ -286,13 +286,15 @@ class Player extends Entity
 
 		var colors = Color.Instances();
 
+		var transformScale =
+			Transform_Scale.fromScaleFactor(dimension * 2);
 		var transformTranslate =
 			Transform_Translate.fromDisplacement(Coords.fromXY(0 - dimension, 0) );
 
-		var bodySize = Coords.ones().multiplyScalar(dimension * 2);
 		var visualBody =
 			visualBuilder
-				.triangleIsocelesOfSizeAndColorPointingRight(bodySize, colors.Gray)
+				.triangleIsocelesOfColorPointingRight(colors.Gray)
+				.transform(transformScale)
 				.transform(transformTranslate);
 
 		var visualThrusterFlame =

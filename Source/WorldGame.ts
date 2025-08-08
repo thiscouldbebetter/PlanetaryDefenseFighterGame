@@ -30,7 +30,12 @@ class WorldGame extends World
 		([
 			[
 				UserInputListener.activityDefn(),
-				EnemyRaider.activityDefnBuild()
+				EnemyBurster.activityDefnBuild(),
+				EnemyChaser.activityDefnBuild(),
+				EnemyHarrier.activityDefnBuild(),
+				EnemyMinelayer.activityDefnBuild(),
+				EnemyMarauder.activityDefnBuild(),
+				EnemyRaider.activityDefnBuild(),
 			],
 			[
 				PlacePlanet.defnBuild()
