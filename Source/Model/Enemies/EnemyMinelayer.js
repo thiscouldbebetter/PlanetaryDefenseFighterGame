@@ -1,0 +1,65 @@
+"use strict";
+class EnemyMinelayer extends Enemy {
+    constructor(pos) {
+        super(EnemyMinelayer.name, pos, [
+            Actor.fromActivityDefnName(EnemyMinelayer.activityDefnBuild().name),
+            Carrier.create(),
+            Device.fromNameTicksToChargeAndUse("Gun", 60, // 3 seconds
+            // 3 seconds
+            uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+            ),
+            Drawable.fromVisual(EnemyMinelayer.visualBuild()),
+            Killable.fromDie(Enemy.killableDie),
+            Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
+            Enemy.projectileGeneratorBuild(),
+            Scorable.fromPoints(100)
+        ]);
+    }
+    static fromPos(pos) {
+        return new EnemyMinelayer(pos);
+    }
+    static activityDefnBuild() {
+        return new ActivityDefn(EnemyMinelayer.name, EnemyMinelayer.activityDefnPerform);
+    }
+    static activityDefnPerform(uwpe) {
+        // Fly in a horizontal zigzag, dropping mines constantly.
+        Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
+        var enemy = uwpe.entity;
+        var enemyActivity = Actor.of(enemy).activity;
+        var target = enemyActivity.targetEntity();
+        if (target == null) {
+            var place = uwpe.place;
+            var placeSizeMinusSurface = place.sizeMinusSurface();
+            var altitudesToFlyBetweenAsFractions = [0.25, 0.75];
+            var altitudesToFlyBetween = altitudesToFlyBetweenAsFractions.map(x => x * placeSizeMinusSurface.y);
+            var differenceOfAltitudesToFlyBetween = altitudesToFlyBetween[1] - altitudesToFlyBetween[0];
+            var enemyPos = Locatable.of(enemy).pos();
+            var altitudeToFlyBetweenIndex = (enemyPos.y <= altitudesToFlyBetween[0])
+                ? 0
+                : 1;
+            var altitudeToFlyToward = altitudesToFlyBetween[altitudeToFlyBetweenIndex];
+            var targetPos = Coords.fromXY(enemyPos.x + differenceOfAltitudesToFlyBetween, altitudeToFlyToward);
+            var target = Entity.fromProperty(Locatable.fromPos(targetPos));
+            enemyActivity.targetEntitySet(target);
+        }
+        else {
+            Enemy.activityDefnPerform_MoveTowardTarget(uwpe, () => EnemyMinelayer.activityDefnPerform_TargetHasBeenReached(uwpe));
+        }
+    }
+    static activityDefnPerform_TargetHasBeenReached(uwpe) {
+        var enemy = uwpe.entity;
+        var enemyActivity = Actor.of(enemy).activity;
+        enemyActivity.targetEntityClear();
+    }
+    static visualBuild() {
+        var colors = Color.Instances();
+        return VisualGroup.fromChildren([
+            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(6, 4, colors.Green),
+            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(4, 3, colors.Red),
+            VisualFan.fromRadiusAnglesStartAndSpannedAndColorsFillAndBorder(4, // radius
+            .5, .5, // angleStart-, angleSpannedInTurns
+            colors.Red, null // colorFill, colorBorder
+            )
+        ]);
+    }
+}

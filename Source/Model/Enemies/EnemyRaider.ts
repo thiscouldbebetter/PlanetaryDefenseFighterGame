@@ -1,0 +1,261 @@
+
+class EnemyRaider extends Enemy
+{
+	constructor(pos: Coords)
+	{
+		super
+		(
+			EnemyRaider.name,
+			pos,
+			[
+				Actor.fromActivityDefnName
+				(
+					EnemyRaider.activityDefnBuild().name
+				),
+
+				Carrier.create(),
+
+				Device.fromNameTicksToChargeAndUse
+				(
+					"Gun",
+					100, // 5 seconds
+					uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+				),
+
+				Drawable.fromVisual
+				(
+					EnemyRaider.visualBuild()
+				),
+
+				Killable.fromDie(Enemy.killableDie),
+
+				Enemy.projectileGeneratorBuild(),
+
+				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
+
+				Scorable.fromPoints(100)
+			]
+		);
+	}
+
+	static fromPos(pos: Coords): EnemyRaider
+	{
+		return new EnemyRaider(pos);
+	}
+
+	static activityDefnBuild(): ActivityDefn
+	{
+		return new ActivityDefn
+		(
+			EnemyRaider.name, EnemyRaider.activityDefnPerform
+		);
+	}
+
+	static activityDefnPerform(uwpe: UniverseWorldPlaceEntities): void
+	{
+		var place = uwpe.place as PlacePlanet;
+		var enemy = uwpe.entity;
+
+		var player = place.player();
+		if (player != null)
+		{
+			Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
+		}
+
+		var enemyActor = Actor.of(enemy);
+		var enemyActivity = enemyActor.activity;
+		var targetEntity = enemyActivity.targetEntity();
+
+		if (targetEntity == null)
+		{
+			targetEntity =
+				EnemyRaider.activityDefnPerform_ChooseTargetEntity(uwpe);
+		}
+
+		enemyActivity.targetEntitySet(targetEntity);
+
+		Enemy.activityDefnPerform_MoveTowardTarget
+		(
+			uwpe,
+			EnemyRaider.activityDefnPerform_MoveTowardTarget_TargetHasBeenReached
+		);
+	}
+
+	static activityDefnPerform_ChooseTargetEntity
+	(
+		uwpe: UniverseWorldPlaceEntities
+	): Entity
+	{
+		var place = uwpe.place;
+		var placePlanet = place as PlacePlanet;
+		var habitats = placePlanet.habitats();
+		var enemies = placePlanet.enemies();
+		var habitatsNotAlreadyCapturedOrTargeted =
+			habitats.filter
+			(
+				h =>
+					(
+						enemies.some
+						(
+							e => Carrier.of(e).habitatCarried == h
+						) == false
+					)
+					&&
+					(
+						enemies.some
+						(
+							e => Actor.of(e).activity.targetEntity() == h
+						) == false
+					)
+			);
+
+		var targetEntity: Entity;
+
+		if (habitatsNotAlreadyCapturedOrTargeted.length == 0)
+		{
+			targetEntity =
+				Enemy.activityDefnPerform_ChooseTargetEntity_RandomPoint(uwpe);
+		}
+		else
+		{
+			var randomizer = uwpe.universe.randomizer;
+			targetEntity = ArrayHelper.random
+			(
+				habitatsNotAlreadyCapturedOrTargeted, randomizer
+			);
+		}
+
+		return targetEntity;
+	}
+
+	static activityDefnPerform_MoveTowardTarget_TargetHasBeenReached
+	(
+		uwpe: UniverseWorldPlaceEntities
+	): void
+	{
+		var enemy = uwpe.entity;
+
+		var enemyActivity = Actor.of(enemy).activity;
+		var targetEntity = enemyActivity.targetEntity();
+		var targetPos = Locatable.of(targetEntity).pos();
+
+		var enemyPos = Locatable.of(enemy).pos();
+		enemyPos.overwriteWith(targetPos);
+
+		var targetIsHabitat = (targetEntity.constructor.name == Habitat.name);
+
+		if (targetIsHabitat)
+		{
+			EnemyRaider
+				.activityDefnPerform_TargetHasBeenReached_CaptureHabitatAndTargetUpgradePoint(uwpe);
+		}
+		else if (enemyPos.y >= 0)
+		{
+			// Choose another random point to wander to.
+			enemyActivity.targetEntityClear();
+		}
+		else // Above the screen.
+		{
+			// Destroy the carried habitat and upgrade the enemy.
+			var place = uwpe.place;
+
+			var carrier = Carrier.of(enemy);
+			place.entityToRemoveAdd(carrier.habitatCarried);
+			place.entityToRemoveAdd(enemy);
+
+			var enemyUpgraded = EnemyMarauder.fromPos(enemyPos);
+			place.entityToSpawnAdd(enemyUpgraded);
+		}
+	}
+
+	static activityDefnPerform_TargetHasBeenReached_CaptureHabitatAndTargetUpgradePoint
+	(
+		uwpe: UniverseWorldPlaceEntities
+	): void
+	{
+		var enemy = uwpe.entity;
+
+		var enemyActor = Actor.of(enemy);
+		var enemyActivity = enemyActor.activity;
+		var targetEntity = enemyActivity.targetEntity();
+
+		var targetHabitat = targetEntity as Habitat;
+		var carrier = Carrier.of(enemy);
+		carrier.habitatCarried = targetHabitat;
+
+		var targetConstrainable = Constrainable.of(targetEntity);
+
+		var constraintToAddToTarget = Constraint_Multiple.fromChildren
+		([
+			Constraint_AttachToEntityWithId
+				.fromTargetEntityId(enemy.id),
+			Constraint_Transform.fromTransform
+			(
+				Transform_Translate.fromDisplacement
+				(
+					Coords.fromXY(0, 10)
+				)
+			)
+		]);
+
+		targetConstrainable
+			.constraintAdd(constraintToAddToTarget);
+
+		var place = uwpe.place;
+		var enemyPos = Locatable.of(enemy).pos();
+
+		var targetEntity = Entity.fromNameAndProperty
+		(
+			"UpgradePoint",
+			Locatable.fromPos
+			(
+				enemyPos.clone().addXY
+				(
+					0, 0 - place.size().y
+				)
+			)
+		);
+		enemyActivity.targetEntitySet(targetEntity);
+	}
+
+	static killableDie(uwpe: UniverseWorldPlaceEntities): void
+	{
+		Enemy.killableDie(uwpe);
+
+		var enemy = uwpe.entity as Enemy;
+		var enemyCarrier = Carrier.of(enemy);
+		if (enemyCarrier != null)
+		{
+			var habitatCaptured = enemyCarrier.habitatCarried;
+			if (habitatCaptured != null)
+			{
+				var constrainable = Constrainable.of(habitatCaptured);
+				constrainable.constraintRemoveFinal();
+			}
+		}
+
+	}
+
+	static visualBuild(): VisualBase
+	{
+		var colors = Color.Instances();
+
+		return VisualGroup.fromChildren
+		([
+			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
+			(
+				6, 4, colors.Green
+			),
+			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
+			(
+				4, 3, colors.Red
+			),
+			VisualFan.fromRadiusAnglesStartAndSpannedAndColorsFillAndBorder
+			(
+				4, // radius
+				.5, .5, // angleStart-, angleSpannedInTurns
+				colors.Red, null // colorFill, colorBorder
+			)
+		]);
+	}
+}

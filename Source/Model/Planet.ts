@@ -131,8 +131,8 @@ class Planet extends Entity
 		var player = place.player();
 
 		var playerStatsKeeper = StatsKeeper.of(player);
-		var enemiesKilled = playerStatsKeeper.kills();
-		var enemiesTotal = place.enemiesCountInitial();
+		var enemyRaidersKilled = playerStatsKeeper.kills();
+		var enemyRaidersTotal = place.enemyRaidersCountInitial();
 
 		var habitatsRemaining = place.habitats().length;
 		var habitatsTotal = place.habitatsCountInitial();
@@ -149,7 +149,7 @@ class Planet extends Entity
 		[
 			place.name + " complete!",
 			"",
-			"Enemies killed: " + (enemiesKilled + "/" + enemiesTotal).padStart(statLengthMax, " "),
+			"Enemies killed: " + (enemyRaidersKilled + "/" + enemyRaidersTotal).padStart(statLengthMax, " "),
 			"Habitats saved: " + (habitatsRemaining + "/" + habitatsTotal).padStart(statLengthMax, " "),
 			"Hits/Shots:     " + (shotsHit + "/" + shotsFired).padStart(statLengthMax, " "),
 			"Seconds taken:  " + ("" + secondsToComplete).padStart(statLengthMax, " "),

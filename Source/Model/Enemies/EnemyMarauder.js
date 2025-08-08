@@ -1,0 +1,56 @@
+"use strict";
+class EnemyMarauder extends Enemy {
+    constructor(pos) {
+        super(EnemyMarauder.name, pos, [
+            Actor.fromActivityDefnName(EnemyMarauder.activityDefnBuild().name),
+            Carrier.create(),
+            Device.fromNameTicksToChargeAndUse("Gun", 40, // 2 seconds
+            // 2 seconds
+            uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+            ),
+            Drawable.fromVisual(EnemyMarauder.visualBuild()),
+            Killable.fromDie(Enemy.killableDie),
+            Enemy.projectileGeneratorBuild(),
+            Movable.fromAccelerationPerTickAndSpeedMax(4, 2),
+            Scorable.fromPoints(100)
+        ]);
+    }
+    static fromPos(pos) {
+        return new EnemyMarauder(pos);
+    }
+    static activityDefnBuild() {
+        return new ActivityDefn(EnemyMarauder.name, EnemyMarauder.activityDefnPerform);
+    }
+    static activityDefnPerform(uwpe) {
+        var enemy = uwpe.entity;
+        var enemyActivity = Actor.of(enemy).activity;
+        var targetEntity = enemyActivity.targetEntity();
+        if (targetEntity == null) {
+            targetEntity =
+                Enemy.activityDefnPerform_ChooseTargetEntity_RandomPoint(uwpe);
+            enemyActivity.targetEntitySet(targetEntity);
+        }
+        Enemy.activityDefnPerform_MoveTowardTarget(uwpe, Enemy.activityDefnPerform_TargetClear);
+        // The marauder moves around jerkily.
+        var jitterDistanceMax = 4;
+        var randomizer = uwpe.universe.randomizer;
+        var randomJitter = Polar
+            .random2D(randomizer)
+            .toCoords()
+            .multiplyScalar(jitterDistanceMax);
+        Locatable.of(enemy).pos().add(randomJitter);
+    }
+    static visualBuild() {
+        var colors = Color.Instances();
+        var colorSaucer = colors.Red;
+        var colorDome = colors.Green;
+        return VisualGroup.fromChildren([
+            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(6, 4, colorSaucer),
+            VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill(4, 3, colorDome),
+            VisualFan.fromRadiusAnglesStartAndSpannedAndColorsFillAndBorder(4, // radius
+            .5, .5, // angleStart-, angleSpannedInTurns
+            colorDome, null // colorFill, colorBorder
+            )
+        ]);
+    }
+}
