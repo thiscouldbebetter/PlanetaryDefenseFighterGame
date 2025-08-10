@@ -19,8 +19,9 @@ class Game
 			() => new WorldGame(this.name)
 		);
 
-		var universe = Universe.fromMediaLibraryAndWorldCreator
+		var universe = Universe.fromNameMediaLibraryAndWorldCreator
 		(
+			"PlanetaryDefenseFighterGame",
 			mediaLibrary,
 			worldCreator
 		);
@@ -100,22 +101,23 @@ class Game
 
 	mediaLibraryBuild_SoundTest(): Sound
 	{
-		var soundSequenceBading =
-			SoundSequence.fromDurationVoiceAndStringsForPitchesAndDurations
+		var soundSequenceBahding =
+			SoundSequence.fromNameDurationVoiceAndStringsForPitchesAndDurations
 			(
+				"Bahding",
 				1,
 				SoundSequenceVoice.Instances().Harmonics,
 				"880,1760",
 				"10,10,5,3,1,1,1"
 			);
 
-		var soundSynthesizedBading =
+		var soundSynthesizedBahding =
 			SoundFromSoundEffectSynthesizerSequence.fromNameAndSoundSequence
 			(
-				"Bading",
-				soundSequenceBading
+				"Bahding",
+				soundSequenceBahding
 			);
 
-		return soundSynthesizedBading;
+		return soundSynthesizedBahding;
 	}
 }

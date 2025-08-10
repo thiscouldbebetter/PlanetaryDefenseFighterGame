@@ -7,7 +7,7 @@ class Game {
     start() {
         var mediaLibrary = this.mediaLibraryBuild();
         var worldCreator = WorldCreator.fromWorldCreate(() => new WorldGame(this.name));
-        var universe = Universe.fromMediaLibraryAndWorldCreator(mediaLibrary, worldCreator);
+        var universe = Universe.fromNameMediaLibraryAndWorldCreator("PlanetaryDefenseFighterGame", mediaLibrary, worldCreator);
         universe.initializeAndStart();
     }
     mediaLibraryBuild() {
@@ -59,8 +59,8 @@ class Game {
         return mediaFilePaths;
     }
     mediaLibraryBuild_SoundTest() {
-        var soundSequenceBading = SoundSequence.fromDurationVoiceAndStringsForPitchesAndDurations(1, SoundSequenceVoice.Instances().Harmonics, "880,1760", "10,10,5,3,1,1,1");
-        var soundSynthesizedBading = SoundFromSoundEffectSynthesizerSequence.fromNameAndSoundSequence("Bading", soundSequenceBading);
-        return soundSynthesizedBading;
+        var soundSequenceBahding = SoundSequence.fromNameDurationVoiceAndStringsForPitchesAndDurations("Bahding", 1, SoundSequenceVoice.Instances().Harmonics, "880,1760", "10,10,5,3,1,1,1");
+        var soundSynthesizedBahding = SoundFromSoundEffectSynthesizerSequence.fromNameAndSoundSequence("Bahding", soundSequenceBahding);
+        return soundSynthesizedBahding;
     }
 }

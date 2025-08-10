@@ -64,7 +64,8 @@
     "Framework/Source/_BuildRecord.ts",
     "Framework/Source/Imports.ts",
     "Framework/Source/main.ts",
-    "Framework/Source/Media/Text/BinaryFileToImageTranscoder/Imports.ts",
+    "Framework/Source/Media/Audio/SoundEffectSynthesizer/Source/_Imports.ts",
+    "Framework/Source/Media/Audio/SoundEffectSynthesizer/Source/WavFileViewer/Source/_Imports.ts",
     "Framework/Source/Demo/",
     "Framework/Stub/",
     "Framework/Tests/"
