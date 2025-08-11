@@ -12,6 +12,8 @@ class Player extends Entity
 					UserInputListener.activityDefn().name
 				),
 
+				Audible.create(),
+
 				Collidable.fromCollider(Sphere.fromRadius(4) ),
 
 				Constrainable.fromConstraints
@@ -311,17 +313,25 @@ class Player extends Entity
 		var visualThrusterFlameOffsetThenRotated =
 			visualThrusterFlameOffset.transform(transformRotate);
 
-		var visualThrusterFlameConditional =
+		//var visualThrusterSound = VisualSound.fromSoundName("Effects_Whoosh");
+
+		var visualThrusterFlamePlusSound =
+			VisualGroup.fromChildren
+			([
+				//visualThrusterSound,
+				visualThrusterFlameOffsetThenRotated
+			]);
+
+		var visualThrusterFlamePlusSoundConditional =
 			VisualHidable.fromIsVisibleAndChild
 			(
 				uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0,
-				visualThrusterFlameOffsetThenRotated
+				visualThrusterFlamePlusSound
 			);
 
-		var visual = VisualGroup.fromNameAndChildren
+		var visual = VisualGroup.fromChildren
 		(
-			"Player",
-			[visualThrusterFlameConditional, visualBody]
+			[visualThrusterFlamePlusSoundConditional, visualBody]
 		);
 
 		return visual;

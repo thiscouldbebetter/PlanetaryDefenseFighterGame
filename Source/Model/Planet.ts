@@ -80,26 +80,43 @@ class Planet extends Entity
 	): void
 	{
 		var universe = uwpe.universe;
-		universe.venueTransitionTo
+
+		var leaderboard =
+			Leaderboard.fromStorageHelper(universe.storageHelper);
+
+		var leaderboardAsVenue = leaderboard.toVenue(uwpe);
+
+		var venueMessageGameOver = VenueMessage.fromTextAndAcknowledgeNoButtons
 		(
-			VenueMessage.fromTextAndAcknowledgeNoButtons
-			(
-				"GAME OVER",
-				() => // acknowledge
-				{
-					var leaderboard =
-						Leaderboard.fromStorageHelper(universe.storageHelper);
-					var place = uwpe.place as PlacePlanet;
-					var player = place.player();
-					var statsKeeper = StatsKeeper.of(player);
-					var score = statsKeeper.score();
-					leaderboard.scoreInsert(score);
-					var leaderboardAsVenue = leaderboard.toVenue(uwpe);
-					var venueNext = leaderboardAsVenue;
-					universe.venueTransitionTo(venueNext);
-				}
-			)
-		)
+			"GAME OVER",
+			() => // acknowledge
+			{
+				var world = uwpe.world as WorldGame;
+				var player = world.player;
+				var statsKeeper = StatsKeeper.of(player);
+				var score = statsKeeper.score();
+				leaderboard.scoreInsert(score);
+				universe.venueTransitionTo(leaderboardAsVenue);
+			}
+		);
+
+		var venueLayered =
+			venueMessageGameOver.venueInner(universe) as VenueLayered;
+		var venueControls = venueLayered.children[0] as VenueControls;
+
+		var secondsToHoldBeforeProceedingToVenueAfterGameOver = 5;
+
+		var controlTimer = ControlTimer.fromNameSecondsToWaitAndElapsed
+		(
+			"Advance to Next Slide Automatically",
+			secondsToHoldBeforeProceedingToVenueAfterGameOver,
+			() => universe.venueTransitionTo(leaderboardAsVenue)
+		);
+
+		var container = venueControls.controlRoot as ControlContainerTransparent;
+		container.childAdd(controlTimer);
+
+		universe.venueTransitionTo(venueMessageGameOver);
 	}
 
 	static triggerWinIsTriggered
@@ -191,10 +208,37 @@ class Planet extends Entity
 	{
 		var colors = Color.Instances();
 
-		var ground = VisualRectangle.fromSizeAndColorFill
+		var groundNormal = VisualRectangle.fromSizeAndColorFill
 		(
 			Coords.fromXY(placeSize.x, horizonHeight),
 			colors.GreenDark
+		);
+
+		var groundHighlighted = VisualRectangle.fromSizeAndColorFill
+		(
+			Coords.fromXY(placeSize.x, horizonHeight),
+			colors.Green
+		);
+
+		var groundFlashing = VisualAnimation.fromTicksToHoldFramesAndFramesRepeating
+		(
+			10, // Half a second per frame.
+			[ groundNormal, groundHighlighted ]
+		);
+
+		var groundSelectNormalOrFlashing = VisualSelect.fromSelectChildToShowAndChildren
+		(
+			(uwpe: UniverseWorldPlaceEntities, visualSelect: VisualSelect) =>
+			{
+				var place = uwpe.place as PlacePlanet;
+				var habitats = place.habitats();
+				var habitatsCount = habitats.length;
+				var onlyOneHabitatRemains = (habitatsCount <= 1);
+				var childIndex = onlyOneHabitatRemains ? 1 : 0;
+				var childToShow = visualSelect.children[childIndex];
+				return childToShow;
+			},
+			[ groundNormal, groundFlashing ]
 		);
 
 		var groundOffset = VisualOffset.fromOffsetAndChild
@@ -204,7 +248,7 @@ class Planet extends Entity
 				placeSize.x / 2,
 				placeSize.y - horizonHeight / 2
 			),
-			ground
+			groundSelectNormalOrFlashing
 		);
 
 		var mountainSegmentCount = 8;
@@ -249,9 +293,8 @@ class Planet extends Entity
 			mountains
 		);
 
-		var visual = VisualGroup.fromNameAndChildren
+		var visual = VisualGroup.fromChildren
 		(
-			"Planet",
 			[
 				groundOffset,
 				mountainsOffset

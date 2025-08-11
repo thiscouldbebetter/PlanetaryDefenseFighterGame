@@ -1,0 +1,19 @@
+
+Known Issues
+============
+
+Need to use the producer image for This Could Be Better.
+Need to finish implementing and test all enemy types.
+Need a producer sound effect.
+Title screen should cycle through several screens, including instructions and 
+Need a sound effect for player firing their thruster.
+Need a sound effect for a habitat being captured by a raider.
+Need a sound effect for transformation of raider to marauder.
+Need a sound effect for habitat falling back to ground.
+Visuals for enemies are seemingly being rendered upside down sometimes.
+Visual of star for score readout should be rotated left a quarter turn.
+Habitats dropped from too high should be destroyed
+The player colliding with an enemy should kill that enemy.
+When habitat is dropped, it drops below ground level.
+Planet should be shown exploding when the last habitat is destroyed.
+Gathering of initials for leaderboard doesn't work yet.

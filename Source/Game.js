@@ -48,9 +48,10 @@ class Game {
             effect("Chirp-Reversed.wav"),
             effect("Clank.wav"),
             effect("Pluck.wav"),
+            effect("Producer.wav"),
             effect("Slap.wav"),
+            effect("Whoosh.wav"),
             music("_Default.mp3"),
-            music("Producer.wav"),
             music("Title.mp3"),
             video("Movie.webm"),
             font("Font.ttf"),
@@ -59,7 +60,7 @@ class Game {
         return mediaFilePaths;
     }
     mediaLibraryBuild_SoundTest() {
-        var soundSequenceBahding = SoundSequence.fromNameDurationVoiceAndStringsForPitchesAndDurations("Bahding", 1, SoundSequenceVoice.Instances().Harmonics, "880,1760", "10,10,5,3,1,1,1");
+        var soundSequenceBahding = SoundSequence.fromNameDurationVoiceAndStringsForPitchesAndDurations("Synth", 1, SoundSequenceVoice.Instances().Harmonics, "880,1760", "10,10,5,3,1,1,1");
         var soundSynthesizedBahding = SoundFromSoundEffectSynthesizerSequence.fromNameAndSoundSequence("Bahding", soundSequenceBahding);
         return soundSynthesizedBahding;
     }

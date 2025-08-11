@@ -3,6 +3,7 @@ class Player extends Entity {
     constructor(pos) {
         super(Player.name, [
             Actor.fromActivityDefnName(UserInputListener.activityDefn().name),
+            Audible.create(),
             Collidable.fromCollider(Sphere.fromRadius(4)),
             Constrainable.fromConstraints([
                 Constraint_WrapToPlaceSizeXTrimY.create(),
@@ -122,8 +123,13 @@ class Player extends Entity {
         var visualThrusterFlameOffset = visualThrusterFlame.transform(transformTranslate);
         var transformRotate = Transform_RotateLeft.fromQuarterTurnsToRotate(1);
         var visualThrusterFlameOffsetThenRotated = visualThrusterFlameOffset.transform(transformRotate);
-        var visualThrusterFlameConditional = VisualHidable.fromIsVisibleAndChild(uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0, visualThrusterFlameOffsetThenRotated);
-        var visual = VisualGroup.fromNameAndChildren("Player", [visualThrusterFlameConditional, visualBody]);
+        //var visualThrusterSound = VisualSound.fromSoundName("Effects_Whoosh");
+        var visualThrusterFlamePlusSound = VisualGroup.fromChildren([
+            //visualThrusterSound,
+            visualThrusterFlameOffsetThenRotated
+        ]);
+        var visualThrusterFlamePlusSoundConditional = VisualHidable.fromIsVisibleAndChild(uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0, visualThrusterFlamePlusSound);
+        var visual = VisualGroup.fromChildren([visualThrusterFlamePlusSoundConditional, visualBody]);
         return visual;
     }
 }

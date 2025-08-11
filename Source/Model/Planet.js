@@ -30,18 +30,24 @@ class Planet extends Entity {
     }
     static triggerLoseReactToBeingTriggered(uwpe) {
         var universe = uwpe.universe;
-        universe.venueTransitionTo(VenueMessage.fromTextAndAcknowledgeNoButtons("GAME OVER", () => // acknowledge
+        var leaderboard = Leaderboard.fromStorageHelper(universe.storageHelper);
+        var leaderboardAsVenue = leaderboard.toVenue(uwpe);
+        var venueMessageGameOver = VenueMessage.fromTextAndAcknowledgeNoButtons("GAME OVER", () => // acknowledge
          {
-            var leaderboard = Leaderboard.fromStorageHelper(universe.storageHelper);
-            var place = uwpe.place;
-            var player = place.player();
+            var world = uwpe.world;
+            var player = world.player;
             var statsKeeper = StatsKeeper.of(player);
             var score = statsKeeper.score();
             leaderboard.scoreInsert(score);
-            var leaderboardAsVenue = leaderboard.toVenue(uwpe);
-            var venueNext = leaderboardAsVenue;
-            universe.venueTransitionTo(venueNext);
-        }));
+            universe.venueTransitionTo(leaderboardAsVenue);
+        });
+        var venueLayered = venueMessageGameOver.venueInner(universe);
+        var venueControls = venueLayered.children[0];
+        var secondsToHoldBeforeProceedingToVenueAfterGameOver = 5;
+        var controlTimer = ControlTimer.fromNameSecondsToWaitAndElapsed("Advance to Next Slide Automatically", secondsToHoldBeforeProceedingToVenueAfterGameOver, () => universe.venueTransitionTo(leaderboardAsVenue));
+        var container = venueControls.controlRoot;
+        container.childAdd(controlTimer);
+        universe.venueTransitionTo(venueMessageGameOver);
     }
     static triggerWinIsTriggered(uwpe) {
         var level = uwpe.place;
@@ -93,8 +99,20 @@ class Planet extends Entity {
     // Visual.
     static visual(placeSize, horizonHeight) {
         var colors = Color.Instances();
-        var ground = VisualRectangle.fromSizeAndColorFill(Coords.fromXY(placeSize.x, horizonHeight), colors.GreenDark);
-        var groundOffset = VisualOffset.fromOffsetAndChild(Coords.fromXY(placeSize.x / 2, placeSize.y - horizonHeight / 2), ground);
+        var groundNormal = VisualRectangle.fromSizeAndColorFill(Coords.fromXY(placeSize.x, horizonHeight), colors.GreenDark);
+        var groundHighlighted = VisualRectangle.fromSizeAndColorFill(Coords.fromXY(placeSize.x, horizonHeight), colors.Green);
+        var groundFlashing = VisualAnimation.fromTicksToHoldFramesAndFramesRepeating(10, // Half a second per frame.
+        [groundNormal, groundHighlighted]);
+        var groundSelectNormalOrFlashing = VisualSelect.fromSelectChildToShowAndChildren((uwpe, visualSelect) => {
+            var place = uwpe.place;
+            var habitats = place.habitats();
+            var habitatsCount = habitats.length;
+            var onlyOneHabitatRemains = (habitatsCount <= 1);
+            var childIndex = onlyOneHabitatRemains ? 1 : 0;
+            var childToShow = visualSelect.children[childIndex];
+            return childToShow;
+        }, [groundNormal, groundFlashing]);
+        var groundOffset = VisualOffset.fromOffsetAndChild(Coords.fromXY(placeSize.x / 2, placeSize.y - horizonHeight / 2), groundSelectNormalOrFlashing);
         var mountainSegmentCount = 8;
         var mountainSegmentWidth = placeSize.x / mountainSegmentCount;
         var mountainHeightAboveHorizonMax = horizonHeight;
@@ -109,7 +127,7 @@ class Planet extends Entity {
         var mountains = VisualPath.fromPathColorAndThicknessOpen(mountainsAsPath, colors.Brown, 1 // thickness
         );
         var mountainsOffset = VisualOffset.fromOffsetAndChild(Coords.fromXY(0, placeSize.y - horizonHeight), mountains);
-        var visual = VisualGroup.fromNameAndChildren("Planet", [
+        var visual = VisualGroup.fromChildren([
             groundOffset,
             mountainsOffset
         ]);
