@@ -1,7 +1,7 @@
 
 class Player extends Entity
 {
-	constructor(pos: Coords)
+	constructor()
 	{
 		super
 		(
@@ -50,10 +50,9 @@ class Player extends Entity
 
 				Locatable.fromDisposition
 				(
-					Disposition.fromPosAndVel
+					Disposition.fromPos
 					(
-						Coords.fromXY(100, 100), // pos
-						Coords.fromXY(1, 0) // vel
+						Coords.fromXY(0, 125)
 					)
 				),
 
@@ -76,9 +75,9 @@ class Player extends Entity
 		);
 	}
 
-	static fromPos(pos: Coords): Player
+	static create(): Player
 	{
-		return new Player(pos);
+		return new Player();
 	}
 
 	static killableDie(uwpe: UniverseWorldPlaceEntities): void
@@ -165,9 +164,14 @@ class Player extends Entity
 			{
 				var place = uwpe.place as PlacePlanet;
 				var player = place.player();
-				var playerStatsKeeper = StatsKeeper.of(player);
-				playerStatsKeeper.shotsIncrement();
-				ProjectileGenerator.fireDefault(uwpe);
+				var playerKillable = Killable.of(player);
+				var playerIsInImmunityPeriod = playerKillable.immunityIsInEffect();
+				if (playerIsInImmunityPeriod == false)
+				{
+					var playerStatsKeeper = StatsKeeper.of(player);
+					playerStatsKeeper.shotsIncrement();
+					ProjectileGenerator.fireDefault(uwpe);
+				}
 			},
 			[
 				generation
@@ -333,11 +337,14 @@ class Player extends Entity
 		var transformScaleShield =
 			Transform_Scale.fromScaleFactor(dimension * 2.5);
 
+		var transformTranslateShield =
+			Transform_Translate.fromDisplacement(Coords.fromXY(0 - dimension * 1.15, 0) );
+
 		var visualShield =
 			visualBuilder
 				.triangleIsocelesOfColorPointingRight(colors.Cyan)
 				.transform(transformScaleShield)
-				.transform(transformTranslateBody);
+				.transform(transformTranslateShield);
 
 		var visualShieldConditional =
 			VisualHidable.fromIsVisibleAndChild

@@ -138,6 +138,10 @@ class Enemy extends Entity
 					var playerEntity = entityOther as Player;
 					var playerKillable = Killable.of(playerEntity);
 					playerKillable.kill();
+
+					var enemyEntity = uwpe.entity;
+					var enemyKillable = Killable.of(enemyEntity);
+					enemyKillable.kill();
 				}
 			}
 		);

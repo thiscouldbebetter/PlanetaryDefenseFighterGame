@@ -9,7 +9,7 @@ class EnemyRaider extends Enemy {
             uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyRaider.visualBuild()),
-            Killable.fromDie(Enemy.killableDie),
+            Killable.fromDie(EnemyRaider.killableDie),
             Enemy.projectileGeneratorBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Scorable.fromPoints(100)
@@ -97,7 +97,7 @@ class EnemyRaider extends Enemy {
             Constraint_AttachToEntityWithId
                 .fromTargetEntityId(enemy.id),
             Constraint_Transform.fromTransform(Transform_Translate.fromDisplacement(Coords.fromXY(0, 10)))
-        ]);
+        ]).nameSet(EnemyRaider.ConstraintCarryHabitatName);
         targetConstrainable
             .constraintAdd(constraintToAddToTarget);
         var place = uwpe.place;
@@ -113,7 +113,7 @@ class EnemyRaider extends Enemy {
             var habitatCaptured = enemyCarrier.habitatCarried;
             if (habitatCaptured != null) {
                 var constrainable = Constrainable.of(habitatCaptured);
-                constrainable.constraintRemoveFinal();
+                constrainable.constraintRemoveByName(EnemyRaider.ConstraintCarryHabitatName);
             }
         }
     }
@@ -130,3 +130,4 @@ class EnemyRaider extends Enemy {
         ]);
     }
 }
+EnemyRaider.ConstraintCarryHabitatName = "CarryHabitat";

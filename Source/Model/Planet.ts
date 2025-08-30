@@ -9,6 +9,8 @@ class Planet extends Entity
 		(
 			Planet.name,
 			[
+				Animatable2.create(),
+
 				Drawable.fromVisual
 				(
 					Planet.visual(size, horizonHeight)
@@ -63,14 +65,52 @@ class Planet extends Entity
 		uwpe: UniverseWorldPlaceEntities
 	): boolean
 	{
+		var playerHasLost = false;
+
 		var level = uwpe.place as PlacePlanet;
+
 		var playerShipIsGone =
 			(level.player() == null);
-		var habitatsAreAllGone =
-			(level.habitats().length == 0);
-		var playerHasLost =
-			playerShipIsGone
-			|| habitatsAreAllGone;
+		if (playerShipIsGone)
+		{
+			playerHasLost = true;
+		}
+		else
+		{
+			var habitatsAreAllGone =
+				(level.habitats().length == 0);
+			if (habitatsAreAllGone)
+			{
+				var planet = level.planet();
+				var planetIsGone = (planet == null);
+				if (planetIsGone)
+				{
+					playerHasLost = true;
+				}
+				else
+				{
+					var planetEphemeral = Ephemeral.of(planet);
+					if (planetEphemeral == null)
+					{
+						planetEphemeral = Ephemeral.fromTicksToLive
+						(
+							100 // 5 seconds.
+						);
+						planet.propertyAdd(planetEphemeral);
+						Animatable2.of(planet).animationsStopAll(); // todo
+						var place = uwpe.place; 
+						var placeEphemerals =
+							place.entitiesByPropertyName(planetEphemeral.propertyName() );
+						placeEphemerals.push(planet);
+					}
+					else
+					{
+						playerHasLost = planetEphemeral.isExpired();
+					}
+				}
+			}
+		}
+
 		return playerHasLost;
 	}
 
@@ -177,26 +217,25 @@ class Planet extends Entity
 		var newline = "\n";
 		var messageAsString = messageAsLines.join(newline);
 
-		universe.venueTransitionTo
+		var venueNext = VenueMessage.fromTextAndAcknowledgeNoButtons
 		(
-			VenueMessage.fromTextAndAcknowledgeNoButtons
-			(
-				messageAsString,
-				() => // acknowledge
-				{
-					playerStatsKeeper.killsClear();
-					playerStatsKeeper.shotsClear();
-					playerStatsKeeper.hitsClear();
-					var levelNextIndex = place.levelIndex + 1;
-					var placeNext = PlacePlanet.fromLevelIndexAndPlayer
-					(
-						levelNextIndex, player
-					);
-					universe.world.placeNextSet(placeNext);
-					universe.venuePrevTransitionTo();
-				}
-			)
+			messageAsString,
+			() => // acknowledge
+			{
+				playerStatsKeeper.killsClear();
+				playerStatsKeeper.shotsClear();
+				playerStatsKeeper.hitsClear();
+				var levelNextIndex = place.levelIndex + 1;
+				var placeNext = PlacePlanet.fromLevelIndexAndPlayer
+				(
+					levelNextIndex, player
+				);
+				universe.world.placeNextSet(placeNext);
+				universe.venuePrevTransitionTo();
+			}
 		)
+
+		universe.venueTransitionTo(venueNext);
 	}
 
 	// Visual.
@@ -206,25 +245,31 @@ class Planet extends Entity
 		placeSize: Coords, horizonHeight: number
 	): VisualBase
 	{
+		var groundSize = Coords.fromXY(placeSize.x, horizonHeight);
+		var groundVisual = (color: Color) => VisualRectangle.fromSizeAndColorFill(groundSize, color);
 		var colors = Color.Instances();
 
-		var groundNormal = VisualRectangle.fromSizeAndColorFill
-		(
-			Coords.fromXY(placeSize.x, horizonHeight),
-			colors.GreenDark
-		);
-
-		var groundHighlighted = VisualRectangle.fromSizeAndColorFill
-		(
-			Coords.fromXY(placeSize.x, horizonHeight),
-			colors.Green
-		);
-
+		var groundNormal = groundVisual(colors.GreenDark);
+		var groundHighlighted = groundVisual(colors.Green);
 		var groundFlashing = VisualAnimation.fromTicksToHoldFramesAndFramesRepeating
 		(
 			10, // Half a second per frame.
 			[ groundNormal, groundHighlighted ]
 		);
+
+		var groundYellow = groundVisual(colors.Yellow);
+		var groundOrange = groundVisual(colors.Orange);
+		var groundRed = groundVisual(colors.Red);
+		var groundRedDark = groundVisual(colors.RedDark);
+		var groundBlack = groundVisual(colors.Black);
+
+		var groundDying = VisualAnimation.fromTicksToHoldFramesAndFramesNonRepeating
+		(
+			10, // 1/2 second per frame.
+			[ groundNormal, groundHighlighted, groundYellow, groundOrange, groundRed, groundRedDark, groundBlack ]
+		);
+
+		var groundsNormalFlashingAndDying = [ groundNormal, groundFlashing, groundDying ];
 
 		var groundSelectNormalOrFlashing = VisualSelect.fromSelectChildToShowAndChildren
 		(
@@ -233,12 +278,16 @@ class Planet extends Entity
 				var place = uwpe.place as PlacePlanet;
 				var habitats = place.habitats();
 				var habitatsCount = habitats.length;
-				var onlyOneHabitatRemains = (habitatsCount <= 1);
-				var childIndex = onlyOneHabitatRemains ? 1 : 0;
+				var childIndex =
+					(habitatsCount > 1)
+					? 0
+					: (habitatsCount == 1)
+					? 1
+					: 2;
 				var childToShow = visualSelect.children[childIndex];
 				return childToShow;
 			},
-			[ groundNormal, groundFlashing ]
+			groundsNormalFlashingAndDying
 		);
 
 		var groundOffset = VisualOffset.fromOffsetAndChild

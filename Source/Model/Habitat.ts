@@ -44,17 +44,22 @@ class Habitat extends Entity
 
 	static visualBuild(): VisualBase
 	{
-		return VisualPolygon.fromVerticesAndColorFill
+		var houseOutlineAsPath = Path.fromPoints
+		([
+			Coords.fromXY(1, 0), // Right bottom.
+			Coords.fromXY(-1, 0), // Left bottom.
+			Coords.fromXY(-1, -1), // Left eave.
+			Coords.fromXY(0, -2), // Peak of roof.
+			Coords.fromXY(1, -1) // Right eave.
+		]).transform(Transform_Scale.fromScaleFactor(4) );
+
+		var house = VisualPolygon.fromPathAndColorFill
 		(
-			[
-				Coords.fromXY(4, 0),
-				Coords.fromXY(-4, 0),
-				Coords.fromXY(-4, -4),
-				Coords.fromXY(0, -8),
-				Coords.fromXY(4, -4)
-			],
-			Color.byName("Brown")
+			houseOutlineAsPath,
+			Color.Instances().Brown
 		);
+
+		return house;
 	}
 }
 

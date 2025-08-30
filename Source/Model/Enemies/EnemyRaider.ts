@@ -1,6 +1,8 @@
 
 class EnemyRaider extends Enemy
 {
+	static ConstraintCarryHabitatName = "CarryHabitat";
+
 	constructor(pos: Coords)
 	{
 		super
@@ -27,7 +29,7 @@ class EnemyRaider extends Enemy
 					EnemyRaider.visualBuild()
 				),
 
-				Killable.fromDie(Enemy.killableDie),
+				Killable.fromDie(EnemyRaider.killableDie),
 
 				Enemy.projectileGeneratorBuild(),
 
@@ -196,7 +198,7 @@ class EnemyRaider extends Enemy
 					Coords.fromXY(0, 10)
 				)
 			)
-		]);
+		]).nameSet(EnemyRaider.ConstraintCarryHabitatName);
 
 		targetConstrainable
 			.constraintAdd(constraintToAddToTarget);
@@ -230,7 +232,7 @@ class EnemyRaider extends Enemy
 			if (habitatCaptured != null)
 			{
 				var constrainable = Constrainable.of(habitatCaptured);
-				constrainable.constraintRemoveFinal();
+				constrainable.constraintRemoveByName(EnemyRaider.ConstraintCarryHabitatName);
 			}
 		}
 

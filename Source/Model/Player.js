@@ -1,6 +1,6 @@
 "use strict";
 class Player extends Entity {
-    constructor(pos) {
+    constructor() {
         super(Player.name, [
             Actor.fromActivityDefnName(UserInputListener.activityDefn().name),
             Audible.create(),
@@ -14,9 +14,7 @@ class Player extends Entity {
             Controllable.fromToControl(uwpe => Player.toControl(uwpe)),
             Drawable.fromVisual(Player.visualBuild()),
             Killable.fromTicksOfImmunityDieAndLives(40, Player.killableDie, 2),
-            Locatable.fromDisposition(Disposition.fromPosAndVel(Coords.fromXY(100, 100), // pos
-            Coords.fromXY(1, 0) // vel
-            )),
+            Locatable.fromDisposition(Disposition.fromPos(Coords.fromXY(0, 125))),
             Movable.fromAccelerationPerTickAndSpeedMax(.2, 8
             /*
             (uwpe: UniverseWorldPlaceEntities, direction: Coords) =>
@@ -28,8 +26,8 @@ class Player extends Entity {
             StatsKeeper.create()
         ]);
     }
-    static fromPos(pos) {
-        return new Player(pos);
+    static create() {
+        return new Player();
     }
     static killableDie(uwpe) {
         var playerEntity = uwpe.entity;
@@ -75,9 +73,13 @@ class Player extends Entity {
         return ProjectileGenerator.fromNameFireAndGenerations("Bullet", uwpe => {
             var place = uwpe.place;
             var player = place.player();
-            var playerStatsKeeper = StatsKeeper.of(player);
-            playerStatsKeeper.shotsIncrement();
-            ProjectileGenerator.fireDefault(uwpe);
+            var playerKillable = Killable.of(player);
+            var playerIsInImmunityPeriod = playerKillable.immunityIsInEffect();
+            if (playerIsInImmunityPeriod == false) {
+                var playerStatsKeeper = StatsKeeper.of(player);
+                playerStatsKeeper.shotsIncrement();
+                ProjectileGenerator.fireDefault(uwpe);
+            }
         }, [
             generation
         ]);
@@ -130,10 +132,11 @@ class Player extends Entity {
         ]);
         var visualThrusterFlamePlusSoundConditional = VisualHidable.fromIsVisibleAndChild(uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0, visualThrusterFlamePlusSound);
         var transformScaleShield = Transform_Scale.fromScaleFactor(dimension * 2.5);
+        var transformTranslateShield = Transform_Translate.fromDisplacement(Coords.fromXY(0 - dimension * 1.15, 0));
         var visualShield = visualBuilder
             .triangleIsocelesOfColorPointingRight(colors.Cyan)
             .transform(transformScaleShield)
-            .transform(transformTranslateBody);
+            .transform(transformTranslateShield);
         var visualShieldConditional = VisualHidable.fromIsVisibleAndChild(uwpe => {
             var killable = Killable.of(uwpe.entity);
             var shieldIsActive = killable == null ? false : killable.immunityIsInEffect();

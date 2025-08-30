@@ -15,13 +15,15 @@ class Habitat extends Entity {
         return new Habitat(pos);
     }
     static visualBuild() {
-        return VisualPolygon.fromVerticesAndColorFill([
-            Coords.fromXY(4, 0),
-            Coords.fromXY(-4, 0),
-            Coords.fromXY(-4, -4),
-            Coords.fromXY(0, -8),
-            Coords.fromXY(4, -4)
-        ], Color.byName("Brown"));
+        var houseOutlineAsPath = Path.fromPoints([
+            Coords.fromXY(1, 0), // Right bottom.
+            Coords.fromXY(-1, 0), // Left bottom.
+            Coords.fromXY(-1, -1), // Left eave.
+            Coords.fromXY(0, -2), // Peak of roof.
+            Coords.fromXY(1, -1) // Right eave.
+        ]).transform(Transform_Scale.fromScaleFactor(4));
+        var house = VisualPolygon.fromPathAndColorFill(houseOutlineAsPath, Color.Instances().Brown);
+        return house;
     }
 }
 class HabitatProperty extends EntityPropertyBase {

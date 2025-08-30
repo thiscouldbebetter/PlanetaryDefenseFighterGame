@@ -2,22 +2,29 @@
 Known Issues
 ============
 
-Need a producer sound effect for This Could Be Better.
-Need to finish implementing and test all enemy types.
-Player should start at respawn point with no velocity.
-Need to implement smart bombs, and show the remaining count.
-Need to implement hyperspace shunt, maybe.
+Higher Priority
+---------------
+
+Need less annoying music for the title screen.
+Need to finish implementing and testing all enemy types.
 If player is hit during the invulnerability period, they should not die once the period expires.
-Player should not be able to fire while invulnerable.
-Title screen should cycle through several screens, including instructions and high scores.
 Need a sound effect for player firing their thruster.
 Need a sound effect for a habitat being captured by a raider.
 Need a sound effect for transformation of raider to marauder.
 Need a sound effect for habitat falling back to ground.
 Visuals for enemies are seemingly being rendered upside down sometimes.
-Habitats dropped from too high should be destroyed.
-The player colliding with an enemy should kill that enemy as well as the player.
-When habitat is dropped, it drops below ground level.
 Planet should be shown (and heard) exploding when the last habitat is destroyed.
 A minimap should be added that shows the entire planet, the habitats, and the enemies.
 Gathering of initials for leaderboard doesn't work yet.
+Sometimes enemies carrying habitats are impossible to hit; across the wrap boundary?
+Sometimes explosions do not appear, perhaps the visuals are not wrapped?
+
+Lower Priority
+--------------
+Need a producer sound effect for This Could Be Better.
+Control style would probably be better if Dark instead of Default.
+Title screen should cycle through several screens, including instructions and high scores.
+Habitats dropped from too high should be destroyed?
+Habitats hit by projectiles should be destroyed?
+Need to implement smart bombs, and show the remaining count?
+Need to implement hyperspace shunt?
