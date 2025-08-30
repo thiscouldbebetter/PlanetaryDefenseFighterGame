@@ -74,10 +74,9 @@ class PlacePlanet extends PlaceBase {
         return new PlacePlanet(levelIndex, player);
     }
     static cameraEntity(placeSize) {
-        var camera = Camera.fromViewSizeAndDisposition(Coords.fromXY(400, 300), // viewSize
-        Disposition.fromPosAndOrientation(Coords.zeroes(), Orientation.fromForwardAndDown(Coords.fromXYZ(0, 0, 1), // forward
-        Coords.fromXYZ(0, 1, 0) // down
-        )));
+        var cameraViewSize = Coords.fromXY(400, 300);
+        var cameraDisp = Disposition.fromOrientation(Orientation.forwardZDownY());
+        var camera = Camera.fromViewSizeDispositionAndEntitiesInViewSort(cameraViewSize, cameraDisp, this.cameraEntity_EntitiesInViewSort);
         var cameraEntity = camera.toEntityFollowingEntityWithName(Player.name);
         var constraintContainInBox = camera.constraintContainInBoxForPlaceSizeWrapped(placeSize);
         var constrainable = Constrainable.of(cameraEntity);
@@ -93,6 +92,9 @@ class PlacePlanet extends PlaceBase {
         ]);
         collidable.colliderAtRestSet(colliderAfterWrapping);
         return cameraEntity;
+    }
+    static cameraEntity_EntitiesInViewSort(entitiesToSort) {
+        return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
     }
     static defnBuild() {
         var actionDisplayRecorderStartStop = DisplayRecorder.actionStartStop();

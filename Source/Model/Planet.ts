@@ -108,7 +108,7 @@ class Planet extends Entity
 
 		var controlTimer = ControlTimer.fromNameSecondsToWaitAndElapsed
 		(
-			"Advance to Next Slide Automatically",
+			"Advance to Next Screen Automatically",
 			secondsToHoldBeforeProceedingToVenueAfterGameOver,
 			() => universe.venueTransitionTo(leaderboardAsVenue)
 		);

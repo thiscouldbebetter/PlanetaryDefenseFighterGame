@@ -44,7 +44,7 @@ class Planet extends Entity {
         var venueLayered = venueMessageGameOver.venueInner(universe);
         var venueControls = venueLayered.children[0];
         var secondsToHoldBeforeProceedingToVenueAfterGameOver = 5;
-        var controlTimer = ControlTimer.fromNameSecondsToWaitAndElapsed("Advance to Next Slide Automatically", secondsToHoldBeforeProceedingToVenueAfterGameOver, () => universe.venueTransitionTo(leaderboardAsVenue));
+        var controlTimer = ControlTimer.fromNameSecondsToWaitAndElapsed("Advance to Next Screen Automatically", secondsToHoldBeforeProceedingToVenueAfterGameOver, () => universe.venueTransitionTo(leaderboardAsVenue));
         var container = venueControls.controlRoot;
         container.childAdd(controlTimer);
         universe.venueTransitionTo(venueMessageGameOver);

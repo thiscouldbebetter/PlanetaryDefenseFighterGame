@@ -154,18 +154,17 @@ class PlacePlanet extends PlaceBase
 
 	static cameraEntity(placeSize: Coords): Entity
 	{
-		var camera = Camera.fromViewSizeAndDisposition
+		var cameraViewSize = Coords.fromXY(400, 300);
+		var cameraDisp = Disposition.fromOrientation
 		(
-			Coords.fromXY(400, 300), // viewSize
-			Disposition.fromPosAndOrientation
-			(
-				Coords.zeroes(),
-				Orientation.fromForwardAndDown
-				(
-					Coords.fromXYZ(0, 0, 1), // forward
-					Coords.fromXYZ(0, 1, 0) // down
-				)
-			)
+			Orientation.forwardZDownY()
+		);
+
+		var camera = Camera.fromViewSizeDispositionAndEntitiesInViewSort
+		(
+			cameraViewSize,
+			cameraDisp,
+			this.cameraEntity_EntitiesInViewSort
 		);
 
 		var cameraEntity =
@@ -212,6 +211,11 @@ class PlacePlanet extends PlaceBase
 		collidable.colliderAtRestSet(colliderAfterWrapping);
 
 		return cameraEntity;
+	}
+
+	static cameraEntity_EntitiesInViewSort(entitiesToSort: Entity[]) : Entity[]
+	{
+		return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
 	}
 
 	static defnBuild(): PlaceDefn

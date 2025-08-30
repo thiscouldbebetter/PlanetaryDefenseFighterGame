@@ -12,7 +12,7 @@ class Game
 
 	start(): void
 	{
-		var mediaLibrary = this.mediaLibraryBuild()
+		var mediaLibrary = this.mediaLibraryBuild();
 
 		var worldCreator = WorldCreator.fromWorldCreate
 		(
