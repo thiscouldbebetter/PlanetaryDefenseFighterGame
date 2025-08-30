@@ -126,8 +126,7 @@ class EnemyRaider extends Enemy {
             .5, .5, // angleStart-, angleSpannedInTurns
             colors.Red, null // colorFill, colorBorder
             ),
-            VisualOffset.fromOffsetAndChild(Coords.fromXY(-1, -1), // todo
-            VisualCircle.fromRadiusAndColorFill(1, colors.White))
+            VisualOffset.fromOffsetAndChild(Coords.fromXY(-1, -1), VisualCircle.fromRadiusAndColorFill(1, colors.White))
         ]);
     }
 }

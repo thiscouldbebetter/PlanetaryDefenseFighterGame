@@ -119,6 +119,45 @@ class Player extends Entity
 
 	static projectileGenerator(): ProjectileGenerator
 	{
+		var generation = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
+		(
+			2, // radius
+			5, // distanceInitial
+			16, // speed
+			8, // ticksToLive
+			uwpe => // hit
+			{
+				var place = uwpe.place as PlacePlanet;
+				var player = place.player();
+				var playerStatsKeeper = StatsKeeper.of(player);
+				playerStatsKeeper.hitsIncrement();
+			},
+			Damage.fromAmount(1),
+			VisualGroup.fromChildren
+			([
+				VisualSound.fromSoundName("Effects_Blip"),
+
+				VisualCircle.fromRadiusAndColorFill
+				(
+					2, Color.Instances().Yellow
+				)
+			]),
+			(entity) =>
+			{
+				entity.propertyAdd
+				(
+					Constrainable.fromConstraint
+					(
+						Constraint_WrapToPlaceSizeXTrimY.create()
+					)
+				);
+
+				Drawable.of(entity).sizeInWrappedInstancesSet
+				(
+					Coords.fromXYZ(3, 1, 1)
+				)
+			}
+		);
 		return ProjectileGenerator.fromNameFireAndGenerations
 		(
 			"Bullet",
@@ -131,45 +170,7 @@ class Player extends Entity
 				ProjectileGenerator.fireDefault(uwpe);
 			},
 			[
-				ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
-				(
-					2, // radius
-					5, // distanceInitial
-					16, // speed
-					8, // ticksToLive
-					uwpe => // hit
-					{
-						var place = uwpe.place as PlacePlanet;
-						var player = place.player();
-						var playerStatsKeeper = StatsKeeper.of(player);
-						playerStatsKeeper.hitsIncrement();
-					},
-					Damage.fromAmount(1),
-					VisualGroup.fromChildren
-					([
-						VisualSound.fromSoundName("Effects_Blip"),
-
-						VisualCircle.fromRadiusAndColorFill
-						(
-							2, Color.Instances().Yellow
-						)
-					]),
-					(entity) =>
-					{
-						entity.propertyAdd
-						(
-							Constrainable.fromConstraint
-							(
-								Constraint_WrapToPlaceSizeXTrimY.create()
-							)
-						);
-
-						Drawable.of(entity).sizeInWrappedInstancesSet
-						(
-							Coords.fromXYZ(3, 1, 1)
-						)
-					}
-				)
+				generation
 			]
 		);
 	}
@@ -288,25 +289,25 @@ class Player extends Entity
 
 		var colors = Color.Instances();
 
-		var transformScale =
+		var transformScaleBody =
 			Transform_Scale.fromScaleFactor(dimension * 2);
-		var transformTranslate =
+		var transformTranslateBody =
 			Transform_Translate.fromDisplacement(Coords.fromXY(0 - dimension, 0) );
 
 		var visualBody =
 			visualBuilder
 				.triangleIsocelesOfColorPointingRight(colors.Gray)
-				.transform(transformScale)
-				.transform(transformTranslate);
+				.transform(transformScaleBody)
+				.transform(transformTranslateBody);
 
 		var visualThrusterFlame =
 			visualBuilder.flame(dimension * .75);
 
-		transformTranslate =
+		var transformTranslateFlame =
 			Transform_Translate.fromDisplacement(Coords.fromXY(0, 0 - dimension * 1.25) );
 
 		var visualThrusterFlameOffset =
-			visualThrusterFlame.transform(transformTranslate);
+			visualThrusterFlame.transform(transformTranslateFlame);
 
 		var transformRotate = Transform_RotateLeft.fromQuarterTurnsToRotate(1)
 
@@ -329,10 +330,34 @@ class Player extends Entity
 				visualThrusterFlamePlusSound
 			);
 
+		var transformScaleShield =
+			Transform_Scale.fromScaleFactor(dimension * 2.5);
+
+		var visualShield =
+			visualBuilder
+				.triangleIsocelesOfColorPointingRight(colors.Cyan)
+				.transform(transformScaleShield)
+				.transform(transformTranslateBody);
+
+		var visualShieldConditional =
+			VisualHidable.fromIsVisibleAndChild
+			(
+				uwpe =>
+				{
+					var killable = Killable.of(uwpe.entity);
+					var shieldIsActive =
+						killable == null ? false : killable.immunityIsInEffect();
+					return shieldIsActive;
+				},
+				visualShield
+			);
+
 		var visual = VisualGroup.fromChildren
-		(
-			[visualThrusterFlamePlusSoundConditional, visualBody]
-		);
+		([
+			visualShieldConditional,
+			visualThrusterFlamePlusSoundConditional,
+			visualBody
+		]);
 
 		return visual;
 	}
