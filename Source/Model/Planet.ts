@@ -124,8 +124,6 @@ class Planet extends Entity
 		var leaderboard =
 			Leaderboard.fromStorageHelper(universe.storageHelper);
 
-		var leaderboardAsVenue = leaderboard.toVenue(uwpe);
-
 		var venueMessageGameOver = VenueMessage.fromTextAndAcknowledgeNoButtons
 		(
 			"GAME OVER",
@@ -135,26 +133,11 @@ class Planet extends Entity
 				var player = world.player;
 				var statsKeeper = StatsKeeper.of(player);
 				var score = statsKeeper.score();
-				leaderboard.scoreInsert(score);
+				leaderboard.scoreBeingEnteredSet(score);
+				var leaderboardAsVenue = leaderboard.toVenue(uwpe);
 				universe.venueTransitionTo(leaderboardAsVenue);
 			}
-		);
-
-		var venueLayered =
-			venueMessageGameOver.venueInner(universe) as VenueLayered;
-		var venueControls = venueLayered.children[0] as VenueControls;
-
-		var secondsToHoldBeforeProceedingToVenueAfterGameOver = 5;
-
-		var controlTimer = ControlTimer.fromNameSecondsToWaitAndElapsed
-		(
-			"Advance to Next Screen Automatically",
-			secondsToHoldBeforeProceedingToVenueAfterGameOver,
-			() => universe.venueTransitionTo(leaderboardAsVenue)
-		);
-
-		var container = venueControls.controlRoot as ControlContainerTransparent;
-		container.childAdd(controlTimer);
+		).secondsToShowSet(5);
 
 		universe.venueTransitionTo(venueMessageGameOver);
 	}

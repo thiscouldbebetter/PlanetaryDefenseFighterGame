@@ -82,6 +82,9 @@ class EnemyRaider extends Enemy {
             place.entityToRemoveAdd(enemy);
             var enemyUpgraded = EnemyMarauder.fromPos(enemyPos);
             place.entityToSpawnAdd(enemyUpgraded);
+            var universe = uwpe.universe;
+            var soundOfTransformation = universe.mediaLibrary.soundGetByName("Effects_Organ");
+            soundOfTransformation.play(universe, 1);
         }
     }
     static activityDefnPerform_TargetHasBeenReached_CaptureHabitatAndTargetUpgradePoint(uwpe) {
@@ -92,6 +95,9 @@ class EnemyRaider extends Enemy {
         var targetHabitat = targetEntity;
         var carrier = Carrier.of(enemy);
         carrier.habitatCarried = targetHabitat;
+        var universe = uwpe.universe;
+        var soundOfCapture = universe.mediaLibrary.soundGetByName("Effects_Buzz");
+        soundOfCapture.play(universe, 1);
         var targetConstrainable = Constrainable.of(targetEntity);
         var constraintToAddToTarget = Constraint_Multiple.fromChildren([
             Constraint_AttachToEntityWithId
@@ -114,6 +120,9 @@ class EnemyRaider extends Enemy {
             if (habitatCaptured != null) {
                 var constrainable = Constrainable.of(habitatCaptured);
                 constrainable.constraintRemoveByName(EnemyRaider.ConstraintCarryHabitatName);
+                var universe = uwpe.universe;
+                var soundOfRelease = universe.mediaLibrary.soundGetByName("Effects_Chirp-Reversed");
+                soundOfRelease.play(universe, 1);
             }
         }
     }

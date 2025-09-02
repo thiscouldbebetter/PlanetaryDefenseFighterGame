@@ -241,42 +241,46 @@ class PlacePlanet extends PlaceBase
 
 		var inputs = Input.Instances();
 
+		var atim =
+			(actionName: string, inputName: string) =>
+				ActionToInputsMapping.fromActionNameAndInputName(actionName, inputName);
+
 		var actionToInputsMappings =
 		[
-			ActionToInputsMapping.fromActionNameAndInputName
+			atim
 			(
 				actionDisplayRecorderStartStop.name,
 				inputs.Tilde.name
 			),
 
-			ActionToInputsMapping.fromActionNameAndInputName
+			atim
 			(
 				actionShowMenu.name, inputs.Escape.name
 			),
 
-			ActionToInputsMapping.fromActionNameAndInputName
+			atim
 			(
 				Movable.actionAccelerateAndFaceLeft().name,
 				inputs.ArrowLeft.name
 			),
-			ActionToInputsMapping.fromActionNameAndInputName
+			atim
 			(
 				Movable.actionAccelerateAndFaceRight().name,
 				inputs.ArrowRight.name
 			),
 
-			ActionToInputsMapping.fromActionNameAndInputName
+			atim
 			(
 				Movable.actionAccelerateWithoutFacingDown().name,
 				inputs.ArrowDown.name
 			),
-			ActionToInputsMapping.fromActionNameAndInputName
+			atim
 			(
 				Movable.actionAccelerateWithoutFacingUp().name,
 				inputs.ArrowUp.name
 			),
 
-			ActionToInputsMapping.fromActionNameAndInputName
+			atim
 			(
 				ProjectileGenerator.actionFire().name,
 				inputs.Space.name

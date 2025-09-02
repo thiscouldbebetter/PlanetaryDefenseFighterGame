@@ -7,17 +7,16 @@ Higher Priority
 
 Need less annoying music for the title screen.
 Need to finish implementing and testing all enemy types.
-If player is hit during the invulnerability period, they should not die once the period expires.
-Need a sound effect for player firing their thruster.
-Need a sound effect for a habitat being captured by a raider.
-Need a sound effect for transformation of raider to marauder.
-Need a sound effect for habitat falling back to ground.
+Need a sound effect each time player fires their thruster.
 Visuals for enemies are seemingly being rendered upside down sometimes.
 Planet should be shown (and heard) exploding when the last habitat is destroyed.
 A minimap should be added that shows the entire planet, the habitats, and the enemies.
 Gathering of initials for leaderboard doesn't work yet.
 Sometimes enemies carrying habitats are impossible to hit; across the wrap boundary?
 Sometimes explosions do not appear, perhaps the visuals are not wrapped?
+Shots should not collide with (and thus destroy) other shots.
+Should enemy shots hurt enemies?
+If the player collides with the last raider, the level will never end.
 
 Lower Priority
 --------------

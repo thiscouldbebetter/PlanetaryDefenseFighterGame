@@ -1,8 +1,0 @@
-Framework/Source/Model/Combat/ProjectileGenerator.ts(18,8): error TS2551: Property '_actionFirePerform' does not exist on type 'ProjectileGenerator'. Did you mean 'actionFirePerform'?
-Framework/Source/Model/Combat/ProjectileGenerator.ts(46,17): error TS2551: Property '_actionFirePerform' does not exist on type 'ProjectileGenerator'. Did you mean 'actionFirePerform'?
-Framework/Source/Model/Combat/ProjectileGenerator.ts(52,8): error TS2551: Property '_actionFirePerform' does not exist on type 'ProjectileGenerator'. Did you mean 'actionFirePerform'?
-Framework/Source/Model/Statistics/StatsKeeper.ts(52,2): error TS2300: Duplicate identifier 'StatNameKills'.
-Framework/Source/Model/Statistics/StatsKeeper.ts(57,36): error TS2551: Property 'StatNameHits' does not exist on type 'StatsKeeper'. Did you mean 'StatNameShots'?
-Framework/Source/Model/Statistics/StatsKeeper.ts(62,35): error TS2551: Property 'StatNameHits' does not exist on type 'StatsKeeper'. Did you mean 'StatNameShots'?
-PlaceDefault.ts(135,24): error TS2339: Property 'actionFire' does not exist on type 'typeof ProjectileGenerator'.
-PlaceDefault.ts(177,25): error TS2339: Property 'actionFire' does not exist on type 'typeof ProjectileGenerator'.

@@ -167,6 +167,11 @@ class EnemyRaider extends Enemy
 
 			var enemyUpgraded = EnemyMarauder.fromPos(enemyPos);
 			place.entityToSpawnAdd(enemyUpgraded);
+
+			var universe = uwpe.universe;
+			var soundOfTransformation = universe.mediaLibrary.soundGetByName("Effects_Organ");
+			soundOfTransformation.play(universe, 1);
+
 		}
 	}
 
@@ -184,6 +189,10 @@ class EnemyRaider extends Enemy
 		var targetHabitat = targetEntity as Habitat;
 		var carrier = Carrier.of(enemy);
 		carrier.habitatCarried = targetHabitat;
+
+		var universe = uwpe.universe;
+		var soundOfCapture = universe.mediaLibrary.soundGetByName("Effects_Buzz");
+		soundOfCapture.play(universe, 1);
 
 		var targetConstrainable = Constrainable.of(targetEntity);
 
@@ -233,6 +242,10 @@ class EnemyRaider extends Enemy
 			{
 				var constrainable = Constrainable.of(habitatCaptured);
 				constrainable.constraintRemoveByName(EnemyRaider.ConstraintCarryHabitatName);
+
+				var universe = uwpe.universe;
+				var soundOfRelease = universe.mediaLibrary.soundGetByName("Effects_Chirp-Reversed");
+				soundOfRelease.play(universe, 1);
 			}
 		}
 

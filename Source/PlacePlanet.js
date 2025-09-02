@@ -109,14 +109,15 @@ class PlacePlanet extends PlaceBase {
             ProjectileGenerator.actionFire()
         ];
         var inputs = Input.Instances();
+        var atim = (actionName, inputName) => ActionToInputsMapping.fromActionNameAndInputName(actionName, inputName);
         var actionToInputsMappings = [
-            ActionToInputsMapping.fromActionNameAndInputName(actionDisplayRecorderStartStop.name, inputs.Tilde.name),
-            ActionToInputsMapping.fromActionNameAndInputName(actionShowMenu.name, inputs.Escape.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateAndFaceLeft().name, inputs.ArrowLeft.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateAndFaceRight().name, inputs.ArrowRight.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateWithoutFacingDown().name, inputs.ArrowDown.name),
-            ActionToInputsMapping.fromActionNameAndInputName(Movable.actionAccelerateWithoutFacingUp().name, inputs.ArrowUp.name),
-            ActionToInputsMapping.fromActionNameAndInputName(ProjectileGenerator.actionFire().name, inputs.Space.name).inactivateInputWhenActionPerformedSet(true)
+            atim(actionDisplayRecorderStartStop.name, inputs.Tilde.name),
+            atim(actionShowMenu.name, inputs.Escape.name),
+            atim(Movable.actionAccelerateAndFaceLeft().name, inputs.ArrowLeft.name),
+            atim(Movable.actionAccelerateAndFaceRight().name, inputs.ArrowRight.name),
+            atim(Movable.actionAccelerateWithoutFacingDown().name, inputs.ArrowDown.name),
+            atim(Movable.actionAccelerateWithoutFacingUp().name, inputs.ArrowUp.name),
+            atim(ProjectileGenerator.actionFire().name, inputs.Space.name).inactivateInputWhenActionPerformedSet(true)
         ];
         var entityPropertyNamesToProcess = [
             Actor.name,

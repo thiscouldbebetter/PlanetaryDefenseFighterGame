@@ -47,6 +47,7 @@ class Game {
             effect("Chirp.wav"),
             effect("Chirp-Reversed.wav"),
             effect("Clank.wav"),
+            effect("Organ.wav"),
             effect("Pluck.wav"),
             effect("Producer.wav"),
             effect("Slap.wav"),

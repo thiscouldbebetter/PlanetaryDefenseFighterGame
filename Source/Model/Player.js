@@ -90,6 +90,7 @@ class Player extends Entity {
         var placeSize = place.size();
         var playerStatsKeeper = StatsKeeper.of(player);
         var visualBuilder = VisualBuilder.Instance();
+        var visualLevel = VisualCircle.fromRadiusAndColorFill(5, Color.Instances().Cyan);
         var visualKills = visualBuilder.explosionStarburstOfRadius(8);
         var visualScore = visualBuilder.starburstWithPointsRatioRadiusAndColor(5, // points
         .5, // radiusInnerAsFractionOfOuter
@@ -107,7 +108,9 @@ class Player extends Entity {
             ControlVisual.fromPosAndVisual(Coords.fromXY(100, 10), DataBinding.fromContext(visualKills)),
             ControlLabel.fromPosAndText(Coords.fromXY(110, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.kills())),
             ControlVisual.fromPosAndVisual(Coords.fromXY(130, 10), DataBinding.fromContext(visualScore)),
-            ControlLabel.fromPosAndText(Coords.fromXY(140, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.score()))
+            ControlLabel.fromPosAndText(Coords.fromXY(140, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.score())),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(160, 10), DataBinding.fromGet(() => visualLevel)),
+            ControlLabel.fromPosAndText(Coords.fromXY(170, 4), DataBinding.fromGet(() => "" + (place.levelIndex + 1)))
         ]).toControlContainerTransparent();
     }
     static visualBuild() {
@@ -125,9 +128,8 @@ class Player extends Entity {
         var visualThrusterFlameOffset = visualThrusterFlame.transform(transformTranslateFlame);
         var transformRotate = Transform_RotateLeft.fromQuarterTurnsToRotate(1);
         var visualThrusterFlameOffsetThenRotated = visualThrusterFlameOffset.transform(transformRotate);
-        //var visualThrusterSound = VisualSound.fromSoundName("Effects_Whoosh");
         var visualThrusterFlamePlusSound = VisualGroup.fromChildren([
-            //visualThrusterSound,
+            // todo
             visualThrusterFlameOffsetThenRotated
         ]);
         var visualThrusterFlamePlusSoundConditional = VisualHidable.fromIsVisibleAndChild(uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0, visualThrusterFlamePlusSound);

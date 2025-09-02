@@ -58,22 +58,16 @@ class Planet extends Entity {
     static triggerLoseReactToBeingTriggered(uwpe) {
         var universe = uwpe.universe;
         var leaderboard = Leaderboard.fromStorageHelper(universe.storageHelper);
-        var leaderboardAsVenue = leaderboard.toVenue(uwpe);
         var venueMessageGameOver = VenueMessage.fromTextAndAcknowledgeNoButtons("GAME OVER", () => // acknowledge
          {
             var world = uwpe.world;
             var player = world.player;
             var statsKeeper = StatsKeeper.of(player);
             var score = statsKeeper.score();
-            leaderboard.scoreInsert(score);
+            leaderboard.scoreBeingEnteredSet(score);
+            var leaderboardAsVenue = leaderboard.toVenue(uwpe);
             universe.venueTransitionTo(leaderboardAsVenue);
-        });
-        var venueLayered = venueMessageGameOver.venueInner(universe);
-        var venueControls = venueLayered.children[0];
-        var secondsToHoldBeforeProceedingToVenueAfterGameOver = 5;
-        var controlTimer = ControlTimer.fromNameSecondsToWaitAndElapsed("Advance to Next Screen Automatically", secondsToHoldBeforeProceedingToVenueAfterGameOver, () => universe.venueTransitionTo(leaderboardAsVenue));
-        var container = venueControls.controlRoot;
-        container.childAdd(controlTimer);
+        }).secondsToShowSet(5);
         universe.venueTransitionTo(venueMessageGameOver);
     }
     static triggerWinIsTriggered(uwpe) {

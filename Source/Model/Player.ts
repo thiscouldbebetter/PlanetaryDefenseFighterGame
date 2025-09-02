@@ -157,6 +157,7 @@ class Player extends Entity
 				)
 			}
 		);
+
 		return ProjectileGenerator.fromNameFireAndGenerations
 		(
 			"Bullet",
@@ -190,6 +191,9 @@ class Player extends Entity
 
 		var visualBuilder = VisualBuilder.Instance();
 
+		var visualLevel: VisualBase =
+			VisualCircle.fromRadiusAndColorFill(5, Color.Instances().Cyan);
+
 		var visualKills =
 			visualBuilder.explosionStarburstOfRadius(8);
 
@@ -210,7 +214,7 @@ class Player extends Entity
 				ControlVisual.fromPosAndVisual
 				(
 					Coords.fromXY(10, 10),
-					DataBinding.fromContext(Player.visualBuild())
+					DataBinding.fromContext(Player.visualBuild() )
 				),
 				ControlLabel.fromPosAndText
 				(
@@ -278,8 +282,21 @@ class Player extends Entity
 					(
 						() => "" + playerStatsKeeper.score()
 					)
-				)
+				),
 
+				ControlVisual.fromPosAndVisual
+				(
+					Coords.fromXY(160, 10),
+					DataBinding.fromGet(() => visualLevel)
+				),
+				ControlLabel.fromPosAndText
+				(
+					Coords.fromXY(170, 4),
+					DataBinding.fromGet
+					(
+						() => "" + (place.levelIndex + 1)
+					)
+				)
 
 			]
 		).toControlContainerTransparent()
@@ -318,12 +335,10 @@ class Player extends Entity
 		var visualThrusterFlameOffsetThenRotated =
 			visualThrusterFlameOffset.transform(transformRotate);
 
-		//var visualThrusterSound = VisualSound.fromSoundName("Effects_Whoosh");
-
 		var visualThrusterFlamePlusSound =
 			VisualGroup.fromChildren
 			([
-				//visualThrusterSound,
+				// todo
 				visualThrusterFlameOffsetThenRotated
 			]);
 
