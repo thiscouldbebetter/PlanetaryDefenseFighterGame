@@ -335,10 +335,12 @@ class Player extends Entity
 		var visualThrusterFlameOffsetThenRotated =
 			visualThrusterFlameOffset.transform(transformRotate);
 
+		//var visualSoundWhoosh = VisualSound.fromSoundName("Effects_Whoosh");
+
 		var visualThrusterFlamePlusSound =
 			VisualGroup.fromChildren
 			([
-				// todo
+				//visualSoundWhoosh,
 				visualThrusterFlameOffsetThenRotated
 			]);
 

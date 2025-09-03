@@ -128,8 +128,9 @@ class Player extends Entity {
         var visualThrusterFlameOffset = visualThrusterFlame.transform(transformTranslateFlame);
         var transformRotate = Transform_RotateLeft.fromQuarterTurnsToRotate(1);
         var visualThrusterFlameOffsetThenRotated = visualThrusterFlameOffset.transform(transformRotate);
+        var visualSoundWhoosh = VisualSound.fromSoundName("Effects_Whoosh");
         var visualThrusterFlamePlusSound = VisualGroup.fromChildren([
-            // todo
+            visualSoundWhoosh,
             visualThrusterFlameOffsetThenRotated
         ]);
         var visualThrusterFlamePlusSoundConditional = VisualHidable.fromIsVisibleAndChild(uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0, visualThrusterFlamePlusSound);

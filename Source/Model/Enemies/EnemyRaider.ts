@@ -170,8 +170,10 @@ class EnemyRaider extends Enemy
 
 			var universe = uwpe.universe;
 			var soundOfTransformation = universe.mediaLibrary.soundGetByName("Effects_Organ");
-			soundOfTransformation.play(universe, 1);
-
+			universe
+				.soundHelper
+				.soundPlaybackCreateFromSound(soundOfTransformation)
+				.startIfNotStartedAlready(universe);
 		}
 	}
 
@@ -192,7 +194,10 @@ class EnemyRaider extends Enemy
 
 		var universe = uwpe.universe;
 		var soundOfCapture = universe.mediaLibrary.soundGetByName("Effects_Buzz");
-		soundOfCapture.play(universe, 1);
+		universe
+			.soundHelper
+			.soundPlaybackCreateFromSound(soundOfCapture)
+			.startIfNotStartedAlready(universe);
 
 		var targetConstrainable = Constrainable.of(targetEntity);
 
@@ -245,7 +250,10 @@ class EnemyRaider extends Enemy
 
 				var universe = uwpe.universe;
 				var soundOfRelease = universe.mediaLibrary.soundGetByName("Effects_Chirp-Reversed");
-				soundOfRelease.play(universe, 1);
+				universe
+					.soundHelper
+					.soundPlaybackCreateFromSound(soundOfRelease)
+					.startIfNotStartedAlready(universe);
 			}
 		}
 
