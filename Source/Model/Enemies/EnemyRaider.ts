@@ -173,7 +173,7 @@ class EnemyRaider extends Enemy
 			universe
 				.soundHelper
 				.soundPlaybackCreateFromSound(soundOfTransformation)
-				.startIfNotStartedAlready(universe);
+				.startIfNotStartedYet(uwpe);
 		}
 	}
 
@@ -197,7 +197,7 @@ class EnemyRaider extends Enemy
 		universe
 			.soundHelper
 			.soundPlaybackCreateFromSound(soundOfCapture)
-			.startIfNotStartedAlready(universe);
+			.startIfNotStartedYet(uwpe);
 
 		var targetConstrainable = Constrainable.of(targetEntity);
 
@@ -253,7 +253,7 @@ class EnemyRaider extends Enemy
 				universe
 					.soundHelper
 					.soundPlaybackCreateFromSound(soundOfRelease)
-					.startIfNotStartedAlready(universe);
+					.startIfNotStartedYet(uwpe);
 			}
 		}
 

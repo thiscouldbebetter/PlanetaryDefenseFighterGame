@@ -87,7 +87,7 @@ class EnemyRaider extends Enemy {
             universe
                 .soundHelper
                 .soundPlaybackCreateFromSound(soundOfTransformation)
-                .startIfNotStartedAlready(universe);
+                .startIfNotStartedYet(uwpe);
         }
     }
     static activityDefnPerform_TargetHasBeenReached_CaptureHabitatAndTargetUpgradePoint(uwpe) {
@@ -103,7 +103,7 @@ class EnemyRaider extends Enemy {
         universe
             .soundHelper
             .soundPlaybackCreateFromSound(soundOfCapture)
-            .startIfNotStartedAlready(universe);
+            .startIfNotStartedYet(uwpe);
         var targetConstrainable = Constrainable.of(targetEntity);
         var constraintToAddToTarget = Constraint_Multiple.fromChildren([
             Constraint_AttachToEntityWithId
@@ -131,7 +131,7 @@ class EnemyRaider extends Enemy {
                 universe
                     .soundHelper
                     .soundPlaybackCreateFromSound(soundOfRelease)
-                    .startIfNotStartedAlready(universe);
+                    .startIfNotStartedYet(uwpe);
             }
         }
     }

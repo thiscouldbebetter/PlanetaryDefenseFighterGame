@@ -335,20 +335,24 @@ class Player extends Entity
 		var visualThrusterFlameOffsetThenRotated =
 			visualThrusterFlameOffset.transform(transformRotate);
 
-		//var visualSoundWhoosh = VisualSound.fromSoundName("Effects_Whoosh");
+		var visualSoundWhoosh = VisualSound.fromSoundName("Effects_Whoosh");
 
 		var visualThrusterFlamePlusSound =
 			VisualGroup.fromChildren
 			([
-				//visualSoundWhoosh,
+				visualSoundWhoosh,
 				visualThrusterFlameOffsetThenRotated
 			]);
 
-		var visualThrusterFlamePlusSoundConditional =
-			VisualHidable.fromIsVisibleAndChild
+		var visualSelectThrusterFlamePlusSoundOrSilence =
+			VisualSelect.fromSelectChildToShowAndChildren
 			(
-				uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0,
-				visualThrusterFlamePlusSound
+				(uwpe, visualSelect) =>
+					this.visualBuild_VisualSelectThrusterFlamePlusSoundOrSilence(uwpe, visualSelect),
+				[
+					VisualSound.silence(),
+					visualThrusterFlamePlusSound
+				]
 			);
 
 		var transformScaleShield =
@@ -379,11 +383,24 @@ class Player extends Entity
 		var visual = VisualGroup.fromChildren
 		([
 			visualShieldConditional,
-			visualThrusterFlamePlusSoundConditional,
+			visualSelectThrusterFlamePlusSoundOrSilence,
 			visualBody
 		]);
 
 		return visual;
+	}
+
+	static visualBuild_VisualSelectThrusterFlamePlusSoundOrSilence
+	(
+		uwpe: UniverseWorldPlaceEntities,
+		visualSelect: VisualSelect
+	): VisualBase
+	{
+		return visualSelect.childByIndex(
+			Locatable.of(uwpe.entity).locPrev.accel.x != 0
+			? 1
+			: 0
+		);
 	}
 
 }

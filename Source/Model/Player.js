@@ -133,7 +133,10 @@ class Player extends Entity {
             visualSoundWhoosh,
             visualThrusterFlameOffsetThenRotated
         ]);
-        var visualThrusterFlamePlusSoundConditional = VisualHidable.fromIsVisibleAndChild(uwpe => Locatable.of(uwpe.entity).locPrev.accel.x != 0, visualThrusterFlamePlusSound);
+        var visualSelectThrusterFlamePlusSoundOrSilence = VisualSelect.fromSelectChildToShowAndChildren((uwpe, visualSelect) => this.visualBuild_VisualSelectThrusterFlamePlusSoundOrSilence(uwpe, visualSelect), [
+            VisualSound.silence(),
+            visualThrusterFlamePlusSound
+        ]);
         var transformScaleShield = Transform_Scale.fromScaleFactor(dimension * 2.5);
         var transformTranslateShield = Transform_Translate.fromDisplacement(Coords.fromXY(0 - dimension * 1.15, 0));
         var visualShield = visualBuilder
@@ -147,9 +150,14 @@ class Player extends Entity {
         }, visualShield);
         var visual = VisualGroup.fromChildren([
             visualShieldConditional,
-            visualThrusterFlamePlusSoundConditional,
+            visualSelectThrusterFlamePlusSoundOrSilence,
             visualBody
         ]);
         return visual;
+    }
+    static visualBuild_VisualSelectThrusterFlamePlusSoundOrSilence(uwpe, visualSelect) {
+        return visualSelect.childByIndex(Locatable.of(uwpe.entity).locPrev.accel.x != 0
+            ? 1
+            : 0);
     }
 }
