@@ -148,14 +148,14 @@ class Planet extends Entity
 	): boolean
 	{
 		var level = uwpe.place as PlacePlanet;
-		var enemyGeneratorIsExhausted =
-			level.enemyGenerator().exhausted();
+		var enemyGeneratorRaidersIsExhausted =
+			level.enemyGeneratorRaiders().exhausted();
 		var enemiesAreAllGone =
 			(level.enemies().length == 0);
 		var habitatIsStillThere =
 			(level.habitats().length > 0);
 		var playerHasWon =
-			enemyGeneratorIsExhausted
+			enemyGeneratorRaidersIsExhausted
 			&& enemiesAreAllGone
 			&& habitatIsStillThere;
 		return playerHasWon;
@@ -172,10 +172,10 @@ class Planet extends Entity
 
 		var playerStatsKeeper = StatsKeeper.of(player);
 		var enemyRaidersKilled = playerStatsKeeper.kills();
-		var enemyRaidersTotal = place.enemyRaidersCountInitial();
+		var enemyRaidersTotal = place.enemyRaidersCountInitial(universe);
 
 		var habitatsRemaining = place.habitats().length;
-		var habitatsTotal = place.habitatsCountInitial();
+		var habitatsTotal = place.habitatsCountInitial(universe);
 
 		var shotsHit = playerStatsKeeper.hits();
 		var shotsFired = playerStatsKeeper.shots();

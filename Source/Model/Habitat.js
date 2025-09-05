@@ -16,8 +16,12 @@ class Habitat extends Entity {
     }
     static visualBuild() {
         var houseOutlineAsPath = Path.fromPoints([
-            Coords.fromXY(1, 0), // Right bottom.
-            Coords.fromXY(-1, 0), // Left bottom.
+            Coords.fromXY(1, 0), // Lower-right corner of wall.
+            Coords.fromXY(.25, 0), // Lower-right corner of door.
+            Coords.fromXY(.25, -.5), // Upper-right corner of door.
+            Coords.fromXY(-.25, -.5), // Upper-left corner of door.
+            Coords.fromXY(-.25, 0), // Lower-left corner of door.
+            Coords.fromXY(-1, 0), // Lower-left corner of wall.
             Coords.fromXY(-1, -1), // Left eave.
             Coords.fromXY(0, -2), // Peak of roof.
             Coords.fromXY(1, -1) // Right eave.

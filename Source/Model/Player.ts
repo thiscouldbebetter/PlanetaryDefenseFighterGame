@@ -191,13 +191,17 @@ class Player extends Entity
 
 		var visualBuilder = VisualBuilder.Instance();
 
+		var visualPlayerShip = Player.visualBuild();
+
+		var visualHabitat = Habitat.visualBuild();
+
 		var visualLevel: VisualBase =
 			VisualCircle.fromRadiusAndColorFill(5, Color.Instances().Cyan);
 
 		var visualKills =
 			visualBuilder.explosionStarburstOfRadius(8);
 
-		var visualScore =
+		var visualStar =
 			visualBuilder.starburstWithPointsRatioRadiusAndColor
 			(
 				5, // points
@@ -206,99 +210,104 @@ class Player extends Entity
 				Color.Instances().Yellow
 			);
 
+		var controlsForStatus =
+		[
+			// Lives in reserve.
+			ControlVisual.fromPosAndVisual
+			(
+				Coords.fromXY(10, 10),
+				DataBinding.fromContext(visualPlayerShip)
+			),
+			ControlLabel.fromPosAndText
+			(
+				Coords.fromXY(20, 4),
+				DataBinding.fromGet
+				(
+					() => "" + Killable.of(uwpe.entity).livesInReserve
+				)
+			),
+
+			// Habitats remaining.
+			ControlVisual.fromPosAndVisual
+			(
+				Coords.fromXY(40, 15),
+				DataBinding.fromContext(visualHabitat)
+			),
+			ControlLabel.fromPosAndText
+			(
+				Coords.fromXY(50, 4),
+				DataBinding.fromGet
+				(
+					() => "" + place.habitats().length
+				)
+			),
+
+			// Enemies remaining.
+			ControlVisual.fromPosAndVisual
+			(
+				Coords.fromXY(70, 10),
+				DataBinding.fromContext(EnemyRaider.visualBuild())
+			),
+			ControlLabel.fromPosAndText
+			(
+				Coords.fromXY(80, 4),
+				DataBinding.fromGet(() => "" + place.enemies().length)
+			),
+
+			// Kills made.
+			ControlVisual.fromPosAndVisual
+			(
+				Coords.fromXY(100, 10),
+				DataBinding.fromContext
+				(
+					visualKills
+				)
+			),
+			ControlLabel.fromPosAndText
+			(
+				Coords.fromXY(110, 4),
+				DataBinding.fromGet
+				(
+					() => "" + playerStatsKeeper.kills()
+				)
+			),
+
+			// Level.
+			ControlVisual.fromPosAndVisual
+			(
+				Coords.fromXY(130, 10),
+				DataBinding.fromGet(() => visualLevel)
+			),
+			ControlLabel.fromPosAndText
+			(
+				Coords.fromXY(140, 4),
+				DataBinding.fromGet
+				(
+					() => "" + (place.levelIndex + 1)
+				)
+			),
+
+			// Score.
+			ControlVisual.fromPosAndVisual
+			(
+				Coords.fromXY(160, 10),
+				DataBinding.fromContext(visualStar)
+			),
+			ControlLabel.fromPosAndText
+			(
+				Coords.fromXY(170, 4),
+				DataBinding.fromGet
+				(
+					() => "" + playerStatsKeeper.score()
+				)
+			)
+		];
+
 		return ControlContainer.fromPosSizeAndChildren
 		(
 			Coords.fromXY(0, placeSize.y - 20), // pos
 			Coords.fromXY(40, 50), // size
-			[
-				ControlVisual.fromPosAndVisual
-				(
-					Coords.fromXY(10, 10),
-					DataBinding.fromContext(Player.visualBuild() )
-				),
-				ControlLabel.fromPosAndText
-				(
-					Coords.fromXY(20, 4),
-					DataBinding.fromGet
-					(
-						() => "" + Killable.of(uwpe.entity).livesInReserve
-					)
-				),
-
-				ControlVisual.fromPosAndVisual
-				(
-					Coords.fromXY(40, 15),
-					DataBinding.fromContext(Habitat.visualBuild())
-				),
-				ControlLabel.fromPosAndText
-				(
-					Coords.fromXY(50, 4),
-					DataBinding.fromGet
-					(
-						() => "" + place.habitats().length
-					)
-				),
-
-				ControlVisual.fromPosAndVisual
-				(
-					Coords.fromXY(70, 10),
-					DataBinding.fromContext(EnemyRaider.visualBuild())
-				),
-				ControlLabel.fromPosAndText
-				(
-					Coords.fromXY(80, 4),
-					DataBinding.fromGet(() => "" + place.enemies().length)
-				),
-
-				ControlVisual.fromPosAndVisual
-				(
-					Coords.fromXY(100, 10),
-					DataBinding.fromContext
-					(
-						visualKills
-					)
-				),
-				ControlLabel.fromPosAndText
-				(
-					Coords.fromXY(110, 4),
-					DataBinding.fromGet
-					(
-						() => "" + playerStatsKeeper.kills()
-					)
-				),
-
-				ControlVisual.fromPosAndVisual
-				(
-					Coords.fromXY(130, 10),
-					DataBinding.fromContext
-					(
-						visualScore
-					)
-				),
-				ControlLabel.fromPosAndText
-				(
-					Coords.fromXY(140, 4),
-					DataBinding.fromGet
-					(
-						() => "" + playerStatsKeeper.score()
-					)
-				),
-
-				ControlVisual.fromPosAndVisual
-				(
-					Coords.fromXY(160, 10),
-					DataBinding.fromGet(() => visualLevel)
-				),
-				ControlLabel.fromPosAndText
-				(
-					Coords.fromXY(170, 4),
-					DataBinding.fromGet
-					(
-						() => "" + (place.levelIndex + 1)
-					)
-				)
-
-			]
+			controlsForStatus
 		).toControlContainerTransparent()
 	}
 
