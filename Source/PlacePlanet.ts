@@ -191,6 +191,12 @@ class PlacePlanet extends PlaceBase
 		var actionShowMenu =
 			Action.Instances().ShowMenuSettings;
 
+		var actionNuke = Action.fromNameAndPerform
+		(
+			"Nuke",
+			(uwpe) => { console.log("todo - Nuke") }
+		);
+
 		var actions =
 		[
 			actionDisplayRecorderStartStop,
@@ -202,54 +208,61 @@ class PlacePlanet extends PlaceBase
 			Movable.actionAccelerateWithoutFacingUp(),
 			Movable.actionAccelerateWithoutFacingDown(),
 
-			ProjectileGenerator.actionFire()
+			ProjectileGenerator.actionFire(),
+			actionNuke
 		];
 
 		var inputs = Input.Instances();
 
 		var atim =
-			(actionName: string, inputName: string) =>
-				ActionToInputsMapping.fromActionNameAndInputName(actionName, inputName);
+			(actionName: string, inputs: Input[]) =>
+				ActionToInputsMapping.fromActionNameAndInputNames(actionName, inputs.map(x => x.name) );
 
 		var actionToInputsMappings =
 		[
 			atim
 			(
 				actionDisplayRecorderStartStop.name,
-				inputs.Tilde.name
+				[ inputs.Tilde ]
 			),
 
 			atim
 			(
-				actionShowMenu.name, inputs.Escape.name
+				actionShowMenu.name, [ inputs.Escape ]
 			),
 
 			atim
 			(
 				Movable.actionAccelerateAndFaceLeft().name,
-				inputs.ArrowLeft.name
+				[ inputs.ArrowLeft, inputs.a ]
 			),
 			atim
 			(
 				Movable.actionAccelerateAndFaceRight().name,
-				inputs.ArrowRight.name
+				[ inputs.ArrowRight, inputs.d ]
 			),
 
 			atim
 			(
 				Movable.actionAccelerateWithoutFacingDown().name,
-				inputs.ArrowDown.name
+				[ inputs.ArrowDown, inputs.s ]
 			),
 			atim
 			(
 				Movable.actionAccelerateWithoutFacingUp().name,
-				inputs.ArrowUp.name
+				[ inputs.ArrowUp, inputs.w ]
 			),
 
 			atim
 			(
 				ProjectileGenerator.actionFire().name,
-				inputs.Space.name
+				[ inputs.Space ]
+			).inactivateInputWhenActionPerformedSet(true),
+
+			atim
+			(
+				"Nuke",
+				[ inputs.n ]
 			).inactivateInputWhenActionPerformedSet(true)
 		];
 

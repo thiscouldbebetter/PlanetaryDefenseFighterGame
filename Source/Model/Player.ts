@@ -43,6 +43,8 @@ class Player extends Entity
 					Player.visualBuild()
 				),
 
+				ItemHolder.fromItem(Item.fromDefnName("Nuke") ),
+
 				Killable.fromTicksOfImmunityDieAndLives
 				(
 					40, Player.killableDie, 2
@@ -74,11 +76,25 @@ class Player extends Entity
 			]
 		);
 
-		if (universe.debugSettings.playerCannotDie() )
+		var debugSettings = universe.debugSettings;
+		var killable = Killable.of(this);
+		if (debugSettings.playerCannotDie() )
 		{
-			var killable = Killable.of(this);
 			killable.deathIsIgnoredSet(true);
 		}
+
+		var playerIntegrity = debugSettings.playerIntegrity();
+		if (playerIntegrity != null)
+		{
+			killable.integrityMaxSet(playerIntegrity);
+		}
+
+		var playerLives = debugSettings.playerLives();
+		if (playerLives != null)
+		{
+			killable.livesInReserveSet(playerLives);
+		}
+
 	}
 
 	static create(universe: Universe): Player
@@ -136,6 +152,7 @@ class Player extends Entity
 				var player = place.player();
 				var playerStatsKeeper = StatsKeeper.of(player);
 				playerStatsKeeper.hitsIncrement();
+				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
 			},
 			Damage.fromAmount(1),
 			VisualGroup.fromChildren
@@ -204,8 +221,8 @@ class Player extends Entity
 		var visualLevel: VisualBase =
 			VisualCircle.fromRadiusAndColorFill(5, Color.Instances().Cyan);
 
-		var visualKills =
-			visualBuilder.explosionStarburstOfRadius(8);
+		// var visualKills = visualBuilder.explosionStarburstOfRadius(8);
+		var visualNukes = visualBuilder.hazardTrefoilRadiation(5);
 
 		var visualStar =
 			visualBuilder.starburstWithPointsRatioRadiusAndColor
@@ -218,18 +235,18 @@ class Player extends Entity
 
 		var controlsForStatus =
 		[
-			// Lives in reserve.
+			// Level.
 			ControlVisual.fromPosAndVisual
 			(
 				Coords.fromXY(10, 10),
-				DataBinding.fromContext(visualPlayerShip)
+				DataBinding.fromGet(() => visualLevel)
 			),
 			ControlLabel.fromPosAndText
 			(
 				Coords.fromXY(20, 4),
 				DataBinding.fromGet
 				(
-					() => "" + Killable.of(uwpe.entity).livesInReserve
+					() => "" + (place.levelIndex + 1)
 				)
 			),
 
@@ -260,36 +277,33 @@ class Player extends Entity
 				DataBinding.fromGet(() => "" + place.enemies().length)
 			),
 
-			// Kills made.
+			// Lives in reserve.
 			ControlVisual.fromPosAndVisual
 			(
 				Coords.fromXY(10, 30),
-				DataBinding.fromContext
-				(
-					visualKills
-				)
+				DataBinding.fromContext(visualPlayerShip)
 			),
 			ControlLabel.fromPosAndText
 			(
 				Coords.fromXY(20, 26),
 				DataBinding.fromGet
 				(
-					() => "" + playerStatsKeeper.kills()
+					() => "" + Killable.of(uwpe.entity).livesInReserve
 				)
 			),
 
-			// Level.
+			// Nukes remaining.
 			ControlVisual.fromPosAndVisual
 			(
 				Coords.fromXY(40, 30),
-				DataBinding.fromGet(() => visualLevel)
+				DataBinding.fromContext(visualNukes)
 			),
 			ControlLabel.fromPosAndText
 			(
 				Coords.fromXY(50, 26),
 				DataBinding.fromGet
 				(
-					() => "" + (place.levelIndex + 1)
+					() => "" + ItemHolder.of(uwpe.entity).itemByDefnName("Nuke").quantity
 				)
 			),
 

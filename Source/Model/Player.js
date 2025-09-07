@@ -13,6 +13,7 @@ class Player extends Entity {
             ]),
             Controllable.fromToControl(uwpe => Player.toControl(uwpe)),
             Drawable.fromVisual(Player.visualBuild()),
+            ItemHolder.fromItem(Item.fromDefnName("Nuke")),
             Killable.fromTicksOfImmunityDieAndLives(40, Player.killableDie, 2),
             Locatable.fromDisposition(Disposition.fromPos(Coords.fromXY(0, 125))),
             Movable.fromAccelerationPerTickAndSpeedMax(.2, 8
@@ -25,9 +26,18 @@ class Player extends Entity {
             Player.projectileGenerator(),
             StatsKeeper.create()
         ]);
-        if (universe.debugSettings.playerCannotDie()) {
-            var killable = Killable.of(this);
+        var debugSettings = universe.debugSettings;
+        var killable = Killable.of(this);
+        if (debugSettings.playerCannotDie()) {
             killable.deathIsIgnoredSet(true);
+        }
+        var playerIntegrity = debugSettings.playerIntegrity();
+        if (playerIntegrity != null) {
+            killable.integrityMaxSet(playerIntegrity);
+        }
+        var playerLives = debugSettings.playerLives();
+        if (playerLives != null) {
+            killable.livesInReserveSet(playerLives);
         }
     }
     static create(universe) {
@@ -67,6 +77,7 @@ class Player extends Entity {
             var player = place.player();
             var playerStatsKeeper = StatsKeeper.of(player);
             playerStatsKeeper.hitsIncrement();
+            ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
         }, Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Blip"),
             VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
@@ -97,27 +108,28 @@ class Player extends Entity {
         var visualPlayerShip = Player.visualBuild();
         var visualHabitat = Habitat.visualBuild();
         var visualLevel = VisualCircle.fromRadiusAndColorFill(5, Color.Instances().Cyan);
-        var visualKills = visualBuilder.explosionStarburstOfRadius(8);
+        // var visualKills = visualBuilder.explosionStarburstOfRadius(8);
+        var visualNukes = visualBuilder.hazardTrefoilRadiation(5);
         var visualStar = visualBuilder.starburstWithPointsRatioRadiusAndColor(5, // points
         .5, // radiusInnerAsFractionOfOuter
         6, // radiusOuter
         Color.Instances().Yellow);
         var controlsForStatus = [
-            // Lives in reserve.
-            ControlVisual.fromPosAndVisual(Coords.fromXY(10, 10), DataBinding.fromContext(visualPlayerShip)),
-            ControlLabel.fromPosAndText(Coords.fromXY(20, 4), DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve)),
+            // Level.
+            ControlVisual.fromPosAndVisual(Coords.fromXY(10, 10), DataBinding.fromGet(() => visualLevel)),
+            ControlLabel.fromPosAndText(Coords.fromXY(20, 4), DataBinding.fromGet(() => "" + (place.levelIndex + 1))),
             // Habitats remaining.
             ControlVisual.fromPosAndVisual(Coords.fromXY(40, 15), DataBinding.fromContext(visualHabitat)),
             ControlLabel.fromPosAndText(Coords.fromXY(50, 4), DataBinding.fromGet(() => "" + place.habitats().length)),
             // Enemies remaining.
             ControlVisual.fromPosAndVisual(Coords.fromXY(70, 10), DataBinding.fromContext(EnemyRaider.visualBuild())),
             ControlLabel.fromPosAndText(Coords.fromXY(80, 4), DataBinding.fromGet(() => "" + place.enemies().length)),
-            // Kills made.
-            ControlVisual.fromPosAndVisual(Coords.fromXY(10, 30), DataBinding.fromContext(visualKills)),
-            ControlLabel.fromPosAndText(Coords.fromXY(20, 26), DataBinding.fromGet(() => "" + playerStatsKeeper.kills())),
-            // Level.
-            ControlVisual.fromPosAndVisual(Coords.fromXY(40, 30), DataBinding.fromGet(() => visualLevel)),
-            ControlLabel.fromPosAndText(Coords.fromXY(50, 26), DataBinding.fromGet(() => "" + (place.levelIndex + 1))),
+            // Lives in reserve.
+            ControlVisual.fromPosAndVisual(Coords.fromXY(10, 30), DataBinding.fromContext(visualPlayerShip)),
+            ControlLabel.fromPosAndText(Coords.fromXY(20, 26), DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve)),
+            // Nukes remaining.
+            ControlVisual.fromPosAndVisual(Coords.fromXY(40, 30), DataBinding.fromContext(visualNukes)),
+            ControlLabel.fromPosAndText(Coords.fromXY(50, 26), DataBinding.fromGet(() => "" + ItemHolder.of(uwpe.entity).itemByDefnName("Nuke").quantity)),
             // Score.
             ControlVisual.fromPosAndVisual(Coords.fromXY(70, 30), DataBinding.fromContext(visualStar)),
             ControlLabel.fromPosAndText(Coords.fromXY(80, 26), DataBinding.fromGet(() => "" + playerStatsKeeper.score()))

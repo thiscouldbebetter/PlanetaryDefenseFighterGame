@@ -77,6 +77,7 @@ class PlacePlanet extends PlaceBase {
     static defnBuild() {
         var actionDisplayRecorderStartStop = DisplayRecorder.actionStartStop();
         var actionShowMenu = Action.Instances().ShowMenuSettings;
+        var actionNuke = Action.fromNameAndPerform("Nuke", (uwpe) => { console.log("todo - Nuke"); });
         var actions = [
             actionDisplayRecorderStartStop,
             actionShowMenu,
@@ -84,18 +85,20 @@ class PlacePlanet extends PlaceBase {
             Movable.actionAccelerateAndFaceRight(),
             Movable.actionAccelerateWithoutFacingUp(),
             Movable.actionAccelerateWithoutFacingDown(),
-            ProjectileGenerator.actionFire()
+            ProjectileGenerator.actionFire(),
+            actionNuke
         ];
         var inputs = Input.Instances();
-        var atim = (actionName, inputName) => ActionToInputsMapping.fromActionNameAndInputName(actionName, inputName);
+        var atim = (actionName, inputs) => ActionToInputsMapping.fromActionNameAndInputNames(actionName, inputs.map(x => x.name));
         var actionToInputsMappings = [
-            atim(actionDisplayRecorderStartStop.name, inputs.Tilde.name),
-            atim(actionShowMenu.name, inputs.Escape.name),
-            atim(Movable.actionAccelerateAndFaceLeft().name, inputs.ArrowLeft.name),
-            atim(Movable.actionAccelerateAndFaceRight().name, inputs.ArrowRight.name),
-            atim(Movable.actionAccelerateWithoutFacingDown().name, inputs.ArrowDown.name),
-            atim(Movable.actionAccelerateWithoutFacingUp().name, inputs.ArrowUp.name),
-            atim(ProjectileGenerator.actionFire().name, inputs.Space.name).inactivateInputWhenActionPerformedSet(true)
+            atim(actionDisplayRecorderStartStop.name, [inputs.Tilde]),
+            atim(actionShowMenu.name, [inputs.Escape]),
+            atim(Movable.actionAccelerateAndFaceLeft().name, [inputs.ArrowLeft, inputs.a]),
+            atim(Movable.actionAccelerateAndFaceRight().name, [inputs.ArrowRight, inputs.d]),
+            atim(Movable.actionAccelerateWithoutFacingDown().name, [inputs.ArrowDown, inputs.s]),
+            atim(Movable.actionAccelerateWithoutFacingUp().name, [inputs.ArrowUp, inputs.w]),
+            atim(ProjectileGenerator.actionFire().name, [inputs.Space]).inactivateInputWhenActionPerformedSet(true),
+            atim("Nuke", [inputs.n]).inactivateInputWhenActionPerformedSet(true)
         ];
         var entityPropertyNamesToProcess = [
             Actor.name,
