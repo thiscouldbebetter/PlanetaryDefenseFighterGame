@@ -1,6 +1,6 @@
 "use strict";
 class Player extends Entity {
-    constructor() {
+    constructor(universe) {
         super(Player.name, [
             Actor.fromActivityDefnName(UserInputListener.activityDefn().name),
             Audible.create(),
@@ -25,9 +25,13 @@ class Player extends Entity {
             Player.projectileGenerator(),
             StatsKeeper.create()
         ]);
+        if (universe.debugSettings.playerCannotDie()) {
+            var killable = Killable.of(this);
+            killable.deathIsIgnoredSet(true);
+        }
     }
-    static create() {
-        return new Player();
+    static create(universe) {
+        return new Player(universe);
     }
     static killableDie(uwpe) {
         var playerEntity = uwpe.entity;
@@ -109,16 +113,16 @@ class Player extends Entity {
             ControlVisual.fromPosAndVisual(Coords.fromXY(70, 10), DataBinding.fromContext(EnemyRaider.visualBuild())),
             ControlLabel.fromPosAndText(Coords.fromXY(80, 4), DataBinding.fromGet(() => "" + place.enemies().length)),
             // Kills made.
-            ControlVisual.fromPosAndVisual(Coords.fromXY(100, 10), DataBinding.fromContext(visualKills)),
-            ControlLabel.fromPosAndText(Coords.fromXY(110, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.kills())),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(10, 30), DataBinding.fromContext(visualKills)),
+            ControlLabel.fromPosAndText(Coords.fromXY(20, 26), DataBinding.fromGet(() => "" + playerStatsKeeper.kills())),
             // Level.
-            ControlVisual.fromPosAndVisual(Coords.fromXY(130, 10), DataBinding.fromGet(() => visualLevel)),
-            ControlLabel.fromPosAndText(Coords.fromXY(140, 4), DataBinding.fromGet(() => "" + (place.levelIndex + 1))),
+            ControlVisual.fromPosAndVisual(Coords.fromXY(40, 30), DataBinding.fromGet(() => visualLevel)),
+            ControlLabel.fromPosAndText(Coords.fromXY(50, 26), DataBinding.fromGet(() => "" + (place.levelIndex + 1))),
             // Score.
-            ControlVisual.fromPosAndVisual(Coords.fromXY(160, 10), DataBinding.fromContext(visualStar)),
-            ControlLabel.fromPosAndText(Coords.fromXY(170, 4), DataBinding.fromGet(() => "" + playerStatsKeeper.score()))
+            ControlVisual.fromPosAndVisual(Coords.fromXY(70, 30), DataBinding.fromContext(visualStar)),
+            ControlLabel.fromPosAndText(Coords.fromXY(80, 26), DataBinding.fromGet(() => "" + playerStatsKeeper.score()))
         ];
-        return ControlContainer.fromPosSizeAndChildren(Coords.fromXY(0, placeSize.y - 20), // pos
+        return ControlContainer.fromPosSizeAndChildren(Coords.fromXY(0, placeSize.y - 40), // pos
         Coords.fromXY(40, 50), // size
         controlsForStatus).toControlContainerTransparent();
     }

@@ -1,11 +1,14 @@
 "use strict";
 class WorldGame extends World {
-    constructor(name) {
+    constructor(universe, name) {
         var name = name;
         var timeCreated = DateTime.now();
         var defn = WorldGame.defnBuild();
-        var player = Player.create();
-        var place = PlacePlanet.fromLevelIndexAndPlayer(0, player);
+        var player = Player.create(universe);
+        var levelNumberInitial = parseInt(universe.debugSettings.placeToStartAtName());
+        levelNumberInitial = isNaN(levelNumberInitial) ? 1 : levelNumberInitial;
+        var levelIndexInitial = levelNumberInitial - 1;
+        var place = PlacePlanet.fromLevelIndexAndPlayer(levelIndexInitial, player);
         var places = [place];
         var placesByName = new Map(places.map(x => [x.name, x]));
         var placeGetByName = (placeName) => placesByName.get(placeName);

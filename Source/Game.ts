@@ -14,12 +14,14 @@ class Game
 	{
 		var mediaLibrary = this.mediaLibraryBuild();
 
+		var universe: Universe = null;
+
 		var worldCreator = WorldCreator.fromWorldCreate
 		(
-			() => new WorldGame(this.name)
+			() => new WorldGame(universe, this.name)
 		);
 
-		var universe = Universe.fromNameMediaLibraryAndWorldCreator
+		universe = Universe.fromNameMediaLibraryAndWorldCreator
 		(
 			"PlanetaryDefenseFighterGame",
 			mediaLibrary,

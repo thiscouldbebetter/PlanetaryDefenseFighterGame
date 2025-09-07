@@ -1,7 +1,7 @@
 
 class Player extends Entity
 {
-	constructor()
+	constructor(universe: Universe)
 	{
 		super
 		(
@@ -73,11 +73,17 @@ class Player extends Entity
 				StatsKeeper.create()
 			]
 		);
+
+		if (universe.debugSettings.playerCannotDie() )
+		{
+			var killable = Killable.of(this);
+			killable.deathIsIgnoredSet(true);
+		}
 	}
 
-	static create(): Player
+	static create(universe: Universe): Player
 	{
-		return new Player();
+		return new Player(universe);
 	}
 
 	static killableDie(uwpe: UniverseWorldPlaceEntities): void
@@ -257,7 +263,7 @@ class Player extends Entity
 			// Kills made.
 			ControlVisual.fromPosAndVisual
 			(
-				Coords.fromXY(100, 10),
+				Coords.fromXY(10, 30),
 				DataBinding.fromContext
 				(
 					visualKills
@@ -265,7 +271,7 @@ class Player extends Entity
 			),
 			ControlLabel.fromPosAndText
 			(
-				Coords.fromXY(110, 4),
+				Coords.fromXY(20, 26),
 				DataBinding.fromGet
 				(
 					() => "" + playerStatsKeeper.kills()
@@ -275,12 +281,12 @@ class Player extends Entity
 			// Level.
 			ControlVisual.fromPosAndVisual
 			(
-				Coords.fromXY(130, 10),
+				Coords.fromXY(40, 30),
 				DataBinding.fromGet(() => visualLevel)
 			),
 			ControlLabel.fromPosAndText
 			(
-				Coords.fromXY(140, 4),
+				Coords.fromXY(50, 26),
 				DataBinding.fromGet
 				(
 					() => "" + (place.levelIndex + 1)
@@ -290,12 +296,12 @@ class Player extends Entity
 			// Score.
 			ControlVisual.fromPosAndVisual
 			(
-				Coords.fromXY(160, 10),
+				Coords.fromXY(70, 30),
 				DataBinding.fromContext(visualStar)
 			),
 			ControlLabel.fromPosAndText
 			(
-				Coords.fromXY(170, 4),
+				Coords.fromXY(80, 26),
 				DataBinding.fromGet
 				(
 					() => "" + playerStatsKeeper.score()
@@ -305,7 +311,7 @@ class Player extends Entity
 
 		return ControlContainer.fromPosSizeAndChildren
 		(
-			Coords.fromXY(0, placeSize.y - 20), // pos
+			Coords.fromXY(0, placeSize.y - 40), // pos
 			Coords.fromXY(40, 50), // size
 			controlsForStatus
 		).toControlContainerTransparent()

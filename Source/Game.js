@@ -6,8 +6,9 @@ class Game {
     }
     start() {
         var mediaLibrary = this.mediaLibraryBuild();
-        var worldCreator = WorldCreator.fromWorldCreate(() => new WorldGame(this.name));
-        var universe = Universe.fromNameMediaLibraryAndWorldCreator("PlanetaryDefenseFighterGame", mediaLibrary, worldCreator);
+        var universe = null;
+        var worldCreator = WorldCreator.fromWorldCreate(() => new WorldGame(universe, this.name));
+        universe = Universe.fromNameMediaLibraryAndWorldCreator("PlanetaryDefenseFighterGame", mediaLibrary, worldCreator);
         universe.initializeAndStart();
     }
     mediaLibraryBuild() {
