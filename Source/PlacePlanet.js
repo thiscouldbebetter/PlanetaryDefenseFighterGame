@@ -13,10 +13,10 @@ class PlacePlanet extends PlaceBase {
             player
         ];
         this.enemyGenerationZone = BoxAxisAligned.fromMinAndMax(Coords.fromXY(0, 0), Coords.fromXY(size.x, 0));
-        var enemyHarrierGenerator = this.constructor_EnemyHarrierGeneratorBuild(this.enemyGenerationZone);
-        entities.push(enemyHarrierGenerator.toEntity());
         var enemyBursterGenerator = this.constructor_EnemyBursterGeneratorBuild(this.enemyGenerationZone);
         entities.push(enemyBursterGenerator.toEntity());
+        var enemyHarrierGenerator = this.constructor_EnemyHarrierGeneratorBuild(this.enemyGenerationZone);
+        entities.push(enemyHarrierGenerator.toEntity());
         var enemyMinelayerGenerator = this.constructor_EnemyMinelayerGeneratorBuild(this.enemyGenerationZone);
         entities.push(enemyMinelayerGenerator.toEntity());
         // Marauders and chasers are not generated spontaneously.

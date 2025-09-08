@@ -22,7 +22,29 @@ class EnemyBurster extends Enemy {
         return new ActivityDefn(EnemyBurster.name, EnemyBurster.activityDefnPerform);
     }
     static activityDefnPerform(uwpe) {
-        // todo
+        var place = uwpe.place;
+        var enemy = uwpe.entity;
+        var player = place.player();
+        if (player != null) {
+            Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
+        }
+        var enemyActor = Actor.of(enemy);
+        var enemyActivity = enemyActor.activity;
+        var targetEntity = enemyActivity.targetEntity();
+        if (targetEntity == null) {
+            targetEntity = place.player();
+        }
+        enemyActivity.targetEntitySet(targetEntity);
+        Enemy.activityDefnPerform_MoveTowardTarget(uwpe, EnemyBurster.activityDefnPerform_MoveTowardTarget_TargetHasBeenReached);
+    }
+    static activityDefnPerform_MoveTowardTarget_TargetHasBeenReached(uwpe) {
+        var enemy = uwpe.entity;
+        var enemyActivity = Actor.of(enemy).activity;
+        var targetEntity = enemyActivity.targetEntity();
+        var targetPos = Locatable.of(targetEntity).pos();
+        var enemyPos = Locatable.of(enemy).pos();
+        enemyPos.overwriteWith(targetPos);
+        enemyActivity.targetEntityClear();
     }
     static killableDie(uwpe) {
         Enemy.killableDie(uwpe);
