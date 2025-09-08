@@ -105,16 +105,22 @@ class EnemyBurster extends Enemy
 		var entityKilledPos = Locatable.of(entityKilled).pos();
 		var place = uwpe.place as PlacePlanet;
 		var chasersToSpawnCount = 4;
+		var polar = Polar.fromAzimuthInTurnsAndRadius(0, 1);
 		for (var i = 0; i < chasersToSpawnCount; i++)
 		{
-			var entityChaser = EnemyChaser.fromPos(entityKilledPos);
+			var azimuthInTurns = i / chasersToSpawnCount;
+			var chaserVel =
+				polar
+					.azimuthInTurnsSet(azimuthInTurns)
+					.toCoords();
+			var entityChaser = EnemyChaser.fromPosAndVel(entityKilledPos, chaserVel);
 			place.entityToSpawnAdd(entityChaser);
 		}
 	}
 
 	static visualBuild(): VisualBase
 	{
-		var dimension = 4;
+		var dimension = 16;
 
 		var colors = Color.Instances();
 		var colorBody = colors.Red;

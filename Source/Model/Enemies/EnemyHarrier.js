@@ -47,28 +47,27 @@ class EnemyHarrier extends Enemy {
         enemyActivity.targetEntityClear();
     }
     static visualBuild() {
-        var dimension = 4;
+        var dimension = 8;
         var colors = Color.Instances();
         var colorBody = colors.Yellow;
-        var colorWindow = colors.Cyan;
-        var visualCapsuleCenter = VisualRectangle.fromSizeAndColorFill(Coords.fromXY(1.5, 1), colorBody);
-        var visualCapsuleEndLeft = VisualOffset.fromOffsetAndChild(Coords.fromXY(-0.75, 0), VisualCircle.fromRadiusAndColorFill(1, colorBody));
-        var visualCapsuleEndRight = VisualOffset.fromOffsetAndChild(Coords.fromXY(0.75, 0), VisualCircle.fromRadiusAndColorFill(1, colorBody));
+        var colorWindow = colors.Blue;
+        var visualCapsuleCenter = VisualRectangle.fromSizeAndColorFill(Coords.fromXY(1.5, 1).multiplyScalar(dimension), colorBody);
+        var radius = dimension / 2;
+        var visualCapsuleEndLeft = VisualOffset.fromOffsetAndChild(Coords.fromXY(-0.75, 0).multiplyScalar(dimension), VisualCircle.fromRadiusAndColorFill(radius, colorBody));
+        var visualCapsuleEndRight = VisualOffset.fromOffsetAndChild(Coords.fromXY(0.75, 0).multiplyScalar(dimension), VisualCircle.fromRadiusAndColorFill(radius, colorBody));
         var visualCapsule = VisualGroup.fromChildren([
             visualCapsuleEndLeft,
             visualCapsuleEndRight,
             visualCapsuleCenter
         ]);
-        var visualWindow = VisualCircle.fromRadiusAndColorFill(.5, colorWindow);
+        var radiusWindow = dimension / 4;
+        var visualWindow = VisualCircle.fromRadiusAndColorFill(radiusWindow, colorWindow);
         var visualCapsuleWithWindows = VisualGroup.fromChildren([
             visualCapsule,
-            VisualOffset.fromOffsetAndChild(Coords.fromXY(-0.5, 0), visualWindow.clone()),
-            VisualOffset.fromOffsetAndChild(Coords.fromXY(0, 0), visualWindow.clone()),
-            VisualOffset.fromOffsetAndChild(Coords.fromXY(0.5, 0), visualWindow.clone())
+            VisualOffset.fromOffsetAndChild(Coords.fromXY(-0.75, 0).multiplyScalar(dimension), visualWindow.clone()),
+            VisualOffset.fromOffsetAndChild(Coords.fromXY(0, 0).multiplyScalar(dimension), visualWindow.clone()),
+            VisualOffset.fromOffsetAndChild(Coords.fromXY(0.75, 0).multiplyScalar(dimension), visualWindow.clone())
         ]);
-        var scaleFactors = Coords.ones().multiplyScalar(dimension);
-        var transform = Transform_Scale.fromScaleFactors(scaleFactors);
-        visualCapsuleWithWindows.transform(transform);
         return visualCapsuleWithWindows;
     }
 }
