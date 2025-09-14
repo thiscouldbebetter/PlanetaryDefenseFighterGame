@@ -5,7 +5,8 @@ class WorldGame extends World {
         var timeCreated = DateTime.now();
         var defn = WorldGame.defnBuild();
         var player = Player.create(universe);
-        var levelNumberInitial = parseInt(universe.debugSettings.placeToStartAtName());
+        var placeToStartAtName = universe.debugSettings.placeToStartAtName();
+        var levelNumberInitial = parseInt(placeToStartAtName);
         levelNumberInitial = isNaN(levelNumberInitial) ? 1 : levelNumberInitial;
         var levelIndexInitial = levelNumberInitial - 1;
         var place = PlacePlanet.fromLevelIndexAndPlayer(levelIndexInitial, player);
@@ -15,6 +16,13 @@ class WorldGame extends World {
         var placeInitialName = places[0].name;
         super(name, timeCreated, defn, placeGetByName, placeInitialName);
         this.player = player;
+        if (placeToStartAtName == "Leaderboard") {
+            var stats = StatsKeeper.of(player);
+            stats.scoreAdd(1000);
+            var killable = Killable.of(player);
+            killable.livesInReserveSet(0);
+            killable.kill();
+        }
     }
     static defnBuild() {
         return new WorldDefn([
