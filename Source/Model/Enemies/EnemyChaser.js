@@ -6,11 +6,11 @@ class EnemyChaser extends Enemy {
             Carrier.create(),
             Device.fromNameTicksToChargeAndUse("Gun", 60, // 3 seconds
             // 3 seconds
-            uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+            uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyChaser.visualBuild()),
             Killable.fromDie(Enemy.killableDie),
-            Enemy.projectileGeneratorBuild(),
+            Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Scorable.fromPoints(100)
         ]);

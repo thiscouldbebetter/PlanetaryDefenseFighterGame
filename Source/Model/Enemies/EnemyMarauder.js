@@ -6,11 +6,11 @@ class EnemyMarauder extends Enemy {
             Carrier.create(),
             Device.fromNameTicksToChargeAndUse("Gun", 40, // 2 seconds
             // 2 seconds
-            uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+            uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyMarauder.visualBuild()),
             Killable.fromDie(Enemy.killableDie),
-            Enemy.projectileGeneratorBuild(),
+            Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(4, 2),
             Scorable.fromPoints(100)
         ]);

@@ -77,7 +77,8 @@ class PlacePlanet extends PlaceBase {
     static defnBuild() {
         var actionDisplayRecorderStartStop = DisplayRecorder.actionStartStop();
         var actionShowMenu = Action.Instances().ShowMenuSettings;
-        var actionNuke = Action.fromNameAndPerform("Nuke", (uwpe) => { console.log("todo - Nuke"); });
+        var actionFireGun = ProjectileGenerator.actionFire("Gun");
+        var actionFireNuke = ProjectileGenerator.actionFire("Nuke");
         var actions = [
             actionDisplayRecorderStartStop,
             actionShowMenu,
@@ -85,8 +86,8 @@ class PlacePlanet extends PlaceBase {
             Movable.actionAccelerateAndFaceRight(),
             Movable.actionAccelerateWithoutFacingUp(),
             Movable.actionAccelerateWithoutFacingDown(),
-            ProjectileGenerator.actionFire(),
-            actionNuke
+            actionFireGun,
+            actionFireNuke
         ];
         var inputs = Input.Instances();
         var atim = (actionName, inputs) => ActionToInputsMapping.fromActionNameAndInputNames(actionName, inputs.map(x => x.name));
@@ -97,8 +98,8 @@ class PlacePlanet extends PlaceBase {
             atim(Movable.actionAccelerateAndFaceRight().name, [inputs.ArrowRight, inputs.d]),
             atim(Movable.actionAccelerateWithoutFacingDown().name, [inputs.ArrowDown, inputs.s]),
             atim(Movable.actionAccelerateWithoutFacingUp().name, [inputs.ArrowUp, inputs.w]),
-            atim(ProjectileGenerator.actionFire().name, [inputs.Space]).inactivateInputWhenActionPerformedSet(true),
-            atim("Nuke", [inputs.n]).inactivateInputWhenActionPerformedSet(true)
+            atim(actionFireGun.name, [inputs.Space]).inactivateInputWhenActionPerformedSet(true),
+            atim(actionFireNuke.name, [inputs.n]).inactivateInputWhenActionPerformedSet(true)
         ];
         var entityPropertyNamesToProcess = [
             Actor.name,

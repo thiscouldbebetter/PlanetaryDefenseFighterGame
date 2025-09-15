@@ -19,7 +19,7 @@ class EnemyHarrier extends Enemy
 				(
 					"Gun",
 					60, // 3 seconds
-					uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+					uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
 				),
 
 				Drawable.fromVisual
@@ -29,7 +29,7 @@ class EnemyHarrier extends Enemy
 
 				Killable.fromDie(Enemy.killableDie),
 
-				Enemy.projectileGeneratorBuild(),
+				Enemy.projectileShooterBuild(),
 
 				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
 
@@ -102,8 +102,8 @@ class EnemyHarrier extends Enemy
 		var dimension = 8;
 
 		var colors = Color.Instances();
-		var colorBody = colors.Yellow;
-		var colorWindow = colors.Blue;
+		var colorBody = colors.Green;
+		var colorWindow = colors.Red;
 
 		var visualCapsuleCenter = VisualRectangle.fromSizeAndColorFill
 		(

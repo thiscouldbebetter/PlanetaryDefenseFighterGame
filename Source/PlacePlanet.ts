@@ -191,11 +191,8 @@ class PlacePlanet extends PlaceBase
 		var actionShowMenu =
 			Action.Instances().ShowMenuSettings;
 
-		var actionNuke = Action.fromNameAndPerform
-		(
-			"Nuke",
-			(uwpe) => { console.log("todo - Nuke") }
-		);
+		var actionFireGun = ProjectileGenerator.actionFire("Gun");
+		var actionFireNuke = ProjectileGenerator.actionFire("Nuke");
 
 		var actions =
 		[
@@ -208,8 +205,8 @@ class PlacePlanet extends PlaceBase
 			Movable.actionAccelerateWithoutFacingUp(),
 			Movable.actionAccelerateWithoutFacingDown(),
 
-			ProjectileGenerator.actionFire(),
-			actionNuke
+			actionFireGun,
+			actionFireNuke
 		];
 
 		var inputs = Input.Instances();
@@ -255,13 +252,13 @@ class PlacePlanet extends PlaceBase
 
 			atim
 			(
-				ProjectileGenerator.actionFire().name,
+				actionFireGun.name,
 				[ inputs.Space ]
 			).inactivateInputWhenActionPerformedSet(true),
 
 			atim
 			(
-				"Nuke",
+				actionFireNuke.name,
 				[ inputs.n ]
 			).inactivateInputWhenActionPerformedSet(true)
 		];

@@ -6,11 +6,11 @@ class EnemyHarrier extends Enemy {
             Carrier.create(),
             Device.fromNameTicksToChargeAndUse("Gun", 60, // 3 seconds
             // 3 seconds
-            uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+            uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyHarrier.visualBuild()),
             Killable.fromDie(Enemy.killableDie),
-            Enemy.projectileGeneratorBuild(),
+            Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Scorable.fromPoints(100)
         ]);
@@ -49,8 +49,8 @@ class EnemyHarrier extends Enemy {
     static visualBuild() {
         var dimension = 8;
         var colors = Color.Instances();
-        var colorBody = colors.Yellow;
-        var colorWindow = colors.Blue;
+        var colorBody = colors.Green;
+        var colorWindow = colors.Red;
         var visualCapsuleCenter = VisualRectangle.fromSizeAndColorFill(Coords.fromXY(1.5, 1).multiplyScalar(dimension), colorBody);
         var radius = dimension / 2;
         var visualCapsuleEndLeft = VisualOffset.fromOffsetAndChild(Coords.fromXY(-0.75, 0).multiplyScalar(dimension), VisualCircle.fromRadiusAndColorFill(radius, colorBody));

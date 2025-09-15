@@ -60,7 +60,8 @@ class Enemy extends Entity
 			var displacementToPlayer =
 				playerPos.clone().subtract(enemyPos);
 			var distanceToPlayer = displacementToPlayer.magnitude();
-			var projectileGenerator = ProjectileGenerator.of(enemy);
+			var projectileShooter = ProjectileShooter.of(enemy);
+			var projectileGenerator = projectileShooter.generatorDefault();
 			var projectileRange = projectileGenerator.range();
 			if (distanceToPlayer < projectileRange)
 			{
@@ -185,9 +186,9 @@ class Enemy extends Entity
 		playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
 	}
 
-	static projectileGeneratorBuild(): ProjectileGenerator
+	static projectileShooterBuild(): ProjectileShooter
 	{
-		return ProjectileGenerator.default();
+		return ProjectileShooter.default();
 	}
 
 	static _displacement: Coords;

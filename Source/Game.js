@@ -9,6 +9,8 @@ class Game {
         var universe = null;
         var worldCreator = WorldCreator.fromWorldCreate(() => new WorldGame(universe, this.name));
         universe = Universe.fromNameMediaLibraryAndWorldCreator("PlanetaryDefenseFighterGame", mediaLibrary, worldCreator);
+        var controlStyleToUse = ControlStyle.Instances().DarkAndRounded;
+        universe.controlBuilder.styleDefaultSet(controlStyleToUse);
         universe.initializeAndStart();
     }
     mediaLibraryBuild() {

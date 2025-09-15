@@ -19,7 +19,7 @@ class EnemyMarauder extends Enemy
 				(
 					"Gun",
 					40, // 2 seconds
-					uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+					uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
 				),
 
 				Drawable.fromVisual
@@ -29,7 +29,7 @@ class EnemyMarauder extends Enemy
 
 				Killable.fromDie(Enemy.killableDie),
 
-				Enemy.projectileGeneratorBuild(),
+				Enemy.projectileShooterBuild(),
 
 				Movable.fromAccelerationPerTickAndSpeedMax(4, 2),
 

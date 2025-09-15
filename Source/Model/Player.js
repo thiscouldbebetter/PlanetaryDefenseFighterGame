@@ -13,7 +13,7 @@ class Player extends Entity {
             ]),
             Controllable.fromToControl(uwpe => Player.toControl(uwpe)),
             Drawable.fromVisual(Player.visualBuild()),
-            ItemHolder.fromItem(Item.fromDefnName("Nuke")),
+            ItemHolder.fromItem(Item.fromDefnNameAndQuantity("Nuke", 3)).retainsItemsWithZeroQuantitiesSet(true),
             Killable.fromTicksOfImmunityDieAndLives(40, Player.killableDie, 2),
             Locatable.fromDisposition(Disposition.fromPos(Coords.fromXY(0, 125))),
             Movable.fromAccelerationPerTickAndSpeedMax(.2, 8
@@ -23,7 +23,7 @@ class Player extends Entity {
             */
             ),
             Playable.create(),
-            Player.projectileGenerator(),
+            Player.projectileShooterBuild(),
             StatsKeeper.create()
         ]);
         var debugSettings = universe.debugSettings;
@@ -65,8 +65,8 @@ class Player extends Entity {
         playerExplosionAndRespawner.propertyAdd(Playable.create());
         place.entityToSpawnAdd(playerExplosionAndRespawner);
     }
-    static projectileGenerator() {
-        var generation = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit(2, // radius
+    static projectileShooterBuild() {
+        var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit(2, // radius
         5, // distanceInitial
         16, // speed
         8, // ticksToLive
@@ -85,7 +85,7 @@ class Player extends Entity {
             entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
             Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
         });
-        return ProjectileGenerator.fromNameFireAndGenerations("Bullet", uwpe => {
+        var generatorGun = ProjectileGenerator.fromNameGenerationAndFire("Gun", generationGun, uwpe => {
             var place = uwpe.place;
             var player = place.player();
             var playerKillable = Killable.of(player);
@@ -93,11 +93,41 @@ class Player extends Entity {
             if (playerIsInImmunityPeriod == false) {
                 var playerStatsKeeper = StatsKeeper.of(player);
                 playerStatsKeeper.shotsIncrement();
-                ProjectileGenerator.fireDefault(uwpe);
+                ProjectileGenerator.fireGeneratorByName("Gun", uwpe);
             }
-        }, [
-            generation
-        ]);
+        });
+        var nukeRadius = 200;
+        var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit(nukeRadius, 0, // distanceInitial
+        0, // speed
+        1, // ticksToLive
+        // ticksToLive
+        uwpe => // hit
+         {
+            ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
+        }, Damage.fromAmount(1), VisualGroup.fromChildren([
+            VisualSound.fromSoundName("Effects_Boom"),
+            VisualCircle.fromRadiusAndColorFill(nukeRadius, Color.Instances().White)
+        ]), (entity) => {
+            entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
+            Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
+        });
+        var generatorNukeName = "Nuke";
+        var generatorNuke = ProjectileGenerator.fromNameGenerationAndFire(generatorNukeName, generationNuke, uwpe => {
+            var place = uwpe.place;
+            var player = place.player();
+            var playerKillable = Killable.of(player);
+            var playerIsInImmunityPeriod = playerKillable.immunityIsInEffect();
+            if (playerIsInImmunityPeriod == false) {
+                var playerItemHolder = ItemHolder.of(player);
+                if (playerItemHolder.hasItemWithDefnName(generatorNukeName)) {
+                    playerItemHolder.itemSubtractDefnNameAndQuantity(generatorNukeName, 1);
+                    ProjectileGenerator.fireGeneratorByName(generatorNukeName, uwpe);
+                }
+            }
+        });
+        var generators = [generatorGun, generatorNuke];
+        var shooter = ProjectileShooter.fromNameAndGenerators("GunAndNuke", generators);
+        return shooter;
     }
     static toControl(uwpe) {
         var place = uwpe.place;

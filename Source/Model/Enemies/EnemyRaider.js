@@ -6,11 +6,11 @@ class EnemyRaider extends Enemy {
             Carrier.create(),
             Device.fromNameTicksToChargeAndUse("Gun", 100, // 5 seconds
             // 5 seconds
-            uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+            uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyRaider.visualBuild()),
             Killable.fromDie(EnemyRaider.killableDie),
-            Enemy.projectileGeneratorBuild(),
+            Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Scorable.fromPoints(100)
         ]);

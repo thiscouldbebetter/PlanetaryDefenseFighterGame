@@ -19,7 +19,7 @@ class EnemyBurster extends Enemy
 				(
 					"Gun",
 					60, // 3 seconds
-					uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+					uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
 				),
 
 				Drawable.fromVisual
@@ -31,7 +31,7 @@ class EnemyBurster extends Enemy
 
 				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
 
-				Enemy.projectileGeneratorBuild(),
+				Enemy.projectileShooterBuild(),
 
 				Scorable.fromPoints(100)
 			]
@@ -123,8 +123,8 @@ class EnemyBurster extends Enemy
 		var dimension = 16;
 
 		var colors = Color.Instances();
-		var colorBody = colors.Red;
-		var colorHighlight = colors.White;
+		var colorBody = colors.Green;
+		var colorHighlight = colors.Red;
 
 		var visualBuilder = VisualBuilder.Instance();
 

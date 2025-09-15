@@ -43,7 +43,10 @@ class Player extends Entity
 					Player.visualBuild()
 				),
 
-				ItemHolder.fromItem(Item.fromDefnName("Nuke") ),
+				ItemHolder.fromItem
+				(
+					Item.fromDefnNameAndQuantity("Nuke", 3)
+				).retainsItemsWithZeroQuantitiesSet(true),
 
 				Killable.fromTicksOfImmunityDieAndLives
 				(
@@ -70,7 +73,7 @@ class Player extends Entity
 
 				Playable.create(),
 
-				Player.projectileGenerator(),
+				Player.projectileShooterBuild(),
 
 				StatsKeeper.create()
 			]
@@ -138,9 +141,9 @@ class Player extends Entity
 		place.entityToSpawnAdd(playerExplosionAndRespawner);
 	}
 
-	static projectileGenerator(): ProjectileGenerator
+	static projectileShooterBuild(): ProjectileShooter
 	{
-		var generation = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
+		var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
 		(
 			2, // radius
 			5, // distanceInitial
@@ -181,9 +184,10 @@ class Player extends Entity
 			}
 		);
 
-		return ProjectileGenerator.fromNameFireAndGenerations
+		var generatorGun = ProjectileGenerator.fromNameGenerationAndFire
 		(
-			"Bullet",
+			"Gun",
+			generationGun,
 			uwpe =>
 			{
 				var place = uwpe.place as PlacePlanet;
@@ -194,13 +198,79 @@ class Player extends Entity
 				{
 					var playerStatsKeeper = StatsKeeper.of(player);
 					playerStatsKeeper.shotsIncrement();
-					ProjectileGenerator.fireDefault(uwpe);
+					ProjectileGenerator.fireGeneratorByName("Gun", uwpe);
 				}
-			},
-			[
-				generation
-			]
+			}
 		);
+
+		var nukeRadius = 200;
+
+		var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
+		(
+			nukeRadius,
+			0, // distanceInitial
+			0, // speed
+			1, // ticksToLive
+			uwpe => // hit
+			{
+				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
+			},
+			Damage.fromAmount(1),
+			VisualGroup.fromChildren
+			([
+				VisualSound.fromSoundName("Effects_Boom"),
+
+				VisualCircle.fromRadiusAndColorFill
+				(
+					nukeRadius, Color.Instances().White
+				)
+			]),
+			(entity) =>
+			{
+				entity.propertyAdd
+				(
+					Constrainable.fromConstraint
+					(
+						Constraint_WrapToPlaceSizeXTrimY.create()
+					)
+				);
+
+				Drawable.of(entity).sizeInWrappedInstancesSet
+				(
+					Coords.fromXYZ(3, 1, 1)
+				)
+			}
+		);
+
+		var generatorNukeName = "Nuke";
+
+		var generatorNuke = ProjectileGenerator.fromNameGenerationAndFire
+		(
+			generatorNukeName,
+			generationNuke,
+			uwpe =>
+			{
+				var place = uwpe.place as PlacePlanet;
+				var player = place.player();
+				var playerKillable = Killable.of(player);
+				var playerIsInImmunityPeriod = playerKillable.immunityIsInEffect();
+				if (playerIsInImmunityPeriod == false)
+				{
+					var playerItemHolder = ItemHolder.of(player);
+					if (playerItemHolder.hasItemWithDefnName(generatorNukeName) )
+					{
+						playerItemHolder.itemSubtractDefnNameAndQuantity(generatorNukeName, 1);
+						ProjectileGenerator.fireGeneratorByName(generatorNukeName, uwpe);
+					}
+				}
+			}
+		);
+
+		var generators = [ generatorGun, generatorNuke ];
+
+		var shooter = ProjectileShooter.fromNameAndGenerators("GunAndNuke", generators);
+
+		return shooter;
 	}
 
 	static toControl(uwpe: UniverseWorldPlaceEntities): ControlBase

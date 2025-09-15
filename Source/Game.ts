@@ -28,6 +28,9 @@ class Game
 			worldCreator
 		);
 
+		var controlStyleToUse = ControlStyle.Instances().DarkAndRounded;
+		universe.controlBuilder.styleDefaultSet(controlStyleToUse);
+
 		universe.initializeAndStart();
 	}
 

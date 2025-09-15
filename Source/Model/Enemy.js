@@ -37,7 +37,8 @@ class Enemy extends Entity {
             var playerPos = Locatable.of(player).pos();
             var displacementToPlayer = playerPos.clone().subtract(enemyPos);
             var distanceToPlayer = displacementToPlayer.magnitude();
-            var projectileGenerator = ProjectileGenerator.of(enemy);
+            var projectileShooter = ProjectileShooter.of(enemy);
+            var projectileGenerator = projectileShooter.generatorDefault();
             var projectileRange = projectileGenerator.range();
             if (distanceToPlayer < projectileRange) {
                 var directionToPlayer = displacementToPlayer.normalize();
@@ -108,8 +109,8 @@ class Enemy extends Entity {
         var scoreForKillingEnemy = scorable.scoreGet(uwpe);
         playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
     }
-    static projectileGeneratorBuild() {
-        return ProjectileGenerator.default();
+    static projectileShooterBuild() {
+        return ProjectileShooter.default();
     }
     static displacement() {
         if (this._displacement == null) {

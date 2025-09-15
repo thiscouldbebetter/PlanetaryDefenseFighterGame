@@ -6,12 +6,12 @@ class EnemyMinelayer extends Enemy {
             Carrier.create(),
             Device.fromNameTicksToChargeAndUse("Gun", 60, // 3 seconds
             // 3 seconds
-            uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+            uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyMinelayer.visualBuild()),
             Killable.fromDie(Enemy.killableDie),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
-            Enemy.projectileGeneratorBuild(),
+            Enemy.projectileShooterBuild(),
             Scorable.fromPoints(100)
         ]);
     }

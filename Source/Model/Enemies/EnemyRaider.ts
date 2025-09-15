@@ -21,7 +21,7 @@ class EnemyRaider extends Enemy
 				(
 					"Gun",
 					100, // 5 seconds
-					uwpe => ProjectileGenerator.of(uwpe.entity).fire(uwpe) // use
+					uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
 				),
 
 				Drawable.fromVisual
@@ -31,7 +31,7 @@ class EnemyRaider extends Enemy
 
 				Killable.fromDie(EnemyRaider.killableDie),
 
-				Enemy.projectileGeneratorBuild(),
+				Enemy.projectileShooterBuild(),
 
 				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
 
