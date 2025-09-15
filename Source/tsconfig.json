@@ -62,6 +62,7 @@
 	"exclude" :
 	[
 		"Framework/Source/_BuildRecord.ts",
+		"Framework/Source/Configuration.ts",
 		"Framework/Source/Imports.ts",
 		"Framework/Source/main.ts",
 		"Framework/Source/Media/Audio/MusicTracker/Source/_Imports.ts",
