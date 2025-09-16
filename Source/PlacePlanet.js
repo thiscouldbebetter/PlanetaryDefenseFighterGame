@@ -13,38 +13,38 @@ class PlacePlanet extends PlaceBase {
             player
         ];
         this.enemyGenerationZone = BoxAxisAligned.fromMinAndMax(Coords.fromXY(0, 0), Coords.fromXY(size.x, 0));
-        var enemyBursterGenerator = this.constructor_EnemyBursterGeneratorBuild(this.enemyGenerationZone);
-        entities.push(enemyBursterGenerator.toEntity());
         var enemyHarrierGenerator = this.constructor_EnemyHarrierGeneratorBuild(this.enemyGenerationZone);
         entities.push(enemyHarrierGenerator.toEntity());
-        var enemyMinelayerGenerator = this.constructor_EnemyMinelayerGeneratorBuild(this.enemyGenerationZone);
+        var enemyBursterGenerator = this.constructor_EnemyBursterGeneratorBuild(this.enemyGenerationZone, levelIndex);
+        entities.push(enemyBursterGenerator.toEntity());
+        var enemyMinelayerGenerator = this.constructor_EnemyMinelayerGeneratorBuild(this.enemyGenerationZone, levelIndex);
         entities.push(enemyMinelayerGenerator.toEntity());
         // Marauders and chasers are not generated spontaneously.
         this.entitiesToSpawnAdd(entities);
     }
-    constructor_EnemyBursterGeneratorBuild(enemyGenerationZone) {
+    constructor_EnemyBursterGeneratorBuild(enemyGenerationZone, levelIndex) {
         var enemyBurstersAndMinelayersToGenerateConcurrentlyCount = this.enemyBurstersAndMinelayersToGenerateConcurrentlyCount();
         var enemyBursterGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyBurster.name, EnemyBurster.fromPos(Coords.create()), 400, // ticksPerGeneration = 20 seconds.
         1, // entitiesPerGeneration
         enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-        null, // all-time
+        levelIndex - 1, // all-time
         enemyGenerationZone);
         return enemyBursterGenerator;
     }
     constructor_EnemyHarrierGeneratorBuild(enemyGenerationZone) {
-        var enemyHarrierGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyHarrier.name, EnemyHarrier.fromPos(Coords.create()), 400, // ticksPerGeneration = 20 seconds.
+        var enemyHarrierGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyHarrier.name, EnemyHarrier.fromPos(Coords.create()), 800, // ticksPerGeneration = 40 seconds.
         1, // entitiesPerGeneration
         1, // concurrent
         null, // all-time
         enemyGenerationZone);
         return enemyHarrierGenerator;
     }
-    constructor_EnemyMinelayerGeneratorBuild(enemyGenerationZone) {
+    constructor_EnemyMinelayerGeneratorBuild(enemyGenerationZone, levelIndex) {
         var enemyBurstersAndMinelayersToGenerateConcurrentlyCount = this.enemyBurstersAndMinelayersToGenerateConcurrentlyCount();
         var enemyMinelayerGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyMinelayer.name, EnemyMinelayer.fromPos(Coords.create()), 400, // ticksPerGeneration = 20 seconds.
         1, // entitiesPerGeneration
         enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-        null, // all-time
+        levelIndex, // all-time
         enemyGenerationZone);
         return enemyMinelayerGenerator;
     }

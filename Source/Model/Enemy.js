@@ -30,20 +30,22 @@ class Enemy extends Entity {
         var enemyPos = enemyDisp.pos;
         var place = uwpe.place;
         var player = place.player();
-        var deviceGun = Device.of(enemy);
-        uwpe.entity2Set(enemy); // For Device.
-        var deviceGunCanBeUsed = deviceGun.canUse(uwpe);
-        if (deviceGunCanBeUsed) {
-            var playerPos = Locatable.of(player).pos();
-            var displacementToPlayer = playerPos.clone().subtract(enemyPos);
-            var distanceToPlayer = displacementToPlayer.magnitude();
-            var projectileShooter = ProjectileShooter.of(enemy);
-            var projectileGenerator = projectileShooter.generatorDefault();
-            var projectileRange = projectileGenerator.range();
-            if (distanceToPlayer < projectileRange) {
-                var directionToPlayer = displacementToPlayer.normalize();
-                enemyDisp.orientation.forwardSet(directionToPlayer);
-                deviceGun.use(uwpe);
+        if (player != null) {
+            var deviceGun = Device.of(enemy);
+            uwpe.entity2Set(enemy); // For Device.
+            var deviceGunCanBeUsed = deviceGun.canUse(uwpe);
+            if (deviceGunCanBeUsed) {
+                var playerPos = Locatable.of(player).pos();
+                var displacementToPlayer = playerPos.clone().subtract(enemyPos);
+                var distanceToPlayer = displacementToPlayer.magnitude();
+                var projectileShooter = ProjectileShooter.of(enemy);
+                var projectileGenerator = projectileShooter.generatorDefault();
+                var projectileRange = projectileGenerator.range();
+                if (distanceToPlayer < projectileRange) {
+                    var directionToPlayer = displacementToPlayer.normalize();
+                    enemyDisp.orientation.forwardSet(directionToPlayer);
+                    deviceGun.use(uwpe);
+                }
             }
         }
     }

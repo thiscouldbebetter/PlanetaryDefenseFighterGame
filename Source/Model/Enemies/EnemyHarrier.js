@@ -11,7 +11,7 @@ class EnemyHarrier extends Enemy {
             Drawable.fromVisual(EnemyHarrier.visualBuild()),
             Killable.fromDie(Enemy.killableDie),
             Enemy.projectileShooterBuild(),
-            Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
+            Movable.fromAccelerationPerTickAndSpeedMax(2, 2),
             Scorable.fromPoints(100)
         ]);
     }
@@ -47,7 +47,7 @@ class EnemyHarrier extends Enemy {
         enemyActivity.targetEntityClear();
     }
     static visualBuild() {
-        var dimension = 8;
+        var dimension = 6;
         var colors = Color.Instances();
         var colorBody = colors.Green;
         var colorWindow = colors.Red;

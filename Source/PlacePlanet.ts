@@ -36,16 +36,16 @@ class PlacePlanet extends PlaceBase
 			Coords.fromXY(size.x, 0)
 		);
 
-		var enemyBursterGenerator =
-			this.constructor_EnemyBursterGeneratorBuild(this.enemyGenerationZone);
-		entities.push(enemyBursterGenerator.toEntity() );
-
 		var enemyHarrierGenerator =
 			this.constructor_EnemyHarrierGeneratorBuild(this.enemyGenerationZone);
 		entities.push(enemyHarrierGenerator.toEntity() );
 
+		var enemyBursterGenerator =
+			this.constructor_EnemyBursterGeneratorBuild(this.enemyGenerationZone, levelIndex);
+		entities.push(enemyBursterGenerator.toEntity() );
+
 		var enemyMinelayerGenerator =
-			this.constructor_EnemyMinelayerGeneratorBuild(this.enemyGenerationZone);
+			this.constructor_EnemyMinelayerGeneratorBuild(this.enemyGenerationZone, levelIndex);
 		entities.push(enemyMinelayerGenerator.toEntity() );
 
 		// Marauders and chasers are not generated spontaneously.
@@ -55,7 +55,8 @@ class PlacePlanet extends PlaceBase
 
 	constructor_EnemyBursterGeneratorBuild
 	(
-		enemyGenerationZone: BoxAxisAligned
+		enemyGenerationZone: BoxAxisAligned,
+		levelIndex: number
 	): EntityGenerator
 	{
 		var enemyBurstersAndMinelayersToGenerateConcurrentlyCount =
@@ -68,7 +69,7 @@ class PlacePlanet extends PlaceBase
 			400, // ticksPerGeneration = 20 seconds.
 			1, // entitiesPerGeneration
 			enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-			null, // all-time
+			levelIndex - 1, // all-time
 			enemyGenerationZone
 		);
 		return enemyBursterGenerator;
@@ -83,7 +84,7 @@ class PlacePlanet extends PlaceBase
 		(
 			EntityGenerator.name + EnemyHarrier.name,
 			EnemyHarrier.fromPos(Coords.create() ),
-			400, // ticksPerGeneration = 20 seconds.
+			800, // ticksPerGeneration = 40 seconds.
 			1, // entitiesPerGeneration
 			1, // concurrent
 			null, // all-time
@@ -94,7 +95,8 @@ class PlacePlanet extends PlaceBase
 
 	constructor_EnemyMinelayerGeneratorBuild
 	(
-		enemyGenerationZone: BoxAxisAligned
+		enemyGenerationZone: BoxAxisAligned,
+		levelIndex: number
 	): EntityGenerator
 	{
 		var enemyBurstersAndMinelayersToGenerateConcurrentlyCount =
@@ -107,7 +109,7 @@ class PlacePlanet extends PlaceBase
 			400, // ticksPerGeneration = 20 seconds.
 			1, // entitiesPerGeneration
 			enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-			null, // all-time
+			levelIndex , // all-time
 			enemyGenerationZone
 		);
 		return enemyMinelayerGenerator;

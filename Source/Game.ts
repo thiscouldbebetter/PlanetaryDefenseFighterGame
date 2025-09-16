@@ -56,7 +56,7 @@ class Game
 		var imageTitlesDirectoryPath = contentDirectoryPath + "Images/Titles/";
 
 		// For everything but the titles, use built-in content from the Framework.
-		contentDirectoryPath = "../Source/Framework/Content/" + contentDirectoryPath;
+		contentDirectoryPath += "../Source/Framework/Content/";
 
 		var fontDirectoryPath = contentDirectoryPath + "Fonts/";
 		//var imageDirectoryPath = contentDirectoryPath + "Images/";

@@ -31,7 +31,7 @@ class EnemyHarrier extends Enemy
 
 				Enemy.projectileShooterBuild(),
 
-				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
+				Movable.fromAccelerationPerTickAndSpeedMax(2, 2),
 
 				Scorable.fromPoints(100)
 			]
@@ -99,7 +99,7 @@ class EnemyHarrier extends Enemy
 
 	static visualBuild(): VisualBase
 	{
-		var dimension = 8;
+		var dimension = 6;
 
 		var colors = Color.Instances();
 		var colorBody = colors.Green;

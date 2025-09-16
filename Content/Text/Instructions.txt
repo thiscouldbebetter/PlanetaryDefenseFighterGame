@@ -1,1 +1,8 @@
-[Instructions.]
+Prevent the habitats
+from being stolen by raiders,
+who then transform to marauders.
+Bursters and minelayers appear at higher levels.
+Bursters explode into chasers when shot.
+Harriers will appear after a time.
+
+
