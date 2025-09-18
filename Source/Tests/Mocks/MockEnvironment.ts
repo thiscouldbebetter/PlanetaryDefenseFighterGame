@@ -10,12 +10,10 @@ class MockEnvironment
 
 	universeCreate(): Universe
 	{
-		var universe = Universe.default();
+		var display = DisplayTest.default();
+		var universe = Universe.default().displaySet(display);
 		universe.world = universe.worldCreate();
-		universe.world.defn = new WorldDefn
-		([
-			[ PlaceDefn.default() ]
-		]);
+		universe.world.defn = WorldGame.defnBuild();
 		universe.initialize(() => {});
 		universe.profile = Profile.anonymous();
 		universe.world.initialize
