@@ -66,6 +66,17 @@ class Player extends Entity {
         place.entityToSpawnAdd(playerExplosionAndRespawner);
     }
     static projectileShooterBuild() {
+        var generatorGun = this.projectileShooterBuild_Gun();
+        var generatorNuke = this.projectileShooterBuild_Nuke();
+        var generators = [generatorGun, generatorNuke];
+        var shooter = ProjectileShooter.fromNameAndGenerators("GunAndNuke", generators);
+        return shooter;
+    }
+    static projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity) {
+        entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
+        Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
+    }
+    static projectileShooterBuild_Gun() {
         var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit(2, // radius
         5, // distanceInitial
         16, // speed
@@ -81,10 +92,7 @@ class Player extends Entity {
         }, Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Blip"),
             VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
-        ]), (entity) => {
-            entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
-            Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
-        });
+        ]), (entity) => this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity));
         var generatorGun = ProjectileGenerator.fromNameGenerationAndFire("Gun", generationGun, uwpe => {
             var place = uwpe.place;
             var player = place.player();
@@ -96,6 +104,9 @@ class Player extends Entity {
                 ProjectileGenerator.fireGeneratorByName("Gun", uwpe);
             }
         });
+        return generatorGun;
+    }
+    static projectileShooterBuild_Nuke() {
         var nukeRadius = 200;
         var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit(nukeRadius, 0, // distanceInitial
         0, // speed
@@ -107,10 +118,7 @@ class Player extends Entity {
         }, Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Boom"),
             VisualCircle.fromRadiusAndColorFill(nukeRadius, Color.Instances().White)
-        ]), (entity) => {
-            entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
-            Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
-        });
+        ]), (entity) => this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity));
         var generatorNukeName = "Nuke";
         var generatorNuke = ProjectileGenerator.fromNameGenerationAndFire(generatorNukeName, generationNuke, uwpe => {
             var place = uwpe.place;
@@ -125,9 +133,7 @@ class Player extends Entity {
                 }
             }
         });
-        var generators = [generatorGun, generatorNuke];
-        var shooter = ProjectileShooter.fromNameAndGenerators("GunAndNuke", generators);
-        return shooter;
+        return generatorNuke;
     }
     static toControl(uwpe) {
         var place = uwpe.place;

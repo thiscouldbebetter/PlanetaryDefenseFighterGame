@@ -1,6 +1,6 @@
 "use strict";
 class PlacePlanet extends PlaceBase {
-    constructor(levelIndex, player) {
+    constructor(universe, levelIndex, player) {
         var size = Coords.fromXY(800, 300);
         super("Level " + (levelIndex + 1), PlacePlanet.defnBuild().name, null, // parentName
         size, [] // entities
@@ -12,44 +12,22 @@ class PlacePlanet extends PlaceBase {
             Planet.fromSizeAndHorizonHeight(Coords.fromXY(800, 300), 50),
             player
         ];
+        var habitats = PlacePlanet.habitatsBuild(size);
+        entities.push(...habitats);
         this.enemyGenerationZone = BoxAxisAligned.fromMinAndMax(Coords.fromXY(0, 0), Coords.fromXY(size.x, 0));
-        var enemyHarrierGenerator = this.constructor_EnemyHarrierGeneratorBuild(this.enemyGenerationZone);
+        var enemyHarrierGenerator = EnemyHarrier.generatorBuildForBox(this.enemyGenerationZone);
         entities.push(enemyHarrierGenerator.toEntity());
-        var enemyBursterGenerator = this.constructor_EnemyBursterGeneratorBuild(this.enemyGenerationZone, levelIndex);
+        var enemyBursterGenerator = EnemyBurster.generatorBuildForBoxAndLevelIndex(this.enemyGenerationZone, levelIndex);
         entities.push(enemyBursterGenerator.toEntity());
-        var enemyMinelayerGenerator = this.constructor_EnemyMinelayerGeneratorBuild(this.enemyGenerationZone, levelIndex);
+        var enemyMinelayerGenerator = EnemyMinelayer.generatorBuildForBoxAndLevelIndex(this.enemyGenerationZone, levelIndex);
         entities.push(enemyMinelayerGenerator.toEntity());
+        var enemyRaiderGenerator = EnemyRaider.generatorBuild(universe, this.enemyGenerationZone, this.levelIndex).toEntity();
+        this.entityToSpawnAdd(enemyRaiderGenerator);
         // Marauders and chasers are not generated spontaneously.
         this.entitiesToSpawnAdd(entities);
     }
-    constructor_EnemyBursterGeneratorBuild(enemyGenerationZone, levelIndex) {
-        var enemyBurstersAndMinelayersToGenerateConcurrentlyCount = this.enemyBurstersAndMinelayersToGenerateConcurrentlyCount();
-        var enemyBursterGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyBurster.name, EnemyBurster.fromPos(Coords.create()), 400, // ticksPerGeneration = 20 seconds.
-        1, // entitiesPerGeneration
-        enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-        levelIndex - 1, // all-time
-        enemyGenerationZone);
-        return enemyBursterGenerator;
-    }
-    constructor_EnemyHarrierGeneratorBuild(enemyGenerationZone) {
-        var enemyHarrierGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyHarrier.name, EnemyHarrier.fromPos(Coords.create()), 800, // ticksPerGeneration = 40 seconds.
-        1, // entitiesPerGeneration
-        1, // concurrent
-        null, // all-time
-        enemyGenerationZone);
-        return enemyHarrierGenerator;
-    }
-    constructor_EnemyMinelayerGeneratorBuild(enemyGenerationZone, levelIndex) {
-        var enemyBurstersAndMinelayersToGenerateConcurrentlyCount = this.enemyBurstersAndMinelayersToGenerateConcurrentlyCount();
-        var enemyMinelayerGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyMinelayer.name, EnemyMinelayer.fromPos(Coords.create()), 400, // ticksPerGeneration = 20 seconds.
-        1, // entitiesPerGeneration
-        enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-        levelIndex, // all-time
-        enemyGenerationZone);
-        return enemyMinelayerGenerator;
-    }
-    static fromLevelIndexAndPlayer(levelIndex, player) {
-        return new PlacePlanet(levelIndex, player);
+    static fromUniverseLevelIndexAndPlayer(universe, levelIndex, player) {
+        return new PlacePlanet(universe, levelIndex, player);
     }
     static cameraEntity(placeSize) {
         var cameraViewSize = Coords.fromXY(400, 300);
@@ -60,6 +38,13 @@ class PlacePlanet extends PlaceBase {
         var constrainable = Constrainable.of(cameraEntity);
         constrainable.constraintAdd(constraintContainInBox);
         var collidable = Collidable.of(cameraEntity);
+        this.colliderWrapForCollidableAndPlaceSize(collidable, placeSize);
+        return cameraEntity;
+    }
+    static cameraEntity_EntitiesInViewSort(entitiesToSort) {
+        return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
+    }
+    static colliderWrapForCollidableAndPlaceSize(collidable, placeSize) {
         var colliderCenter = collidable.collider;
         var colliderLeft = ShapeTransformed.fromTransformAndChild(Transform_Translate.fromDisplacement(Coords.fromXY(0 - placeSize.x, 0)), colliderCenter.clone());
         var colliderRight = ShapeTransformed.fromTransformAndChild(Transform_Translate.fromDisplacement(Coords.fromXY(placeSize.x, 0)), colliderCenter.clone());
@@ -69,10 +54,7 @@ class PlacePlanet extends PlaceBase {
             colliderRight
         ]);
         collidable.colliderAtRestSet(colliderAfterWrapping);
-        return cameraEntity;
-    }
-    static cameraEntity_EntitiesInViewSort(entitiesToSort) {
-        return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
+        return collidable;
     }
     static defnBuild() {
         var actionDisplayRecorderStartStop = DisplayRecorder.actionStartStop();
@@ -115,53 +97,28 @@ class PlacePlanet extends PlaceBase {
         return PlaceDefn.fromNameMusicActionsMappingsAndPropertyNames(PlacePlanet.name, "Music__Default", // soundForMusicName
         actions, actionToInputsMappings, entityPropertyNamesToProcess);
     }
-    enemyRaidersCountInitial(universe) {
-        var habitatsCount = this.habitatsCountInitial(universe);
-        var enemyRaidersCountForLevel0 = habitatsCount * 2;
-        var enemyRaidersAdditionalPerLevel = 3;
-        var enemyRaidersCount = enemyRaidersCountForLevel0
-            + enemyRaidersAdditionalPerLevel * this.levelIndex;
-        return enemyRaidersCount;
-    }
-    enemyBurstersAndMinelayersToGenerateConcurrentlyCount() {
-        var enemiesCountForLevel0 = 0;
-        var enemiesAdditionalPerLevel = 1;
-        var enemiesCount = enemiesCountForLevel0
-            + enemiesAdditionalPerLevel * this.levelIndex;
-        return enemiesCount;
-    }
     finalize(uwpe) {
         this.initializeIsComplete = false;
         super.finalize(uwpe);
     }
     initialize(uwpe) {
         if (this.initializeIsComplete == false) {
-            var habitats = this.initialize_HabitatsBuild(uwpe);
-            this.entitiesToSpawnAdd(habitats);
-            var enemyRaiderGenerator = this.initialize_EnemyRaiderGeneratorBuild(uwpe).toEntity();
-            this.entityToSpawnAdd(enemyRaiderGenerator);
             super.initialize(uwpe);
             this.initializeIsComplete = true;
         }
     }
-    initialize_EnemyRaiderGeneratorBuild(uwpe) {
-        var enemyRaidersCount = this.enemyRaidersCountInitial(uwpe.universe);
-        var enemyRaiderGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyRaider.name, EnemyRaider.fromPos(Coords.create()), 100, // ticksPerGeneration = 5 seconds.
-        1, // entitiesPerGeneration
-        enemyRaidersCount, // concurrent
-        enemyRaidersCount, // all-time
-        this.enemyGenerationZone);
-        return enemyRaiderGenerator;
-    }
-    initialize_HabitatsBuild(uwpe) {
+    static habitatsBuild(placeSize) {
         var habitats = [];
-        var habitatsCount = this.habitatsCountInitial(uwpe.universe);
-        var habitatSpacing = this.size().x / habitatsCount;
+        var habitatsCount = this.habitatsCountInitial();
+        var habitatSpacing = placeSize.x / habitatsCount;
         for (var i = 0; i < habitatsCount; i++) {
             var habitat = Habitat.fromPos(Coords.fromXY(i * habitatSpacing, 250));
             habitats.push(habitat);
         }
         return habitats;
+    }
+    static habitatsCountInitial() {
+        return 4;
     }
     sizeMinusSurface() {
         var planet = this.planet();
@@ -180,11 +137,23 @@ class PlacePlanet extends PlaceBase {
         var entityGenerator = EntityGenerator.of(entity);
         return entityGenerator;
     }
+    static enemyRaidersCountInitial(universe, levelIndex) {
+        var enemyRaidersCount;
+        if (universe.debugSettings.difficultyEasy()) {
+            enemyRaidersCount = 0;
+        }
+        else {
+            var habitatsCount = PlacePlanet.habitatsCountInitial();
+            var enemyRaidersCountForLevel0 = habitatsCount * 2;
+            var enemyRaidersAdditionalPerLevel = 3;
+            enemyRaidersCount =
+                enemyRaidersCountForLevel0
+                    + enemyRaidersAdditionalPerLevel * levelIndex;
+        }
+        return enemyRaidersCount;
+    }
     habitats() {
         return this.entitiesByPropertyName(HabitatProperty.name);
-    }
-    habitatsCountInitial(universe) {
-        return (universe == null ? 4 : universe.debugSettings.difficultyEasy() ? 1 : 4);
     }
     planet() {
         return this.entityByName(Planet.name);

@@ -32,7 +32,7 @@ class EnemyTests extends TestFixture {
         var world = universe.world;
         var player = new Player(universe);
         var levelIndex = 0;
-        var place = new PlacePlanet(levelIndex, player);
+        var place = PlacePlanet.fromUniverseLevelIndexAndPlayer(universe, levelIndex, player);
         world.placeNextSet(place);
         universe.venueNextSet(world.toVenue());
         universe.updateForTimerTick();
@@ -47,7 +47,7 @@ class EnemyTests extends TestFixture {
         var enemy = this.enemyBuild();
         var player = new Player(universe);
         var levelIndex = 0;
-        var place = new PlacePlanet(levelIndex, player);
+        var place = PlacePlanet.fromUniverseLevelIndexAndPlayer(universe, levelIndex, player);
         world.placeNextSet(place);
         universe.venueNextSet(world.toVenue());
         universe.updateForTimerTick();
@@ -63,7 +63,7 @@ class EnemyTests extends TestFixture {
         var player = new Player(universe);
         Actor.of(enemy).activity.targetEntitySet(player);
         var levelIndex = 0;
-        var place = new PlacePlanet(levelIndex, player);
+        var place = PlacePlanet.fromUniverseLevelIndexAndPlayer(universe, levelIndex, player);
         world.placeNextSet(place);
         universe.venueNextSet(world.toVenue());
         universe.updateForTimerTick();
@@ -81,7 +81,7 @@ class EnemyTests extends TestFixture {
         var enemy = this.enemyBuild();
         var player = new Player(universe);
         var levelIndex = 0;
-        var place = new PlacePlanet(levelIndex, player);
+        var place = PlacePlanet.fromUniverseLevelIndexAndPlayer(universe, levelIndex, player);
         world.placeNextSet(place);
         universe.venueNextSet(world.toVenue());
         universe.updateForTimerTick();
@@ -104,7 +104,7 @@ class EnemyTests extends TestFixture {
         var enemy = this.enemyBuild();
         var player = new Player(universe);
         var levelIndex = 0;
-        var place = new PlacePlanet(levelIndex, player);
+        var place = PlacePlanet.fromUniverseLevelIndexAndPlayer(universe, levelIndex, player);
         world.placeNextSet(place);
         universe.venueNextSet(world.toVenue());
         universe.updateForTimerTick();

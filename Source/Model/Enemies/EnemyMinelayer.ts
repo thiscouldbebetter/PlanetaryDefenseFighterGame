@@ -102,6 +102,30 @@ class EnemyMinelayer extends Enemy
 		enemyActivity.targetEntityClear();
 	}
 
+	static generatorBuildForBoxAndLevelIndex
+	(
+		enemyGenerationZone: BoxAxisAligned,
+		levelIndex: number
+	): EntityGenerator
+	{
+		var levelOfFirstAppearanceIndex = 1;
+		var enemiesAdditionalPerLevel = 1;
+		var enemiesCount =
+			enemiesAdditionalPerLevel * (levelIndex - levelOfFirstAppearanceIndex);
+
+		var enemyMinelayerGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox
+		(
+			EntityGenerator.name + EnemyMinelayer.name,
+			EnemyMinelayer.fromPos(Coords.create() ),
+			0, // ticksPerGeneration
+			enemiesCount, // entitiesPerGeneration
+			enemiesCount, // concurrent
+			enemiesCount, // all-time
+			enemyGenerationZone
+		);
+		return enemyMinelayerGenerator;
+	}
+
 	static visualBuild(): VisualBase
 	{
 		var colors = Color.Instances();

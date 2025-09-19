@@ -172,10 +172,10 @@ class Planet extends Entity
 
 		var playerStatsKeeper = StatsKeeper.of(player);
 		var enemyRaidersKilled = playerStatsKeeper.kills();
-		var enemyRaidersTotal = place.enemyRaidersCountInitial(universe);
+		var enemyRaidersTotal = PlacePlanet.enemyRaidersCountInitial(universe, place.levelIndex);
 
 		var habitatsRemaining = place.habitats().length;
-		var habitatsTotal = place.habitatsCountInitial(universe);
+		var habitatsTotal = PlacePlanet.habitatsCountInitial();
 
 		var shotsHit = playerStatsKeeper.hits();
 		var shotsFired = playerStatsKeeper.shots();
@@ -209,9 +209,9 @@ class Planet extends Entity
 				playerStatsKeeper.shotsClear();
 				playerStatsKeeper.hitsClear();
 				var levelNextIndex = place.levelIndex + 1;
-				var placeNext = PlacePlanet.fromLevelIndexAndPlayer
+				var placeNext = PlacePlanet.fromUniverseLevelIndexAndPlayer
 				(
-					levelNextIndex, player
+					universe, levelNextIndex, player
 				);
 				universe.world.placeNextSet(placeNext);
 				universe.venuePrevTransitionTo();

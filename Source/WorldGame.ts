@@ -13,7 +13,7 @@ class WorldGame extends World
 		var levelNumberInitial = parseInt(placeToStartAtName);
 		levelNumberInitial = isNaN(levelNumberInitial) ? 1 : levelNumberInitial;
 		var levelIndexInitial = levelNumberInitial - 1;
-		var place = PlacePlanet.fromLevelIndexAndPlayer(levelIndexInitial, player);
+		var place = PlacePlanet.fromUniverseLevelIndexAndPlayer(universe, levelIndexInitial, player);
 		var places = [ place ];
 		var placesByName = new Map(places.map(x => [x.name, x]) );
 		var placeGetByName =

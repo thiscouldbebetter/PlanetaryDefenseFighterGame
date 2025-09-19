@@ -5,7 +5,7 @@ class PlacePlanet extends PlaceBase
 
 	enemyGenerationZone: BoxAxisAligned;
 
-	constructor(levelIndex: number, player: Player)
+	constructor(universe: Universe, levelIndex: number, player: Player)
 	{
 		var size = Coords.fromXY(800, 300);
 
@@ -30,6 +30,9 @@ class PlacePlanet extends PlaceBase
 			player
 		];
 
+		var habitats = PlacePlanet.habitatsBuild(size);
+		entities.push(...habitats);
+
 		this.enemyGenerationZone = BoxAxisAligned.fromMinAndMax
 		(
 			Coords.fromXY(0, 0),
@@ -37,87 +40,32 @@ class PlacePlanet extends PlaceBase
 		);
 
 		var enemyHarrierGenerator =
-			this.constructor_EnemyHarrierGeneratorBuild(this.enemyGenerationZone);
+			EnemyHarrier.generatorBuildForBox(this.enemyGenerationZone);
 		entities.push(enemyHarrierGenerator.toEntity() );
 
 		var enemyBursterGenerator =
-			this.constructor_EnemyBursterGeneratorBuild(this.enemyGenerationZone, levelIndex);
+			EnemyBurster.generatorBuildForBoxAndLevelIndex(this.enemyGenerationZone, levelIndex);
 		entities.push(enemyBursterGenerator.toEntity() );
 
 		var enemyMinelayerGenerator =
-			this.constructor_EnemyMinelayerGeneratorBuild(this.enemyGenerationZone, levelIndex);
+			EnemyMinelayer.generatorBuildForBoxAndLevelIndex(this.enemyGenerationZone, levelIndex);
 		entities.push(enemyMinelayerGenerator.toEntity() );
+
+		var enemyRaiderGenerator =
+			EnemyRaider.generatorBuild(universe, this.enemyGenerationZone, this.levelIndex).toEntity();
+		this.entityToSpawnAdd(enemyRaiderGenerator);
 
 		// Marauders and chasers are not generated spontaneously.
 
 		this.entitiesToSpawnAdd(entities);
 	}
 
-	constructor_EnemyBursterGeneratorBuild
+	static fromUniverseLevelIndexAndPlayer
 	(
-		enemyGenerationZone: BoxAxisAligned,
-		levelIndex: number
-	): EntityGenerator
+		universe: Universe, levelIndex: number, player: Player
+	): PlacePlanet
 	{
-		var enemyBurstersAndMinelayersToGenerateConcurrentlyCount =
-			this.enemyBurstersAndMinelayersToGenerateConcurrentlyCount();
-
-		var enemyBursterGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox
-		(
-			EntityGenerator.name + EnemyBurster.name,
-			EnemyBurster.fromPos(Coords.create() ),
-			400, // ticksPerGeneration = 20 seconds.
-			1, // entitiesPerGeneration
-			enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-			levelIndex - 1, // all-time
-			enemyGenerationZone
-		);
-		return enemyBursterGenerator;
-	}
-
-	constructor_EnemyHarrierGeneratorBuild
-	(
-		enemyGenerationZone: BoxAxisAligned
-	): EntityGenerator
-	{
-		var enemyHarrierGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox
-		(
-			EntityGenerator.name + EnemyHarrier.name,
-			EnemyHarrier.fromPos(Coords.create() ),
-			800, // ticksPerGeneration = 40 seconds.
-			1, // entitiesPerGeneration
-			1, // concurrent
-			null, // all-time
-			enemyGenerationZone
-		);
-		return enemyHarrierGenerator;
-	}
-
-	constructor_EnemyMinelayerGeneratorBuild
-	(
-		enemyGenerationZone: BoxAxisAligned,
-		levelIndex: number
-	): EntityGenerator
-	{
-		var enemyBurstersAndMinelayersToGenerateConcurrentlyCount =
-			this.enemyBurstersAndMinelayersToGenerateConcurrentlyCount();
-
-		var enemyMinelayerGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox
-		(
-			EntityGenerator.name + EnemyMinelayer.name,
-			EnemyMinelayer.fromPos(Coords.create() ),
-			400, // ticksPerGeneration = 20 seconds.
-			1, // entitiesPerGeneration
-			enemyBurstersAndMinelayersToGenerateConcurrentlyCount, // concurrent
-			levelIndex , // all-time
-			enemyGenerationZone
-		);
-		return enemyMinelayerGenerator;
-	}
-
-	static fromLevelIndexAndPlayer(levelIndex: number, player: Player): PlacePlanet
-	{
-		return new PlacePlanet(levelIndex, player);
+		return new PlacePlanet(universe, levelIndex, player);
 	}
 
 	static cameraEntity(placeSize: Coords): Entity
@@ -149,6 +97,18 @@ class PlacePlanet extends PlaceBase
 
 		var collidable = Collidable.of(cameraEntity);
 
+		this.colliderWrapForCollidableAndPlaceSize(collidable, placeSize);
+
+		return cameraEntity;
+	}
+
+	static cameraEntity_EntitiesInViewSort(entitiesToSort: Entity[]) : Entity[]
+	{
+		return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
+	}
+
+	static colliderWrapForCollidableAndPlaceSize(collidable: Collidable, placeSize: Coords): Collidable
+	{
 		var colliderCenter = collidable.collider;
 
 		var colliderLeft = ShapeTransformed.fromTransformAndChild
@@ -158,7 +118,7 @@ class PlacePlanet extends PlaceBase
 				Coords.fromXY(0 - placeSize.x, 0)
 			),
 			colliderCenter.clone()
-		)
+		);
 
 		var colliderRight = ShapeTransformed.fromTransformAndChild
 		(
@@ -167,7 +127,7 @@ class PlacePlanet extends PlaceBase
 				Coords.fromXY(placeSize.x, 0)
 			),
 			colliderCenter.clone()
-		)
+		);
 
 		var colliderAfterWrapping = ShapeGroupAny.fromChildren
 		([
@@ -178,12 +138,7 @@ class PlacePlanet extends PlaceBase
 
 		collidable.colliderAtRestSet(colliderAfterWrapping);
 
-		return cameraEntity;
-	}
-
-	static cameraEntity_EntitiesInViewSort(entitiesToSort: Entity[]) : Entity[]
-	{
-		return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
+		return collidable;
 	}
 
 	static defnBuild(): PlaceDefn
@@ -288,27 +243,6 @@ class PlacePlanet extends PlaceBase
 		);
 	}
 
-	enemyRaidersCountInitial(universe: Universe): number
-	{
-		var habitatsCount = this.habitatsCountInitial(universe);
-		var enemyRaidersCountForLevel0 = habitatsCount * 2;
-		var enemyRaidersAdditionalPerLevel = 3;
-		var enemyRaidersCount =
-			enemyRaidersCountForLevel0
-			+ enemyRaidersAdditionalPerLevel * this.levelIndex;
-		return enemyRaidersCount;
-	}
-
-	enemyBurstersAndMinelayersToGenerateConcurrentlyCount(): number
-	{
-		var enemiesCountForLevel0 = 0;
-		var enemiesAdditionalPerLevel = 1;
-		var enemiesCount =
-			enemiesCountForLevel0
-			+ enemiesAdditionalPerLevel * this.levelIndex;
-		return enemiesCount;
-	}
-
 	finalize(uwpe: UniverseWorldPlaceEntities): void
 	{
 		this.initializeIsComplete = false;
@@ -321,12 +255,6 @@ class PlacePlanet extends PlaceBase
 	{
 		if (this.initializeIsComplete == false)
 		{
-			var habitats = this.initialize_HabitatsBuild(uwpe);
-			this.entitiesToSpawnAdd(habitats);
-
-			var enemyRaiderGenerator =
-				this.initialize_EnemyRaiderGeneratorBuild(uwpe).toEntity();
-			this.entityToSpawnAdd(enemyRaiderGenerator);
 
 			super.initialize(uwpe);
 
@@ -334,27 +262,11 @@ class PlacePlanet extends PlaceBase
 		}
 	}
 
-	initialize_EnemyRaiderGeneratorBuild(uwpe: UniverseWorldPlaceEntities): EntityGenerator
-	{
-		var enemyRaidersCount = this.enemyRaidersCountInitial(uwpe.universe);
-		var enemyRaiderGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox
-		(
-			EntityGenerator.name + EnemyRaider.name,
-			EnemyRaider.fromPos(Coords.create() ),
-			100, // ticksPerGeneration = 5 seconds.
-			1, // entitiesPerGeneration
-			enemyRaidersCount, // concurrent
-			enemyRaidersCount, // all-time
-			this.enemyGenerationZone
-		);
-		return enemyRaiderGenerator;
-	}
-
-	initialize_HabitatsBuild(uwpe: UniverseWorldPlaceEntities): Habitat[]
+	static habitatsBuild(placeSize: Coords): Habitat[]
 	{
 		var habitats: Habitat[] = [];
-		var habitatsCount = this.habitatsCountInitial(uwpe.universe);
-		var habitatSpacing = this.size().x / habitatsCount;
+		var habitatsCount = this.habitatsCountInitial();
+		var habitatSpacing = placeSize.x / habitatsCount;
 		for (var i = 0; i < habitatsCount; i++)
 		{
 			var habitat =
@@ -362,6 +274,11 @@ class PlacePlanet extends PlaceBase
 			habitats.push(habitat);
 		}
 		return habitats;
+	}
+
+	static habitatsCountInitial(): number
+	{
+		return 4;
 	}
 
 	sizeMinusSurface(): Coords
@@ -394,14 +311,28 @@ class PlacePlanet extends PlaceBase
 		return entityGenerator;
 	}
 
+	static enemyRaidersCountInitial(universe: Universe, levelIndex: number): number
+	{
+		var enemyRaidersCount: number;
+		if (universe.debugSettings.difficultyEasy() )
+		{
+			enemyRaidersCount = 0;
+		}
+		else
+		{
+			var habitatsCount = PlacePlanet.habitatsCountInitial();
+			var enemyRaidersCountForLevel0 = habitatsCount * 2;
+			var enemyRaidersAdditionalPerLevel = 3;
+			enemyRaidersCount =
+				enemyRaidersCountForLevel0
+				+ enemyRaidersAdditionalPerLevel * levelIndex;
+		}
+		return enemyRaidersCount;
+	}
+
 	habitats(): Habitat[]
 	{
 		return this.entitiesByPropertyName(HabitatProperty.name) as Habitat[];
-	}
-
-	habitatsCountInitial(universe: Universe): number
-	{
-		return (universe == null ? 4 : universe.debugSettings.difficultyEasy() ? 1 : 4);
 	}
 
 	planet(): Planet

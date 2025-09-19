@@ -117,6 +117,15 @@ class EnemyRaider extends Enemy {
         var targetEntity = Entity.fromNameAndProperty("UpgradePoint", Locatable.fromPos(enemyPos.clone().addXY(0, 0 - place.size().y)));
         enemyActivity.targetEntitySet(targetEntity);
     }
+    static generatorBuild(universe, enemyGenerationZone, levelIndex) {
+        var enemyRaidersCount = PlacePlanet.enemyRaidersCountInitial(universe, levelIndex);
+        var enemyRaiderGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyRaider.name, EnemyRaider.fromPos(Coords.create()), 100, // ticksPerGeneration = 5 seconds.
+        1, // entitiesPerGeneration
+        enemyRaidersCount, // concurrent
+        enemyRaidersCount, // all-time
+        enemyGenerationZone);
+        return enemyRaiderGenerator;
+    }
     static killableDie(uwpe) {
         Enemy.killableDie(uwpe);
         var enemy = uwpe.entity;

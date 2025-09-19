@@ -51,6 +51,17 @@ class EnemyMinelayer extends Enemy {
         var enemyActivity = Actor.of(enemy).activity;
         enemyActivity.targetEntityClear();
     }
+    static generatorBuildForBoxAndLevelIndex(enemyGenerationZone, levelIndex) {
+        var levelOfFirstAppearanceIndex = 1;
+        var enemiesAdditionalPerLevel = 1;
+        var enemiesCount = enemiesAdditionalPerLevel * (levelIndex - levelOfFirstAppearanceIndex);
+        var enemyMinelayerGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyMinelayer.name, EnemyMinelayer.fromPos(Coords.create()), 0, // ticksPerGeneration
+        enemiesCount, // entitiesPerGeneration
+        enemiesCount, // concurrent
+        enemiesCount, // all-time
+        enemyGenerationZone);
+        return enemyMinelayerGenerator;
+    }
     static visualBuild() {
         var colors = Color.Instances();
         return VisualGroup.fromChildren([

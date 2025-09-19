@@ -234,6 +234,22 @@ class EnemyRaider extends Enemy
 		enemyActivity.targetEntitySet(targetEntity);
 	}
 
+	static generatorBuild(universe: Universe, enemyGenerationZone: BoxAxisAligned, levelIndex: number): EntityGenerator
+	{
+		var enemyRaidersCount = PlacePlanet.enemyRaidersCountInitial(universe, levelIndex);
+		var enemyRaiderGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox
+		(
+			EntityGenerator.name + EnemyRaider.name,
+			EnemyRaider.fromPos(Coords.create() ),
+			100, // ticksPerGeneration = 5 seconds.
+			1, // entitiesPerGeneration
+			enemyRaidersCount, // concurrent
+			enemyRaidersCount, // all-time
+			enemyGenerationZone
+		);
+		return enemyRaiderGenerator;
+	}
+
 	static killableDie(uwpe: UniverseWorldPlaceEntities): void
 	{
 		Enemy.killableDie(uwpe);
@@ -256,7 +272,6 @@ class EnemyRaider extends Enemy
 					.startIfNotStartedYet(uwpe);
 			}
 		}
-
 	}
 
 	static visualBuild(): VisualBase

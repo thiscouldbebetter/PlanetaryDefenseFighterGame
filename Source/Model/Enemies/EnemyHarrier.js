@@ -46,6 +46,14 @@ class EnemyHarrier extends Enemy {
         enemyPos.overwriteWith(targetPos);
         enemyActivity.targetEntityClear();
     }
+    static generatorBuildForBox(enemyGenerationZone) {
+        var enemyHarrierGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyHarrier.name, EnemyHarrier.fromPos(Coords.create()), 800, // ticksPerGeneration = 40 seconds.
+        1, // entitiesPerGeneration
+        1, // concurrent
+        null, // all-time
+        enemyGenerationZone);
+        return enemyHarrierGenerator;
+    }
     static visualBuild() {
         var dimension = 6;
         var colors = Color.Instances();

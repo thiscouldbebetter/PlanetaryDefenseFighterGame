@@ -97,6 +97,30 @@ class EnemyBurster extends Enemy
 		enemyActivity.targetEntityClear();
 	}
 
+	static generatorBuildForBoxAndLevelIndex
+	(
+		enemyGenerationZone: BoxAxisAligned,
+		levelIndex: number
+	): EntityGenerator
+	{
+		var levelOfFirstAppearanceIndex = 2;
+		var enemiesAdditionalPerLevel = 1;
+		var enemiesCount =
+			enemiesAdditionalPerLevel * (levelIndex - levelOfFirstAppearanceIndex);
+
+		var enemyBursterGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox
+		(
+			EntityGenerator.name + EnemyBurster.name,
+			EnemyBurster.fromPos(Coords.create() ),
+			0, // ticksPerGeneration
+			enemiesCount, // entitiesPerGeneration
+			enemiesCount, // concurrent
+			enemiesCount, // all-time
+			enemyGenerationZone
+		);
+		return enemyBursterGenerator;
+	}
+
 	static killableDie(uwpe: UniverseWorldPlaceEntities): void
 	{
 		Enemy.killableDie(uwpe);
@@ -105,7 +129,8 @@ class EnemyBurster extends Enemy
 		var entityKilledPos = Locatable.of(entityKilled).pos();
 		var place = uwpe.place as PlacePlanet;
 		var chasersToSpawnCount = 4;
-		var polar = Polar.fromAzimuthInTurnsAndRadius(0, 1);
+		var distanceToGenerateChasersAt = 10;
+		var polar = Polar.fromAzimuthInTurnsAndRadius(0, distanceToGenerateChasersAt);
 		for (var i = 0; i < chasersToSpawnCount; i++)
 		{
 			var azimuthInTurns = i / chasersToSpawnCount;

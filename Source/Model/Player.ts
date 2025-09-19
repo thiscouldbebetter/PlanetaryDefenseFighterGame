@@ -143,6 +143,35 @@ class Player extends Entity
 
 	static projectileShooterBuild(): ProjectileShooter
 	{
+		var generatorGun = this.projectileShooterBuild_Gun();
+
+		var generatorNuke = this.projectileShooterBuild_Nuke();
+
+		var generators = [ generatorGun, generatorNuke ];
+
+		var shooter = ProjectileShooter.fromNameAndGenerators("GunAndNuke", generators);
+
+		return shooter;
+	}
+
+	static projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity: Entity): void
+	{
+		entity.propertyAdd
+		(
+			Constrainable.fromConstraint
+			(
+				Constraint_WrapToPlaceSizeXTrimY.create()
+			)
+		);
+
+		Drawable.of(entity).sizeInWrappedInstancesSet
+		(
+			Coords.fromXYZ(3, 1, 1)
+		);
+	}
+
+	static projectileShooterBuild_Gun(): ProjectileGenerator
+	{
 		var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
 		(
 			2, // radius
@@ -168,20 +197,7 @@ class Player extends Entity
 				)
 			]),
 			(entity) =>
-			{
-				entity.propertyAdd
-				(
-					Constrainable.fromConstraint
-					(
-						Constraint_WrapToPlaceSizeXTrimY.create()
-					)
-				);
-
-				Drawable.of(entity).sizeInWrappedInstancesSet
-				(
-					Coords.fromXYZ(3, 1, 1)
-				)
-			}
+				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity)
 		);
 
 		var generatorGun = ProjectileGenerator.fromNameGenerationAndFire
@@ -203,6 +219,11 @@ class Player extends Entity
 			}
 		);
 
+		return generatorGun;
+	}
+
+	static projectileShooterBuild_Nuke(): ProjectileGenerator
+	{
 		var nukeRadius = 200;
 
 		var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
@@ -226,20 +247,7 @@ class Player extends Entity
 				)
 			]),
 			(entity) =>
-			{
-				entity.propertyAdd
-				(
-					Constrainable.fromConstraint
-					(
-						Constraint_WrapToPlaceSizeXTrimY.create()
-					)
-				);
-
-				Drawable.of(entity).sizeInWrappedInstancesSet
-				(
-					Coords.fromXYZ(3, 1, 1)
-				)
-			}
+				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity)
 		);
 
 		var generatorNukeName = "Nuke";
@@ -266,11 +274,7 @@ class Player extends Entity
 			}
 		);
 
-		var generators = [ generatorGun, generatorNuke ];
-
-		var shooter = ProjectileShooter.fromNameAndGenerators("GunAndNuke", generators);
-
-		return shooter;
+		return generatorNuke;
 	}
 
 	static toControl(uwpe: UniverseWorldPlaceEntities): ControlBase
