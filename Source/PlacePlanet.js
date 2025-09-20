@@ -1,33 +1,62 @@
 "use strict";
 class PlacePlanet extends PlaceBase {
-    constructor(universe, levelIndex, player) {
+    constructor(universe, levelIndex, player, enemyTypeToTestName) {
         var size = Coords.fromXY(800, 300);
         super("Level " + (levelIndex + 1), PlacePlanet.defnBuild().name, null, // parentName
         size, [] // entities
         );
         this.initializeIsComplete = false;
         this.levelIndex = levelIndex;
-        var entities = [
-            PlacePlanet.cameraEntity(Coords.fromXY(800, 300)),
-            Planet.fromSizeAndHorizonHeight(Coords.fromXY(800, 300), 50),
+        var entitiesPlacePlanetPlayer = [
+            PlacePlanet.cameraEntity(size.clone()),
+            Planet.fromSizeAndHorizonHeight(size.clone(), 50),
             player
         ];
+        this.entitiesToSpawnAdd(entitiesPlacePlanetPlayer);
         var habitats = PlacePlanet.habitatsBuild(size);
-        entities.push(...habitats);
+        this.entitiesToSpawnAdd(habitats);
+        var enemyGenerators = this.constructor_EnemyGeneratorsBuild(universe, levelIndex, size);
+        this.entitiesToSpawnAdd(enemyGenerators);
+        if (enemyTypeToTestName == null) {
+            // Do nothing.
+        }
+        else if (enemyTypeToTestName == EnemyObstructor.name) {
+            // For testing.
+            enemyGenerators.forEach(x => EntityGenerator.of(x).inactivate());
+            var enemyGeneratorRaiders = enemyGenerators.find(x => x.name == EntityGenerator.name + EnemyRaider.name);
+            EntityGenerator.of(enemyGeneratorRaiders).exhaust();
+            var enemies = [
+                EnemyObstructor.fromPos(Coords.fromXY(0, size.y / 2)),
+                EnemyObstructor.fromPos(size.clone().half())
+            ];
+            this.entitiesToSpawnAdd(enemies);
+        }
+        else {
+            throw new Error("Unsupported enemyTypeToTestName: " + enemyTypeToTestName);
+        }
+    }
+    constructor_EnemyGeneratorsBuild(universe, levelIndex, size) {
         this.enemyGenerationZone = BoxAxisAligned.fromMinAndMax(Coords.fromXY(0, 0), Coords.fromXY(size.x, 0));
         var enemyHarrierGenerator = EnemyHarrier.generatorBuildForBox(this.enemyGenerationZone);
-        entities.push(enemyHarrierGenerator.toEntity());
         var enemyBursterGenerator = EnemyBurster.generatorBuildForBoxAndLevelIndex(this.enemyGenerationZone, levelIndex);
-        entities.push(enemyBursterGenerator.toEntity());
         var enemyMinelayerGenerator = EnemyMinelayer.generatorBuildForBoxAndLevelIndex(this.enemyGenerationZone, levelIndex);
-        entities.push(enemyMinelayerGenerator.toEntity());
-        var enemyRaiderGenerator = EnemyRaider.generatorBuild(universe, this.enemyGenerationZone, this.levelIndex).toEntity();
-        this.entityToSpawnAdd(enemyRaiderGenerator);
+        var enemyRaiderGenerator = EnemyRaider.generatorBuild(universe, this.enemyGenerationZone, this.levelIndex);
+        var entityGenerators = [
+            enemyHarrierGenerator,
+            enemyBursterGenerator,
+            enemyMinelayerGenerator,
+            enemyRaiderGenerator
+        ];
+        var entities = entityGenerators.map(x => x.toEntity());
         // Marauders and chasers are not generated spontaneously.
-        this.entitiesToSpawnAdd(entities);
+        return entities;
+    }
+    static fromUniversePlayerAndEnemyTypeName(universe, player, enemyTypeName) {
+        var place = new PlacePlanet(universe, 0, player, enemyTypeName);
+        return place;
     }
     static fromUniverseLevelIndexAndPlayer(universe, levelIndex, player) {
-        return new PlacePlanet(universe, levelIndex, player);
+        return new PlacePlanet(universe, levelIndex, player, null);
     }
     static cameraEntity(placeSize) {
         var cameraViewSize = Coords.fromXY(400, 300);

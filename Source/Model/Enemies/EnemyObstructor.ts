@@ -67,12 +67,11 @@ class EnemyObstructor extends Enemy
 
 	static visualBuild(): VisualBase
 	{
-		var dimension = 4;
+		var dimension = 8;
 
-		var colors = Color.Instances();
-		var colorBody = colors.Green;
+		var visualBuilder = VisualBuilder.Instance();
 
-		var visual = VisualCircle.fromRadiusAndColorFill(dimension, colorBody);
+		var visual = visualBuilder.archeryTarget(dimension);
 
 		return visual;
 	}

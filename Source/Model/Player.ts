@@ -156,6 +156,8 @@ class Player extends Entity
 
 	static projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity: Entity): void
 	{
+		// todo - Find a way to wrap the collider as well.
+
 		entity.propertyAdd
 		(
 			Constrainable.fromConstraint

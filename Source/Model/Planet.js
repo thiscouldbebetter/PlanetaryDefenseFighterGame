@@ -75,9 +75,12 @@ class Planet extends Entity {
         var enemyGeneratorRaidersIsExhausted = level.enemyGeneratorRaiders().exhausted();
         var enemiesAreAllGone = (level.enemies().length == 0);
         var habitatIsStillThere = (level.habitats().length > 0);
+        var player = level.player();
+        var playerIsNotAnExplosion = (StatsKeeper.of(player) != null);
         var playerHasWon = enemyGeneratorRaidersIsExhausted
             && enemiesAreAllGone
-            && habitatIsStillThere;
+            && habitatIsStillThere
+            && playerIsNotAnExplosion;
         return playerHasWon;
     }
     static triggerWinReactToBeingTriggered(uwpe) {
@@ -85,8 +88,7 @@ class Planet extends Entity {
         var place = uwpe.place;
         var player = place.player();
         var playerStatsKeeper = StatsKeeper.of(player);
-        var enemyRaidersKilled = playerStatsKeeper.kills();
-        var enemyRaidersTotal = PlacePlanet.enemyRaidersCountInitial(universe, place.levelIndex);
+        var enemiesKilled = playerStatsKeeper.kills();
         var habitatsRemaining = place.habitats().length;
         var habitatsTotal = PlacePlanet.habitatsCountInitial();
         var shotsHit = playerStatsKeeper.hits();
@@ -97,7 +99,7 @@ class Planet extends Entity {
         var messageAsLines = [
             place.name + " complete!",
             "",
-            "Enemies killed: " + (enemyRaidersKilled + "/" + enemyRaidersTotal).padStart(statLengthMax, " "),
+            "Enemies killed: " + ("" + enemiesKilled).padStart(statLengthMax, " "),
             "Habitats saved: " + (habitatsRemaining + "/" + habitatsTotal).padStart(statLengthMax, " "),
             "Hits/Shots:     " + (shotsHit + "/" + shotsFired).padStart(statLengthMax, " "),
             "Seconds taken:  " + ("" + secondsToComplete).padStart(statLengthMax, " "),

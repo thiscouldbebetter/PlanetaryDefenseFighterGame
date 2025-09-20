@@ -73,6 +73,7 @@ class Player extends Entity {
         return shooter;
     }
     static projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity) {
+        // todo - Find a way to wrap the collider as well.
         entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
         Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
     }

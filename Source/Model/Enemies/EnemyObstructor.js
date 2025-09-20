@@ -30,10 +30,9 @@ class EnemyObstructor extends Enemy {
         Enemy.killableDie(uwpe);
     }
     static visualBuild() {
-        var dimension = 4;
-        var colors = Color.Instances();
-        var colorBody = colors.Green;
-        var visual = VisualCircle.fromRadiusAndColorFill(dimension, colorBody);
+        var dimension = 8;
+        var visualBuilder = VisualBuilder.Instance();
+        var visual = visualBuilder.archeryTarget(dimension);
         return visual;
     }
 }

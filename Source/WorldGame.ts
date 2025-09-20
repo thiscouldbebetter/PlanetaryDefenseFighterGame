@@ -13,7 +13,13 @@ class WorldGame extends World
 		var levelNumberInitial = parseInt(placeToStartAtName);
 		levelNumberInitial = isNaN(levelNumberInitial) ? 1 : levelNumberInitial;
 		var levelIndexInitial = levelNumberInitial - 1;
-		var place = PlacePlanet.fromUniverseLevelIndexAndPlayer(universe, levelIndexInitial, player);
+		var place =
+			placeToStartAtName != null && placeToStartAtName.startsWith(Enemy.name)
+			? PlacePlanet.fromUniversePlayerAndEnemyTypeName(universe, player, placeToStartAtName)
+			: PlacePlanet.fromUniverseLevelIndexAndPlayer
+			(
+				universe, levelIndexInitial, player
+			);
 		var places = [ place ];
 		var placesByName = new Map(places.map(x => [x.name, x]) );
 		var placeGetByName =
@@ -48,6 +54,7 @@ class WorldGame extends World
 				EnemyHarrier.activityDefnBuild(),
 				EnemyMinelayer.activityDefnBuild(),
 				EnemyMarauder.activityDefnBuild(),
+				EnemyObstructor.activityDefnBuild(),
 				EnemyRaider.activityDefnBuild(),
 			],
 			[
