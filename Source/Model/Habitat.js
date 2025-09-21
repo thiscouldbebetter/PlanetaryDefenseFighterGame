@@ -6,7 +6,7 @@ class Habitat extends Entity {
                 Constraint_Gravity.fromAccelerationPerTick(Coords.fromXY(0, .03)),
                 Constraint_ContainInHemispace.fromHemispace(Hemispace.fromPlane(Plane.fromNormalAndDistanceFromOrigin(Coords.fromXY(0, 1), 250)))
             ]),
-            Drawable.fromVisual(Habitat.visualBuild()).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
+            Drawable.fromVisual(Habitat.visualBuild()),
             HabitatProperty.create(),
             Locatable.fromPos(pos)
         ]);
@@ -27,6 +27,7 @@ class Habitat extends Entity {
             Coords.fromXY(1, -1) // Right eave.
         ]).transform(Transform_Scale.fromScaleFactor(4));
         var house = VisualPolygon.fromPathAndColorFill(houseOutlineAsPath, Color.Instances().Brown);
+        house = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), house);
         return house;
     }
 }

@@ -28,7 +28,7 @@ class Habitat extends Entity
 				Drawable.fromVisual
 				(
 					Habitat.visualBuild()
-				).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
+				),
 
 				HabitatProperty.create(),
 
@@ -42,7 +42,7 @@ class Habitat extends Entity
 		return new Habitat(pos);
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var houseOutlineAsPath = Path.fromPoints
 		([
@@ -57,10 +57,16 @@ class Habitat extends Entity
 			Coords.fromXY(1, -1) // Right eave.
 		]).transform(Transform_Scale.fromScaleFactor(4) );
 
-		var house = VisualPolygon.fromPathAndColorFill
+		var house: Visual = VisualPolygon.fromPathAndColorFill
 		(
 			houseOutlineAsPath,
 			Color.Instances().Brown
+		);
+
+		house = VisualWrapped.fromSizeInWrappedInstancesAndChild
+		(
+			Coords.fromXYZ(3, 1, 1),
+			house
 		);
 
 		return house;

@@ -143,7 +143,7 @@ class EnemyBurster extends Enemy
 		}
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var dimension = 16;
 

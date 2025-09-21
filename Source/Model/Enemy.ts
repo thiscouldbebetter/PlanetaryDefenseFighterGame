@@ -5,7 +5,13 @@ class Enemy extends Entity
 	{
 		var propertyDrawable =
 			properties.find(x => x.propertyName() == Drawable.name) as Drawable;
-		propertyDrawable.sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) );
+		var visual = propertyDrawable.visual;
+		visual = VisualWrapped.fromSizeInWrappedInstancesAndChild
+		(
+			Coords.fromXYZ(3, 1, 1),
+			visual
+		);
+		propertyDrawable.visual = visual;
 
 		var propertiesCommonToAllEnemies = 
 		[

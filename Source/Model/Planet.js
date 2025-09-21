@@ -3,7 +3,7 @@ class Planet extends Entity {
     constructor(size, horizonHeight) {
         super(Planet.name, [
             Animatable2.create(),
-            Drawable.fromVisual(Planet.visual(size, horizonHeight)).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1)),
+            Drawable.fromVisual(Planet.visualBuild(size, horizonHeight)),
             Locatable.create(),
             Planet.triggerable()
         ]);
@@ -121,7 +121,7 @@ class Planet extends Entity {
         universe.venueTransitionTo(venueNext);
     }
     // Visual.
-    static visual(placeSize, horizonHeight) {
+    static visualBuild(placeSize, horizonHeight) {
         var groundSize = Coords.fromXY(placeSize.x, horizonHeight);
         var groundVisual = (color) => VisualRectangle.fromSizeAndColorFill(groundSize, color);
         var colors = Color.Instances();
@@ -168,6 +168,7 @@ class Planet extends Entity {
             groundOffset,
             mountainsOffset
         ]);
+        visual = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), visual);
         return visual;
     }
 }

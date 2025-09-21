@@ -57,7 +57,7 @@ class EnemyEmplacement extends Enemy
 		}
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var dimension = 4;
 		var color = Color.Instances().Green;

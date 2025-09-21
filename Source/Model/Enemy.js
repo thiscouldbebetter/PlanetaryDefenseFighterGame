@@ -2,7 +2,9 @@
 class Enemy extends Entity {
     constructor(name, pos, properties) {
         var propertyDrawable = properties.find(x => x.propertyName() == Drawable.name);
-        propertyDrawable.sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
+        var visual = propertyDrawable.visual;
+        visual = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), visual);
+        propertyDrawable.visual = visual;
         var propertiesCommonToAllEnemies = [
             Enemy.collidableBuild(),
             Enemy.constrainableBuild(),

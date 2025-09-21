@@ -169,10 +169,17 @@ class Player extends Entity
 			)
 		);
 
-		Drawable.of(entity).sizeInWrappedInstancesSet
+		var drawable = Drawable.of(entity);
+
+		var visual = drawable.visual;
+
+		visual = VisualWrapped.fromSizeInWrappedInstancesAndChild
 		(
-			Coords.fromXYZ(3, 1, 1)
+			Coords.fromXYZ(3, 1, 1),
+			visual
 		);
+
+		drawable.visual = visual;
 	}
 
 	static projectileShooterBuild_Gun(): ProjectileGenerator
@@ -297,7 +304,7 @@ class Player extends Entity
 
 		var visualHabitat = Habitat.visualBuild();
 
-		var visualLevel: VisualBase =
+		var visualLevel: Visual =
 			VisualCircle.fromRadiusAndColorFill(5, Color.Instances().Cyan);
 
 		// var visualKills = visualBuilder.explosionStarburstOfRadius(8);
@@ -410,7 +417,7 @@ class Player extends Entity
 		).toControlContainerTransparent()
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var dimension = 5;
 
@@ -502,7 +509,7 @@ class Player extends Entity
 	(
 		uwpe: UniverseWorldPlaceEntities,
 		visualSelect: VisualSelect
-	): VisualBase
+	): Visual
 	{
 		return visualSelect.childByIndex(
 			Locatable.of(uwpe.entity).locPrev.accel.x != 0

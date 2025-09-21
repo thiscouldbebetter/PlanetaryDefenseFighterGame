@@ -43,7 +43,7 @@ class EnemyObstructor extends Enemy
 		// Do nothing.
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var dimension = 8;
 

@@ -81,7 +81,7 @@ class EnemyMarauder extends Enemy
 
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var colors = Color.Instances();
 		var colorSaucer = colors.Red;

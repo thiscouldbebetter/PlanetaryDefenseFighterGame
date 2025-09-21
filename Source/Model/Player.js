@@ -77,7 +77,10 @@ class Player extends Entity {
     static projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity) {
         // todo - Find a way to wrap the collider as well.
         entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
-        Drawable.of(entity).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1));
+        var drawable = Drawable.of(entity);
+        var visual = drawable.visual;
+        visual = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), visual);
+        drawable.visual = visual;
     }
     static projectileShooterBuild_Gun() {
         var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit(2, // radius

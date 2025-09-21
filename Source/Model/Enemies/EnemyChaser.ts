@@ -99,7 +99,7 @@ class EnemyChaser extends Enemy
 		enemyActivity.targetEntityClear();
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var colors = Color.Instances();
 		var color = colors.Red;

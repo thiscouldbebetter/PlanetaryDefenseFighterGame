@@ -126,7 +126,7 @@ class EnemyMinelayer extends Enemy
 		return enemyMinelayerGenerator;
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var colors = Color.Instances();
 

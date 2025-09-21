@@ -115,7 +115,7 @@ class EnemyHarrier extends Enemy
 		return enemyHarrierGenerator;
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var dimension = 6;
 

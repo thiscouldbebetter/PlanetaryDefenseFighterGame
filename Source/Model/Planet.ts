@@ -13,8 +13,8 @@ class Planet extends Entity
 
 				Drawable.fromVisual
 				(
-					Planet.visual(size, horizonHeight)
-				).sizeInWrappedInstancesSet(Coords.fromXYZ(3, 1, 1) ),
+					Planet.visualBuild(size, horizonHeight)
+				),
 
 				Locatable.create(),
 
@@ -226,10 +226,10 @@ class Planet extends Entity
 
 	// Visual.
 
-	static visual
+	static visualBuild
 	(
 		placeSize: Coords, horizonHeight: number
-	): VisualBase
+	): Visual
 	{
 		var groundSize = Coords.fromXY(placeSize.x, horizonHeight);
 		var groundVisual = (color: Color) => VisualRectangle.fromSizeAndColorFill(groundSize, color);
@@ -328,12 +328,16 @@ class Planet extends Entity
 			mountains
 		);
 
-		var visual = VisualGroup.fromChildren
+		var visual: Visual = VisualGroup.fromChildren
+		([
+			groundOffset,
+			mountainsOffset
+		]);
+
+		visual = VisualWrapped.fromSizeInWrappedInstancesAndChild
 		(
-			[
-				groundOffset,
-				mountainsOffset
-			]
+			Coords.fromXYZ(3, 1, 1),
+			visual
 		);
 
 		return visual;

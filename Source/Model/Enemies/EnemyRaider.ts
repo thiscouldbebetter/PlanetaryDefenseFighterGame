@@ -274,7 +274,7 @@ class EnemyRaider extends Enemy
 		}
 	}
 
-	static visualBuild(): VisualBase
+	static visualBuild(): Visual
 	{
 		var colors = Color.Instances();
 
