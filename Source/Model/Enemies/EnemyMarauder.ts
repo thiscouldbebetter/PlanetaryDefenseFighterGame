@@ -27,7 +27,7 @@ class EnemyMarauder extends Enemy
 					EnemyMarauder.visualBuild()
 				),
 
-				Killable.fromDie(Enemy.killableDie),
+				Enemy.killableBuild(),
 
 				Enemy.projectileShooterBuild(),
 

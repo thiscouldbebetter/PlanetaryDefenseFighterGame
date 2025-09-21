@@ -9,7 +9,7 @@ class EnemyChaser extends Enemy {
             uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyChaser.visualBuild()),
-            Killable.fromDie(Enemy.killableDie),
+            Enemy.killableBuild(),
             Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Scorable.fromPoints(100)

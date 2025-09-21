@@ -10,20 +10,15 @@ Sound effect when player fires thruster could be start noise followed by continu
 Visuals for enemies are seemingly being rendered upside down sometimes.
 Planet should be shown (and heard) exploding when the last habitat is destroyed.
 A minimap should be added that shows the entire planet, the habitats, and the enemies.
-Gathering of initials for leaderboard doesn't work yet.
 Sometimes enemies carrying habitats are impossible to hit; across the wrap boundary?
 Sometimes explosions do not appear, perhaps the visuals are not wrapped?
-Shots should not collide with (and thus destroy) other shots.
-Should enemy shots hurt other enemies?
-If the player collides with the last raider/marauder, the level will never end (and an exception is thrown).
-Marauders should shoot shoot.
-No enemies of types other than raiders and marauders are appearing, even on higher levels.
-A nuke status control is present, but pressing the nuke button doesn't do anything.
+Marauders should shoot.
+Nukes don't work across the wrap boundary.
+Enemy explosions seem to share the player's velocity, rather than the enemy's, or being stationary.
 
 Lower Priority
 --------------
 Need a producer sound effect for This Could Be Better.
-Control style would probably be better if Dark instead of Default.
 Title screen should cycle through several screens, including instructions and high scores.
 Habitats dropped from too high should be destroyed?
 Habitats hit by projectiles should be destroyed?

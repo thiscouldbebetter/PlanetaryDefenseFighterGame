@@ -7,6 +7,7 @@ class Enemy extends Entity {
             Enemy.collidableBuild(),
             Enemy.constrainableBuild(),
             EnemyProperty.create(),
+            Enemy.killableBuild(),
             Locatable.fromPos(pos)
         ];
         properties.push(...propertiesCommonToAllEnemies);
@@ -96,12 +97,15 @@ class Enemy extends Entity {
     static constrainableBuild() {
         return Constrainable.fromConstraint(Constraint_WrapToPlaceSizeX.create());
     }
+    static killableBuild() {
+        return Killable.fromDie(this.killableDie);
+    }
     static killableDie(uwpe) {
+        var place = uwpe.place;
         var enemy = uwpe.entity;
         var entityExplosion = uwpe.universe.entityBuilder.explosion(Locatable.of(enemy).loc.pos, 10, // radius
         "Effects_Boom", 40, // ticksToLive
-        (uwpe) => { });
-        var place = uwpe.place;
+        (uwpe) => { }).propertyAdd(EnemyProperty.create());
         place.entityToSpawnAdd(entityExplosion);
         // Stats.
         var player = place.player();
@@ -112,7 +116,10 @@ class Enemy extends Entity {
         playerStatsKeeper.scoreAdd(scoreForKillingEnemy);
     }
     static projectileShooterBuild() {
-        return ProjectileShooter.default();
+        var propertyNames = [Playable.name];
+        var shooter = ProjectileShooter.default()
+            .collideOnlyWithEntitiesHavingPropertiesNamedSet(propertyNames);
+        return shooter;
     }
     static displacement() {
         if (this._displacement == null) {

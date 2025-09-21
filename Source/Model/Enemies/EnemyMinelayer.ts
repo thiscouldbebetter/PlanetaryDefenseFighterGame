@@ -27,7 +27,7 @@ class EnemyMinelayer extends Enemy
 					EnemyMinelayer.visualBuild()
 				),
 
-				Killable.fromDie(Enemy.killableDie),
+				Enemy.killableBuild(),
 
 				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
 

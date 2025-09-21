@@ -18,7 +18,7 @@ class EnemyObstructor extends Enemy
 					EnemyObstructor.visualBuild()
 				),
 
-				Killable.fromDie(EnemyObstructor.killableDie),
+				Enemy.killableBuild(),
 
 				Scorable.fromPoints(100)
 			]
@@ -41,28 +41,6 @@ class EnemyObstructor extends Enemy
 	static activityDefnPerform(uwpe: UniverseWorldPlaceEntities): void
 	{
 		// Do nothing.
-	}
-
-	static activityDefnPerform_MoveTowardTarget_TargetHasBeenReached
-	(
-		uwpe: UniverseWorldPlaceEntities
-	): void
-	{
-		var enemy = uwpe.entity;
-
-		var enemyActivity = Actor.of(enemy).activity;
-		var targetEntity = enemyActivity.targetEntity();
-		var targetPos = Locatable.of(targetEntity).pos();
-
-		var enemyPos = Locatable.of(enemy).pos();
-		enemyPos.overwriteWith(targetPos);
-
-		enemyActivity.targetEntityClear();
-	}
-
-	static killableDie(uwpe: UniverseWorldPlaceEntities): void
-	{
-		Enemy.killableDie(uwpe);
 	}
 
 	static visualBuild(): VisualBase

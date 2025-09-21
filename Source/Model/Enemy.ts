@@ -12,6 +12,7 @@ class Enemy extends Entity
 			Enemy.collidableBuild(),
 			Enemy.constrainableBuild(),
 			EnemyProperty.create(),
+			Enemy.killableBuild(),
 			Locatable.fromPos(pos)
 		];
 		properties.push(...propertiesCommonToAllEnemies);
@@ -159,8 +160,14 @@ class Enemy extends Entity
 		);
 	}
 
+	static killableBuild()
+	{
+		return Killable.fromDie(this.killableDie);
+	}
+
 	static killableDie(uwpe: UniverseWorldPlaceEntities): void
 	{
+		var place = uwpe.place as PlacePlanet;
 		var enemy = uwpe.entity;
 
 		var entityExplosion =
@@ -171,9 +178,7 @@ class Enemy extends Entity
 				"Effects_Boom",
 				40, // ticksToLive
 				(uwpe) => {}
-			);
-
-		var place = uwpe.place as PlacePlanet;
+			).propertyAdd(EnemyProperty.create() );
 
 		place.entityToSpawnAdd(entityExplosion);
 
@@ -191,7 +196,11 @@ class Enemy extends Entity
 
 	static projectileShooterBuild(): ProjectileShooter
 	{
-		return ProjectileShooter.default();
+		var propertyNames = [ Playable.name ];
+		var shooter =
+			ProjectileShooter.default()
+			.collideOnlyWithEntitiesHavingPropertiesNamedSet(propertyNames);
+		return shooter;
 	}
 
 	static _displacement: Coords;

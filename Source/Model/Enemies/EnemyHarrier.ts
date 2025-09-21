@@ -27,7 +27,7 @@ class EnemyHarrier extends Enemy
 					EnemyHarrier.visualBuild()
 				),
 
-				Killable.fromDie(Enemy.killableDie),
+				Enemy.killableBuild(),
 
 				Enemy.projectileShooterBuild(),
 

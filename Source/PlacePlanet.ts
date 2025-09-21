@@ -42,23 +42,36 @@ class PlacePlanet extends PlaceBase
 		{
 			// Do nothing.
 		}
-		else if (enemyTypeToTestName == EnemyObstructor.name)
+		else
 		{
-			// For testing.
 			enemyGenerators.forEach(x => EntityGenerator.of(x).inactivate() );
 			var enemyGeneratorRaiders =
 				enemyGenerators.find(x => x.name == EntityGenerator.name + EnemyRaider.name);
 			EntityGenerator.of(enemyGeneratorRaiders).exhaust();
-			var enemies =
-			[
-				EnemyObstructor.fromPos(Coords.fromXY(0, size.y / 2) ),
-				EnemyObstructor.fromPos(size.clone().half() )
-			];
+			var enemies: Entity[] = [];
+
+			if (enemyTypeToTestName == EnemyEmplacement.name)
+			{
+				// For testing.
+				enemies =
+				[
+					EnemyEmplacement.fromPos(size.clone().half().addXY(0, 30) )
+				];
+			}
+			else if (enemyTypeToTestName == EnemyObstructor.name)
+			{
+				enemies =
+				[
+					EnemyObstructor.fromPos(Coords.fromXY(0, size.y / 2) ),
+					EnemyObstructor.fromPos(size.clone().half().addXY(0, 30) )
+				];
+			}
+			else
+			{
+				throw new Error("Unsupported enemyTypeToTestName: " + enemyTypeToTestName);
+			}
+
 			this.entitiesToSpawnAdd(enemies);
-		}
-		else
-		{
-			throw new Error("Unsupported enemyTypeToTestName: " + enemyTypeToTestName);
 		}
 	}
 

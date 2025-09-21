@@ -9,7 +9,7 @@ class EnemyHarrier extends Enemy {
             uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyHarrier.visualBuild()),
-            Killable.fromDie(Enemy.killableDie),
+            Enemy.killableBuild(),
             Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 2),
             Scorable.fromPoints(100)

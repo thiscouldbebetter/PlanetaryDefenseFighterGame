@@ -9,7 +9,7 @@ class EnemyMinelayer extends Enemy {
             uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyMinelayer.visualBuild()),
-            Killable.fromDie(Enemy.killableDie),
+            Enemy.killableBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Enemy.projectileShooterBuild(),
             Scorable.fromPoints(100)

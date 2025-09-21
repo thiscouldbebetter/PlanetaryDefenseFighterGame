@@ -151,6 +151,9 @@ class Player extends Entity
 
 		var shooter = ProjectileShooter.fromNameAndGenerators("GunAndNuke", generators);
 
+		var propertyNames = [ EnemyProperty.name ];
+		shooter.collideOnlyWithEntitiesHavingPropertiesNamedSet(propertyNames);
+
 		return shooter;
 	}
 
@@ -174,20 +177,12 @@ class Player extends Entity
 
 	static projectileShooterBuild_Gun(): ProjectileGenerator
 	{
-		var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
+		var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit
 		(
 			2, // radius
 			5, // distanceInitial
 			16, // speed
 			8, // ticksToLive
-			uwpe => // hit
-			{
-				var place = uwpe.place as PlacePlanet;
-				var player = place.player();
-				var playerStatsKeeper = StatsKeeper.of(player);
-				playerStatsKeeper.hitsIncrement();
-				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
-			},
 			Damage.fromAmount(1),
 			VisualGroup.fromChildren
 			([
@@ -199,7 +194,15 @@ class Player extends Entity
 				)
 			]),
 			(entity) =>
-				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity)
+				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity),
+			uwpe => // hit
+			{
+				var place = uwpe.place as PlacePlanet;
+				var player = place.player();
+				var playerStatsKeeper = StatsKeeper.of(player);
+				playerStatsKeeper.hitsIncrement();
+				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
+			}
 		);
 
 		var generatorGun = ProjectileGenerator.fromNameGenerationAndFire
@@ -228,16 +231,12 @@ class Player extends Entity
 	{
 		var nukeRadius = 200;
 
-		var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksHitDamageVisualAndInit
+		var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit
 		(
 			nukeRadius,
 			0, // distanceInitial
 			0, // speed
 			1, // ticksToLive
-			uwpe => // hit
-			{
-				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
-			},
 			Damage.fromAmount(1),
 			VisualGroup.fromChildren
 			([
@@ -249,7 +248,11 @@ class Player extends Entity
 				)
 			]),
 			(entity) =>
-				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity)
+				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity),
+			uwpe => // hit
+			{
+				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
+			}
 		);
 
 		var generatorNukeName = "Nuke";

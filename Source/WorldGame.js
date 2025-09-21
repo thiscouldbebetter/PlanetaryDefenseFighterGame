@@ -32,6 +32,7 @@ class WorldGame extends World {
                 UserInputListener.activityDefn(),
                 EnemyBurster.activityDefnBuild(),
                 EnemyChaser.activityDefnBuild(),
+                EnemyEmplacement.activityDefnBuild(),
                 EnemyHarrier.activityDefnBuild(),
                 EnemyMinelayer.activityDefnBuild(),
                 EnemyMarauder.activityDefnBuild(),

@@ -9,7 +9,7 @@ class EnemyMarauder extends Enemy {
             uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyMarauder.visualBuild()),
-            Killable.fromDie(Enemy.killableDie),
+            Enemy.killableBuild(),
             Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(4, 2),
             Scorable.fromPoints(100)

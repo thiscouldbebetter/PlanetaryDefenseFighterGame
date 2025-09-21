@@ -27,7 +27,7 @@ class EnemyChaser extends Enemy
 					EnemyChaser.visualBuild()
 				),
 
-				Killable.fromDie(Enemy.killableDie),
+				Enemy.killableBuild(),
 
 				Enemy.projectileShooterBuild(),
 
