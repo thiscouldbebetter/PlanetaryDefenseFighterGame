@@ -75,7 +75,9 @@ class Player extends Entity
 
 				Player.projectileShooterBuild(),
 
-				StatsKeeper.create()
+				StatsKeeper.create(),
+
+				PlacePlanet.wrappableBuild()
 			]
 		);
 
@@ -157,29 +159,10 @@ class Player extends Entity
 		return shooter;
 	}
 
-	static projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity: Entity): void
+	static projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity: Entity): void
 	{
-		// todo - Find a way to wrap the collider as well.
-
-		entity.propertyAdd
-		(
-			Constrainable.fromConstraint
-			(
-				Constraint_WrapToPlaceSizeXTrimY.create()
-			)
-		);
-
-		var drawable = Drawable.of(entity);
-
-		var visual = drawable.visual;
-
-		visual = VisualWrapped.fromSizeInWrappedInstancesAndChild
-		(
-			Coords.fromXYZ(3, 1, 1),
-			visual
-		);
-
-		drawable.visual = visual;
+		var wrappable = PlacePlanet.wrappableBuild();
+		entity.propertyAdd(wrappable);
 	}
 
 	static projectileShooterBuild_Gun(): ProjectileGenerator
@@ -201,7 +184,7 @@ class Player extends Entity
 				)
 			]),
 			(entity) =>
-				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity),
+				this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity),
 			uwpe => // hit
 			{
 				var place = uwpe.place as PlacePlanet;
@@ -255,7 +238,7 @@ class Player extends Entity
 				)
 			]),
 			(entity) =>
-				this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity),
+				this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity),
 			uwpe => // hit
 			{
 				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);

@@ -43,9 +43,9 @@ class EnemyRaider extends Enemy {
         var placePlanet = place;
         var habitats = placePlanet.habitats();
         var enemies = placePlanet.enemies();
-        var habitatsNotAlreadyCapturedOrTargeted = habitats.filter(h => (enemies.some(e => Carrier.of(e).habitatCarried == h) == false)
+        var habitatsNotAlreadyCapturedOrTargeted = habitats.filter(h => (enemies.some(e => { var _a; return ((_a = Carrier.of(e)) === null || _a === void 0 ? void 0 : _a.habitatCarried) == h; }) == false)
             &&
-                (enemies.some(e => Actor.of(e).activity.targetEntity() == h) == false));
+                (enemies.some(e => { var _a; return ((_a = Actor.of(e)) === null || _a === void 0 ? void 0 : _a.activity.targetEntity()) == h; }) == false));
         var targetEntity;
         if (habitatsNotAlreadyCapturedOrTargeted.length == 0) {
             targetEntity =

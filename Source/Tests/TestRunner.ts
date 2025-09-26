@@ -6,8 +6,8 @@ class TestRunner
 		var testSuite = new TestSuite
 		(
 			"TestsAll",
-
 			[
+				new CameraTests(),
 				new EnemyTests()
 			]
 		);

@@ -76,24 +76,54 @@ class PlacePlanet extends PlaceBase {
         var constraintContainInBox = camera.constraintContainInBoxForPlaceSizeWrapped(placeSize);
         var constrainable = Constrainable.of(cameraEntity);
         constrainable.constraintAdd(constraintContainInBox);
+        /*
         var collidable = Collidable.of(cameraEntity);
         this.colliderWrapForCollidableAndPlaceSize(collidable, placeSize);
+        */
+        var wrappable = PlacePlanet.wrappableBuild();
+        cameraEntity.propertyAdd(wrappable);
         return cameraEntity;
     }
     static cameraEntity_EntitiesInViewSort(entitiesToSort) {
         return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
     }
-    static colliderWrapForCollidableAndPlaceSize(collidable, placeSize) {
+    /*
+    static colliderWrapForCollidableAndPlaceSize(collidable: Collidable, placeSize: Coords): Collidable
+    {
         var colliderCenter = collidable.collider;
-        var colliderLeft = ShapeTransformed.fromTransformAndChild(Transform_Translate.fromDisplacement(Coords.fromXY(0 - placeSize.x, 0)), colliderCenter.clone());
-        var colliderRight = ShapeTransformed.fromTransformAndChild(Transform_Translate.fromDisplacement(Coords.fromXY(placeSize.x, 0)), colliderCenter.clone());
-        var colliderAfterWrapping = ShapeGroupAny.fromChildren([
+
+        var colliderLeft = ShapeTransformed.fromTransformAndChild
+        (
+            Transform_Translate.fromDisplacement
+            (
+                Coords.fromXY(0 - placeSize.x, 0)
+            ),
+            colliderCenter.clone()
+        );
+
+        var colliderRight = ShapeTransformed.fromTransformAndChild
+        (
+            Transform_Translate.fromDisplacement
+            (
+                Coords.fromXY(placeSize.x, 0)
+            ),
+            colliderCenter.clone()
+        );
+
+        var colliderAfterWrapping = ShapeGroupAny.fromChildren
+        ([
             colliderLeft,
             colliderCenter,
             colliderRight
         ]);
+
         collidable.colliderAtRestSet(colliderAfterWrapping);
+
         return collidable;
+    }
+    */
+    static constraintWrapBuild() {
+        return Constraint_WrapToPlaceSizeXTrimY.create();
     }
     static defnBuild() {
         var actionDisplayRecorderStartStop = DisplayRecorder.actionStartStop();
@@ -131,10 +161,20 @@ class PlacePlanet extends PlaceBase {
             Killable.name,
             Locatable.name,
             Movable.name,
-            Triggerable.name
+            Triggerable.name,
+            Wrappable.name
         ];
         return PlaceDefn.fromNameMusicActionsMappingsAndPropertyNames(PlacePlanet.name, "Music__Default", // soundForMusicName
         actions, actionToInputsMappings, entityPropertyNamesToProcess);
+    }
+    static sizeInWrappedInstances() {
+        if (this._sizeInWrappedInstances == null) {
+            this._sizeInWrappedInstances = Coords.fromXYZ(3, 1, 1);
+        }
+        return this._sizeInWrappedInstances;
+    }
+    static wrappableBuild() {
+        return Wrappable.fromSizeInWrappedInstancesAndConstraintWrap(PlacePlanet.sizeInWrappedInstances(), PlacePlanet.constraintWrapBuild());
     }
     finalize(uwpe) {
         this.initializeIsComplete = false;

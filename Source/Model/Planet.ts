@@ -18,7 +18,9 @@ class Planet extends Entity
 
 				Locatable.create(),
 
-				Planet.triggerable()
+				Planet.triggerable(),
+
+				PlacePlanet.wrappableBuild()
 			]
 		);
 
@@ -333,12 +335,6 @@ class Planet extends Entity
 			groundOffset,
 			mountainsOffset
 		]);
-
-		visual = VisualWrapped.fromSizeInWrappedInstancesAndChild
-		(
-			Coords.fromXYZ(3, 1, 1),
-			visual
-		);
 
 		return visual;
 	}

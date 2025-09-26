@@ -5,7 +5,8 @@ class Planet extends Entity {
             Animatable2.create(),
             Drawable.fromVisual(Planet.visualBuild(size, horizonHeight)),
             Locatable.create(),
-            Planet.triggerable()
+            Planet.triggerable(),
+            PlacePlanet.wrappableBuild()
         ]);
         this.horizonHeight = horizonHeight;
     }
@@ -168,7 +169,6 @@ class Planet extends Entity {
             groundOffset,
             mountainsOffset
         ]);
-        visual = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), visual);
         return visual;
     }
 }

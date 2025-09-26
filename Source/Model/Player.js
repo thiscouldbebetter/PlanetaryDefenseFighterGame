@@ -24,7 +24,8 @@ class Player extends Entity {
             ),
             Playable.create(),
             Player.projectileShooterBuild(),
-            StatsKeeper.create()
+            StatsKeeper.create(),
+            PlacePlanet.wrappableBuild()
         ]);
         var debugSettings = universe.debugSettings;
         var killable = Killable.of(this);
@@ -74,13 +75,9 @@ class Player extends Entity {
         shooter.collideOnlyWithEntitiesHavingPropertiesNamedSet(propertyNames);
         return shooter;
     }
-    static projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity) {
-        // todo - Find a way to wrap the collider as well.
-        entity.propertyAdd(Constrainable.fromConstraint(Constraint_WrapToPlaceSizeXTrimY.create()));
-        var drawable = Drawable.of(entity);
-        var visual = drawable.visual;
-        visual = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), visual);
-        drawable.visual = visual;
+    static projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity) {
+        var wrappable = PlacePlanet.wrappableBuild();
+        entity.propertyAdd(wrappable);
     }
     static projectileShooterBuild_Gun() {
         var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit(2, // radius
@@ -90,7 +87,7 @@ class Player extends Entity {
         Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Blip"),
             VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
-        ]), (entity) => this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
+        ]), (entity) => this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
          {
             var place = uwpe.place;
             var player = place.player();
@@ -119,7 +116,7 @@ class Player extends Entity {
         Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Boom"),
             VisualCircle.fromRadiusAndColorFill(nukeRadius, Color.Instances().White)
-        ]), (entity) => this.projectileShooterBuild_ConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
+        ]), (entity) => this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
          {
             ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
         });

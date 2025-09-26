@@ -3,23 +3,14 @@ class Enemy extends Entity
 {
 	constructor(name: string, pos: Coords, properties: EntityProperty[])
 	{
-		var propertyDrawable =
-			properties.find(x => x.propertyName() == Drawable.name) as Drawable;
-		var visual = propertyDrawable.visual;
-		visual = VisualWrapped.fromSizeInWrappedInstancesAndChild
-		(
-			Coords.fromXYZ(3, 1, 1),
-			visual
-		);
-		propertyDrawable.visual = visual;
-
 		var propertiesCommonToAllEnemies = 
 		[
 			Enemy.collidableBuild(),
 			Enemy.constrainableBuild(),
 			EnemyProperty.create(),
 			Enemy.killableBuild(),
-			Locatable.fromPos(pos)
+			Locatable.fromPos(pos),
+			PlacePlanet.wrappableBuild()
 		];
 		properties.push(...propertiesCommonToAllEnemies);
 
@@ -137,9 +128,11 @@ class Enemy extends Entity
 
 	static collidableBuild(): Collidable
 	{
+		var collider = Sphere.fromRadius(4);
+
 		return Collidable.fromColliderPropertyNameAndCollide
 		(
-			Sphere.fromRadius(4),
+			collider,
 			Player.name,
 			(uwpe: UniverseWorldPlaceEntities, c: Collision) =>
 			{
@@ -184,7 +177,11 @@ class Enemy extends Entity
 				"Effects_Boom",
 				40, // ticksToLive
 				(uwpe) => {}
-			).propertyAdd(EnemyProperty.create() );
+			);
+
+		entityExplosion
+			.propertyAdd(EnemyProperty.create() )
+			.propertyAdd(PlacePlanet.wrappableBuild() );
 
 		place.entityToSpawnAdd(entityExplosion);
 

@@ -32,7 +32,9 @@ class Habitat extends Entity
 
 				HabitatProperty.create(),
 
-				Locatable.fromPos(pos)
+				Locatable.fromPos(pos),
+
+				PlacePlanet.wrappableBuild()
 			]
 		);
 	}
@@ -61,12 +63,6 @@ class Habitat extends Entity
 		(
 			houseOutlineAsPath,
 			Color.Instances().Brown
-		);
-
-		house = VisualWrapped.fromSizeInWrappedInstancesAndChild
-		(
-			Coords.fromXYZ(3, 1, 1),
-			house
 		);
 
 		return house;

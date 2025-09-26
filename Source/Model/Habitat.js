@@ -8,7 +8,8 @@ class Habitat extends Entity {
             ]),
             Drawable.fromVisual(Habitat.visualBuild()),
             HabitatProperty.create(),
-            Locatable.fromPos(pos)
+            Locatable.fromPos(pos),
+            PlacePlanet.wrappableBuild()
         ]);
     }
     static fromPos(pos) {
@@ -27,7 +28,6 @@ class Habitat extends Entity {
             Coords.fromXY(1, -1) // Right eave.
         ]).transform(Transform_Scale.fromScaleFactor(4));
         var house = VisualPolygon.fromPathAndColorFill(houseOutlineAsPath, Color.Instances().Brown);
-        house = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), house);
         return house;
     }
 }

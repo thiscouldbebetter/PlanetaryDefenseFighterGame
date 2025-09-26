@@ -1,16 +1,13 @@
 "use strict";
 class Enemy extends Entity {
     constructor(name, pos, properties) {
-        var propertyDrawable = properties.find(x => x.propertyName() == Drawable.name);
-        var visual = propertyDrawable.visual;
-        visual = VisualWrapped.fromSizeInWrappedInstancesAndChild(Coords.fromXYZ(3, 1, 1), visual);
-        propertyDrawable.visual = visual;
         var propertiesCommonToAllEnemies = [
             Enemy.collidableBuild(),
             Enemy.constrainableBuild(),
             EnemyProperty.create(),
             Enemy.killableBuild(),
-            Locatable.fromPos(pos)
+            Locatable.fromPos(pos),
+            PlacePlanet.wrappableBuild()
         ];
         properties.push(...propertiesCommonToAllEnemies);
         super(name, properties);
@@ -84,7 +81,8 @@ class Enemy extends Entity {
         enemyActivity.targetEntityClear();
     }
     static collidableBuild() {
-        return Collidable.fromColliderPropertyNameAndCollide(Sphere.fromRadius(4), Player.name, (uwpe, c) => {
+        var collider = Sphere.fromRadius(4);
+        return Collidable.fromColliderPropertyNameAndCollide(collider, Player.name, (uwpe, c) => {
             var entityOther = uwpe.entity2;
             if (entityOther.name == Player.name) {
                 var playerEntity = entityOther;
@@ -107,7 +105,10 @@ class Enemy extends Entity {
         var enemy = uwpe.entity;
         var entityExplosion = uwpe.universe.entityBuilder.explosion(Locatable.of(enemy).loc.pos, 10, // radius
         "Effects_Boom", 40, // ticksToLive
-        (uwpe) => { }).propertyAdd(EnemyProperty.create());
+        (uwpe) => { });
+        entityExplosion
+            .propertyAdd(EnemyProperty.create())
+            .propertyAdd(PlacePlanet.wrappableBuild());
         place.entityToSpawnAdd(entityExplosion);
         // Stats.
         var player = place.player();

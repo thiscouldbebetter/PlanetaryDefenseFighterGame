@@ -99,14 +99,14 @@ class EnemyRaider extends Enemy
 					(
 						enemies.some
 						(
-							e => Carrier.of(e).habitatCarried == h
+							e => Carrier.of(e)?.habitatCarried == h
 						) == false
 					)
 					&&
 					(
 						enemies.some
 						(
-							e => Actor.of(e).activity.targetEntity() == h
+							e => Actor.of(e)?.activity.targetEntity() == h
 						) == false
 					)
 			);
