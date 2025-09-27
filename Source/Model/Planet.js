@@ -6,7 +6,7 @@ class Planet extends Entity {
             Drawable.fromVisual(Planet.visualBuild(size, horizonHeight)),
             Locatable.create(),
             Planet.triggerable(),
-            PlacePlanet.wrappableBuild()
+            PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true)
         ]);
         this.horizonHeight = horizonHeight;
     }

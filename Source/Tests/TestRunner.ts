@@ -8,7 +8,8 @@ class TestRunner
 			"TestsAll",
 			[
 				new CameraTests(),
-				new EnemyTests()
+				new EnemyTests(),
+				new HabitatTests()
 			]
 		);
 

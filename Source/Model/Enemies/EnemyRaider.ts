@@ -234,7 +234,10 @@ class EnemyRaider extends Enemy
 		enemyActivity.targetEntitySet(targetEntity);
 	}
 
-	static generatorBuild(universe: Universe, enemyGenerationZone: BoxAxisAligned, levelIndex: number): EntityGenerator
+	static generatorBuild
+	(
+		universe: Universe, enemyGenerationZone: BoxAxisAligned, levelIndex: number
+	): EntityGenerator
 	{
 		var enemyRaidersCount = PlacePlanet.enemyRaidersCountInitial(universe, levelIndex);
 		var enemyRaiderGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox

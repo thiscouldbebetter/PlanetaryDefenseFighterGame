@@ -20,7 +20,7 @@ class Planet extends Entity
 
 				Planet.triggerable(),
 
-				PlacePlanet.wrappableBuild()
+				PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true)
 			]
 		);
 

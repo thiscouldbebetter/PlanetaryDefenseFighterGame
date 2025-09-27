@@ -9,7 +9,7 @@ class Habitat extends Entity {
             Drawable.fromVisual(Habitat.visualBuild()),
             HabitatProperty.create(),
             Locatable.fromPos(pos),
-            PlacePlanet.wrappableBuild()
+            PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(false)
         ]);
     }
     static fromPos(pos) {

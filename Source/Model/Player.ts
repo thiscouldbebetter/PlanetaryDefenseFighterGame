@@ -77,7 +77,7 @@ class Player extends Entity
 
 				StatsKeeper.create(),
 
-				PlacePlanet.wrappableBuild()
+				PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true)
 			]
 		);
 
@@ -161,7 +161,7 @@ class Player extends Entity
 
 	static projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity: Entity): void
 	{
-		var wrappable = PlacePlanet.wrappableBuild();
+		var wrappable = PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true);
 		entity.propertyAdd(wrappable);
 	}
 

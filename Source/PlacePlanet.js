@@ -76,54 +76,18 @@ class PlacePlanet extends PlaceBase {
         var constraintContainInBox = camera.constraintContainInBoxForPlaceSizeWrapped(placeSize);
         var constrainable = Constrainable.of(cameraEntity);
         constrainable.constraintAdd(constraintContainInBox);
-        /*
-        var collidable = Collidable.of(cameraEntity);
-        this.colliderWrapForCollidableAndPlaceSize(collidable, placeSize);
-        */
-        var wrappable = PlacePlanet.wrappableBuild();
+        var wrappable = PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true);
         cameraEntity.propertyAdd(wrappable);
         return cameraEntity;
     }
     static cameraEntity_EntitiesInViewSort(entitiesToSort) {
         return Camera.entitiesSortByRenderingOrderThenZThenY(entitiesToSort);
     }
-    /*
-    static colliderWrapForCollidableAndPlaceSize(collidable: Collidable, placeSize: Coords): Collidable
-    {
-        var colliderCenter = collidable.collider;
-
-        var colliderLeft = ShapeTransformed.fromTransformAndChild
-        (
-            Transform_Translate.fromDisplacement
-            (
-                Coords.fromXY(0 - placeSize.x, 0)
-            ),
-            colliderCenter.clone()
-        );
-
-        var colliderRight = ShapeTransformed.fromTransformAndChild
-        (
-            Transform_Translate.fromDisplacement
-            (
-                Coords.fromXY(placeSize.x, 0)
-            ),
-            colliderCenter.clone()
-        );
-
-        var colliderAfterWrapping = ShapeGroupAny.fromChildren
-        ([
-            colliderLeft,
-            colliderCenter,
-            colliderRight
-        ]);
-
-        collidable.colliderAtRestSet(colliderAfterWrapping);
-
-        return collidable;
-    }
-    */
-    static constraintWrapBuild() {
-        return Constraint_WrapToPlaceSizeXTrimY.create();
+    static constraintWrapBuild(posShouldBeTrimmedToPlaceSizeY) {
+        var constraint = posShouldBeTrimmedToPlaceSizeY
+            ? Constraint_WrapToPlaceSizeXTrimY.create()
+            : Constraint_WrapToPlaceSizeX.create();
+        return constraint;
     }
     static defnBuild() {
         var actionDisplayRecorderStartStop = DisplayRecorder.actionStartStop();
@@ -173,8 +137,8 @@ class PlacePlanet extends PlaceBase {
         }
         return this._sizeInWrappedInstances;
     }
-    static wrappableBuild() {
-        return Wrappable.fromSizeInWrappedInstancesAndConstraintWrap(PlacePlanet.sizeInWrappedInstances(), PlacePlanet.constraintWrapBuild());
+    static wrappableBuildWithPosTrimmedToPlaceSizeY(posShouldBeTrimmedToPlaceSizeY) {
+        return Wrappable.fromSizeInWrappedInstancesAndConstraintWrap(PlacePlanet.sizeInWrappedInstances(), PlacePlanet.constraintWrapBuild(posShouldBeTrimmedToPlaceSizeY));
     }
     finalize(uwpe) {
         this.initializeIsComplete = false;

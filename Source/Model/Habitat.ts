@@ -34,7 +34,7 @@ class Habitat extends Entity
 
 				Locatable.fromPos(pos),
 
-				PlacePlanet.wrappableBuild()
+				PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(false)
 			]
 		);
 	}

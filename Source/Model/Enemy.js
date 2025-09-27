@@ -5,9 +5,8 @@ class Enemy extends Entity {
             Enemy.collidableBuild(),
             Enemy.constrainableBuild(),
             EnemyProperty.create(),
-            Enemy.killableBuild(),
             Locatable.fromPos(pos),
-            PlacePlanet.wrappableBuild()
+            PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(false)
         ];
         properties.push(...propertiesCommonToAllEnemies);
         super(name, properties);
@@ -108,7 +107,7 @@ class Enemy extends Entity {
         (uwpe) => { });
         entityExplosion
             .propertyAdd(EnemyProperty.create())
-            .propertyAdd(PlacePlanet.wrappableBuild());
+            .propertyAdd(PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(false));
         place.entityToSpawnAdd(entityExplosion);
         // Stats.
         var player = place.player();

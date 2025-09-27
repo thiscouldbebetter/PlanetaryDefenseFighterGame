@@ -8,9 +8,8 @@ class Enemy extends Entity
 			Enemy.collidableBuild(),
 			Enemy.constrainableBuild(),
 			EnemyProperty.create(),
-			Enemy.killableBuild(),
 			Locatable.fromPos(pos),
-			PlacePlanet.wrappableBuild()
+			PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(false)
 		];
 		properties.push(...propertiesCommonToAllEnemies);
 
@@ -159,7 +158,7 @@ class Enemy extends Entity
 		);
 	}
 
-	static killableBuild()
+	static killableBuild(): Killable
 	{
 		return Killable.fromDie(this.killableDie);
 	}
@@ -181,7 +180,7 @@ class Enemy extends Entity
 
 		entityExplosion
 			.propertyAdd(EnemyProperty.create() )
-			.propertyAdd(PlacePlanet.wrappableBuild() );
+			.propertyAdd(PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(false) );
 
 		place.entityToSpawnAdd(entityExplosion);
 

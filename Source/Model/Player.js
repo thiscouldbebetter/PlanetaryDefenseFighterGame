@@ -25,7 +25,7 @@ class Player extends Entity {
             Playable.create(),
             Player.projectileShooterBuild(),
             StatsKeeper.create(),
-            PlacePlanet.wrappableBuild()
+            PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true)
         ]);
         var debugSettings = universe.debugSettings;
         var killable = Killable.of(this);
@@ -76,7 +76,7 @@ class Player extends Entity {
         return shooter;
     }
     static projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity) {
-        var wrappable = PlacePlanet.wrappableBuild();
+        var wrappable = PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true);
         entity.propertyAdd(wrappable);
     }
     static projectileShooterBuild_Gun() {
