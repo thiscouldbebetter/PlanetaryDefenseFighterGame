@@ -167,12 +167,13 @@ class Player extends Entity
 
 	static projectileShooterBuild_Gun(): ProjectileGenerator
 	{
-		var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit
+		var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksIntegrityDamageVisualInitAndHit
 		(
 			2, // radius
 			5, // distanceInitial
 			16, // speed
 			8, // ticksToLive
+			1, // integrityMax
 			Damage.fromAmount(1),
 			VisualGroup.fromChildren
 			([
@@ -221,12 +222,13 @@ class Player extends Entity
 	{
 		var nukeRadius = 200;
 
-		var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit
+		var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksIntegrityDamageVisualInitAndHit
 		(
 			nukeRadius,
 			0, // distanceInitial
 			0, // speed
 			1, // ticksToLive
+			1000000, // integrityMax - Don't die on first hit.
 			Damage.fromAmount(1),
 			VisualGroup.fromChildren
 			([

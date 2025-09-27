@@ -9,8 +9,13 @@ class Game {
         var universe = null;
         var worldCreator = WorldCreator.fromWorldCreate(() => new WorldGame(universe, this.name));
         universe = Universe.fromNameMediaLibraryAndWorldCreator("PlanetaryDefenseFighterGame", mediaLibrary, worldCreator);
+        var controlBuilder = universe.controlBuilder;
         var controlStyleToUse = ControlStyle.Instances().DarkAndRounded;
-        universe.controlBuilder.styleDefaultSet(controlStyleToUse);
+        controlBuilder.styleDefaultSet(controlStyleToUse);
+        var controlBuilderSettings = controlBuilder.settings;
+        controlBuilderSettings
+            .titleScreensOmitButtonsSet(true)
+            .titleScreenFlowNameSet("todo");
         universe.initializeAndStart();
     }
     mediaLibraryBuild() {

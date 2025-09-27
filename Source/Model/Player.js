@@ -80,10 +80,11 @@ class Player extends Entity {
         entity.propertyAdd(wrappable);
     }
     static projectileShooterBuild_Gun() {
-        var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit(2, // radius
+        var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksIntegrityDamageVisualInitAndHit(2, // radius
         5, // distanceInitial
         16, // speed
         8, // ticksToLive
+        1, // integrityMax
         Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Blip"),
             VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
@@ -110,9 +111,10 @@ class Player extends Entity {
     }
     static projectileShooterBuild_Nuke() {
         var nukeRadius = 200;
-        var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksDamageVisualInitAndHit(nukeRadius, 0, // distanceInitial
+        var generationNuke = ProjectileGeneration.fromRadiusDistanceSpeedTicksIntegrityDamageVisualInitAndHit(nukeRadius, 0, // distanceInitial
         0, // speed
         1, // ticksToLive
+        1000000, // integrityMax - Don't die on first hit.
         Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Boom"),
             VisualCircle.fromRadiusAndColorFill(nukeRadius, Color.Instances().White)

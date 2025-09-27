@@ -77,11 +77,12 @@ class Planet extends Entity {
         var enemiesAreAllGone = (level.enemies().length == 0);
         var habitatIsStillThere = (level.habitats().length > 0);
         var player = level.player();
-        var playerIsNotAnExplosion = (StatsKeeper.of(player) != null);
+        var playerExistsAndIsNotAnExplosion = (player != null)
+            && (StatsKeeper.of(player) != null);
         var playerHasWon = enemyGeneratorRaidersIsExhausted
             && enemiesAreAllGone
             && habitatIsStillThere
-            && playerIsNotAnExplosion;
+            && playerExistsAndIsNotAnExplosion;
         return playerHasWon;
     }
     static triggerWinReactToBeingTriggered(uwpe) {

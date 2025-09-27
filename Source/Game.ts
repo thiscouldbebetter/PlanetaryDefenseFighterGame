@@ -28,8 +28,13 @@ class Game
 			worldCreator
 		);
 
+		var controlBuilder = universe.controlBuilder;
 		var controlStyleToUse = ControlStyle.Instances().DarkAndRounded;
-		universe.controlBuilder.styleDefaultSet(controlStyleToUse);
+		controlBuilder.styleDefaultSet(controlStyleToUse);
+		var controlBuilderSettings = controlBuilder.settings;
+		controlBuilderSettings
+			.titleScreensOmitButtonsSet(true)
+			.titleScreenFlowNameSet("todo");
 
 		universe.initializeAndStart();
 	}
