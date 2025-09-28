@@ -159,12 +159,6 @@ class Player extends Entity
 		return shooter;
 	}
 
-	static projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity: Entity): void
-	{
-		var wrappable = PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true);
-		entity.propertyAdd(wrappable);
-	}
-
 	static projectileShooterBuild_Gun(): ProjectileGenerator
 	{
 		var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksIntegrityDamageVisualInitAndHit
@@ -184,8 +178,8 @@ class Player extends Entity
 					2, Color.Instances().Yellow
 				)
 			]),
-			(entity) =>
-				this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity),
+			(entity) => // init
+				PlacePlanet.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity),
 			uwpe => // hit
 			{
 				var place = uwpe.place as PlacePlanet;
@@ -240,7 +234,7 @@ class Player extends Entity
 				)
 			]),
 			(entity) =>
-				this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity),
+				PlacePlanet.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity),
 			uwpe => // hit
 			{
 				ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);

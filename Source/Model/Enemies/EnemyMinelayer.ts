@@ -15,12 +15,7 @@ class EnemyMinelayer extends Enemy
 
 				Carrier.create(),
 
-				Device.fromNameTicksToChargeAndUse
-				(
-					"Gun",
-					60, // 3 seconds
-					uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
-				),
+				EnemyMinelayer.deviceMineLauncherBuild(),
 
 				Drawable.fromVisual
 				(
@@ -29,9 +24,9 @@ class EnemyMinelayer extends Enemy
 
 				Enemy.killableBuild(),
 
-				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
+				Movable.fromAccelerationPerTickAndSpeedMax(2, 2.5),
 
-				Enemy.projectileShooterBuild(),
+				EnemyMinelayer.projectileShooterBuild(),
 
 				Scorable.fromPoints(250)
 			]
@@ -58,48 +53,62 @@ class EnemyMinelayer extends Enemy
 		Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
 
 		var enemy = uwpe.entity as Enemy;
-		var enemyActivity = Actor.of(enemy).activity;
-		var target = enemyActivity.targetEntity();
-		if (target == null)
-		{
-			var place = uwpe.place as PlacePlanet;
-			var placeSizeMinusSurface = place.sizeMinusSurface();
-			var altitudesToFlyBetweenAsFractions = [0.25, 0.75];
-			var altitudesToFlyBetween =
-				altitudesToFlyBetweenAsFractions.map(x => x * placeSizeMinusSurface.y);
-			var differenceOfAltitudesToFlyBetween =
-				altitudesToFlyBetween[1] - altitudesToFlyBetween[0];
 
-			var enemyPos = Locatable.of(enemy).pos();
-			var altitudeToFlyBetweenIndex =
-				(enemyPos.y <= altitudesToFlyBetween[0])
-				? 0
-				: 1;
-			var altitudeToFlyToward =
-				altitudesToFlyBetween[altitudeToFlyBetweenIndex];
-			var targetPos = Coords.fromXY
-			(
-				enemyPos.x + differenceOfAltitudesToFlyBetween,
-				altitudeToFlyToward
-			);
-			var target = Entity.fromProperty(Locatable.fromPos(targetPos) );
-			enemyActivity.targetEntitySet(target);
-		}
-		else
+		var place = uwpe.place as PlacePlanet;
+		var placeSizeMinusSurface = place.sizeMinusSurface();
+		var altitudesToFlyBetweenAsFractions = [0.15, 0.85];
+		var altitudesToFlyBetween =
+			altitudesToFlyBetweenAsFractions.map(x => x * placeSizeMinusSurface.y);
+		var enemyDisp = Locatable.of(enemy).loc; 
+		var enemyVel = enemyDisp.vel;
+		var enemySpeed = enemyVel.magnitude();
+		if (enemySpeed == 0)
 		{
-			Enemy.activityDefnPerform_MoveTowardTarget
-			(
-				uwpe,
-				() => EnemyMinelayer.activityDefnPerform_TargetHasBeenReached(uwpe)
-			);
+			var enemySpeedFixed = Movable.of(enemy).speedMax(null);
+			var enemyVelToSet =
+				Coords.oneOneZero().normalize().multiplyScalar(enemySpeedFixed);
+			enemyVel.overwriteWith(enemyVelToSet);
+		}
+		var enemyPos = enemyDisp.pos;
+		var enemyPosY = enemyPos.y;
+		var enemyPosYIsOutsideAllowedRange =
+			enemyPosY < altitudesToFlyBetween[0]
+			|| enemyPosY > altitudesToFlyBetween[1];
+		if (enemyPosYIsOutsideAllowedRange)
+		{
+			enemyVel.y *= -1;
+			enemyPos.add(enemyVel);
+		}
+		EnemyMinelayer.activityDefnPerform_FireMineLauncherIfCharged(uwpe);
+	}
+
+	static activityDefnPerform_FireMineLauncherIfCharged(uwpe: UniverseWorldPlaceEntities): void
+	{
+		var enemy = uwpe.entity;
+
+		var place = uwpe.place as PlacePlanet;
+		var player = place.player();
+
+		if (player != null)
+		{
+			var deviceGun = Device.of(enemy);
+			uwpe.entity2Set(enemy); // For Device.
+			var deviceGunCanBeUsed = deviceGun.canUse(uwpe);
+			if (deviceGunCanBeUsed)
+			{
+				deviceGun.use(uwpe);
+			}
 		}
 	}
 
-	static activityDefnPerform_TargetHasBeenReached(uwpe: UniverseWorldPlaceEntities): void
+	static deviceMineLauncherBuild()
 	{
-		var enemy = uwpe.entity as Enemy;
-		var enemyActivity = Actor.of(enemy).activity;
-		enemyActivity.targetEntityClear();
+		return Device.fromNameTicksToChargeAndUse
+		(
+			"Gun",
+			20, // 1 seconds
+			uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
+		);
 	}
 
 	static generatorBuildForBoxAndLevelIndex
@@ -126,26 +135,106 @@ class EnemyMinelayer extends Enemy
 		return enemyMinelayerGenerator;
 	}
 
+	static projectileShooterBuild(): ProjectileShooter
+	{
+		var propertiesToCollideWithNames = [ Playable.name ];
+
+		var visualBuilder = VisualBuilder.Instance();
+
+		var projectileColor = Color.Instances().Yellow
+
+		var radius = 6;
+
+		var projectileVisual = visualBuilder.starburstWithPointsRatioRadiusAndColor
+		(
+			4, .25, radius, projectileColor
+		);
+
+		var init = (entity: Entity) =>
+			PlacePlanet.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity);
+
+		var projectileGeneration = new ProjectileGeneration
+		(
+			radius,
+			0, // distanceInitial
+			0, // speed
+			100, // ticksToLive - 5 seconds
+			null, // integrityMax
+			propertiesToCollideWithNames,
+			null, // damage
+			projectileVisual,
+			init,
+			null // hit
+		);
+
+		var projectileGenerator =
+			ProjectileGenerator.fromGeneration(projectileGeneration);
+
+		var shooter = ProjectileShooter.fromNameAndGenerator
+		(
+			EnemyMinelayer.name + ProjectileShooter.name,
+			projectileGenerator
+		);
+
+		shooter.collideOnlyWithEntitiesHavingPropertiesNamedSet(propertiesToCollideWithNames);
+
+		return shooter;
+	}
+
+
+
 	static visualBuild(): Visual
 	{
-		var colors = Color.Instances();
+		var dimension = 6;
 
-		return VisualGroup.fromChildren
+		var colors = Color.Instances();
+		var colorBody = colors.Green;
+		var colorLauncherPort = colors.Red;
+
+		var visualShaft = VisualRectangle.fromSizeAndColorFill
+		(
+			Coords.fromXY(1.5, 1).multiplyScalar(dimension),
+			colorBody
+		);
+
+		var dimensionLauncher = dimension * 1.2;
+
+		var visualLauncherFrame =
+			VisualRectangle.fromSizeAndColorFill
+			(
+				Coords.ones().multiplyScalar(dimensionLauncher),
+				colorBody
+			);
+
+		var launcherPortRadius = dimensionLauncher * 0.4;
+
+		var visualLauncherPort =
+			VisualCircle.fromRadiusAndColorFill(launcherPortRadius, colorLauncherPort);
+
+		var visualLauncher = VisualGroup.fromChildren
 		([
-			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
-			(
-				6, 4, colors.Green
-			),
-			VisualEllipse.fromSemiaxesHorizontalAndVerticalAndColorFill
-			(
-				4, 3, colors.Red
-			),
-			VisualFan.fromRadiusAnglesStartAndSpannedAndColorsFillAndBorder
-			(
-				4, // radius
-				.5, .5, // angleStart-, angleSpannedInTurns
-				colors.Red, null // colorFill, colorBorder
-			)
+			visualLauncherFrame, visualLauncherPort
 		]);
+
+		var visualLauncherOffsetLeft = VisualOffset.fromOffsetAndChild
+		(
+			Coords.fromXY(-1, 0).multiplyScalar(dimension),
+			visualLauncher
+		);
+
+		var visualLauncherOffsetRight = VisualOffset.fromOffsetAndChild
+		(
+			Coords.fromXY(1, 0).multiplyScalar(dimension),
+			visualLauncher
+		);
+
+		var visualShaftPlusLauncher = VisualGroup.fromChildren
+		([
+			visualShaft,
+			visualLauncherOffsetLeft,
+			visualLauncherOffsetRight
+		]);
+
+		return visualShaftPlusLauncher;
 	}
 }

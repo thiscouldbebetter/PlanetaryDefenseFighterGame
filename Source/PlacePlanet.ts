@@ -58,6 +58,13 @@ class PlacePlanet extends PlaceBase
 					EnemyEmplacement.fromPos(size.clone().half().addXY(0, 30) )
 				];
 			}
+			else if (enemyTypeToTestName == EnemyMinelayer.name)
+			{
+				enemies =
+				[
+					EnemyMinelayer.fromPos(Coords.fromXY(0, size.y / 2) ),
+				];
+			}
 			else if (enemyTypeToTestName == EnemyObstructor.name)
 			{
 				enemies =
@@ -277,6 +284,12 @@ class PlacePlanet extends PlaceBase
 			actionToInputsMappings,
 			entityPropertyNamesToProcess
 		);
+	}
+
+	static projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity: Entity): void
+	{
+		var wrappable = PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true);
+		entity.propertyAdd(wrappable);
 	}
 
 	static _sizeInWrappedInstances: Coords;

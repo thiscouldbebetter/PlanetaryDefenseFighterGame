@@ -75,10 +75,6 @@ class Player extends Entity {
         shooter.collideOnlyWithEntitiesHavingPropertiesNamedSet(propertyNames);
         return shooter;
     }
-    static projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity) {
-        var wrappable = PlacePlanet.wrappableBuildWithPosTrimmedToPlaceSizeY(true);
-        entity.propertyAdd(wrappable);
-    }
     static projectileShooterBuild_Gun() {
         var generationGun = ProjectileGeneration.fromRadiusDistanceSpeedTicksIntegrityDamageVisualInitAndHit(2, // radius
         5, // distanceInitial
@@ -88,7 +84,8 @@ class Player extends Entity {
         Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Blip"),
             VisualCircle.fromRadiusAndColorFill(2, Color.Instances().Yellow)
-        ]), (entity) => this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
+        ]), (entity) => // init
+         PlacePlanet.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
          {
             var place = uwpe.place;
             var player = place.player();
@@ -118,7 +115,7 @@ class Player extends Entity {
         Damage.fromAmount(1), VisualGroup.fromChildren([
             VisualSound.fromSoundName("Effects_Boom"),
             VisualCircle.fromRadiusAndColorFill(nukeRadius, Color.Instances().White)
-        ]), (entity) => this.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
+        ]), (entity) => PlacePlanet.projectileShooterBuild_CollidableConstrainableAndDrawableWrapForEntity(entity), uwpe => // hit
          {
             ProjectileGeneration.hit_DamageTargetAndDestroySelf(uwpe);
         });
