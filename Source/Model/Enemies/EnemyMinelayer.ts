@@ -33,7 +33,7 @@ class EnemyMinelayer extends Enemy
 
 				Enemy.projectileShooterBuild(),
 
-				Scorable.fromPoints(100)
+				Scorable.fromPoints(250)
 			]
 		);
 	}

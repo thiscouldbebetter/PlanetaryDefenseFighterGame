@@ -12,7 +12,7 @@ class EnemyRaider extends Enemy {
             Killable.fromDie(EnemyRaider.killableDie),
             Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
-            Scorable.fromPoints(100)
+            Scorable.fromPoints(150)
         ]);
     }
     static fromPos(pos) {

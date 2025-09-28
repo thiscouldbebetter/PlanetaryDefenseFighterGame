@@ -12,7 +12,7 @@ class EnemyHarrier extends Enemy {
             Enemy.killableBuild(),
             Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 2),
-            Scorable.fromPoints(100)
+            Scorable.fromPoints(200)
         ]);
     }
     static fromPos(pos) {

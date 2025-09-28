@@ -35,7 +35,7 @@ class EnemyRaider extends Enemy
 
 				Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
 
-				Scorable.fromPoints(100)
+				Scorable.fromPoints(150)
 			]
 		);
 	}

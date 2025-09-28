@@ -33,7 +33,7 @@ class EnemyHarrier extends Enemy
 
 				Movable.fromAccelerationPerTickAndSpeedMax(2, 2),
 
-				Scorable.fromPoints(100)
+				Scorable.fromPoints(200)
 			]
 		);
 	}

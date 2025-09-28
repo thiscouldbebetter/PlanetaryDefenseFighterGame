@@ -12,7 +12,7 @@ class EnemyMarauder extends Enemy {
             Enemy.killableBuild(),
             Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(4, 2),
-            Scorable.fromPoints(100)
+            Scorable.fromPoints(150)
         ]);
     }
     static fromPos(pos) {

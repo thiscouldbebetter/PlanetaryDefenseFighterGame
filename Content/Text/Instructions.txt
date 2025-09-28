@@ -1,8 +1,26 @@
-Prevent the habitats
-from being stolen by raiders,
-who then transform to marauders.
-Bursters and minelayers appear at higher levels.
+Controls
+ 
+Use the arrow keys or WASD to move,
+Space to fire,
+and N to detonate a nuke.
+
+
+Objective
+ 
+Shoot the raiders
+to prevent them stealing habitats
+and transforming to marauders.
+Bursters and minelayers
+appear at higher levels.
 Bursters explode into chasers when shot.
 Harriers will appear after a time.
 
 
+Scoring
+ 
+Raiders:     150
+Marauders:   150
+Harriers:    200
+Minelayers:  250
+Bursters:   1000
+Chasers:     150

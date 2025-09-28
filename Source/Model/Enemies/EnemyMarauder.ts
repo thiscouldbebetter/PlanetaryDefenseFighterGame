@@ -33,7 +33,7 @@ class EnemyMarauder extends Enemy
 
 				Movable.fromAccelerationPerTickAndSpeedMax(4, 2),
 
-				Scorable.fromPoints(100)
+				Scorable.fromPoints(150)
 			]
 		);
 	}

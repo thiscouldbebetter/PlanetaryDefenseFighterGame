@@ -33,7 +33,7 @@ class EnemyBurster extends Enemy
 
 				Enemy.projectileShooterBuild(),
 
-				Scorable.fromPoints(100)
+				Scorable.fromPoints(1000)
 			]
 		);
 	}

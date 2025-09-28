@@ -12,7 +12,7 @@ class EnemyBurster extends Enemy {
             Killable.fromDie(EnemyBurster.killableDie),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Enemy.projectileShooterBuild(),
-            Scorable.fromPoints(100)
+            Scorable.fromPoints(1000)
         ]);
     }
     static fromPos(pos) {

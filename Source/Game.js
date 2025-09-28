@@ -28,13 +28,13 @@ class Game {
     mediaLibraryBuild_FilePaths() {
         var contentDirectoryPath = this.contentDirectoryPath;
         var imageTitlesDirectoryPath = contentDirectoryPath + "Images/Titles/";
-        // For everything but the titles, use built-in content from the Framework.
+        var textStringDirectoryPath = contentDirectoryPath + "Text/";
+        // For everything else, use built-in content from the Framework.
         contentDirectoryPath += "../Source/Framework/Content/";
         var fontDirectoryPath = contentDirectoryPath + "Fonts/";
         //var imageDirectoryPath = contentDirectoryPath + "Images/";
         var soundEffectDirectoryPath = contentDirectoryPath + "Audio/Effects/";
         var soundMusicDirectoryPath = contentDirectoryPath + "Audio/Music/";
-        var textStringDirectoryPath = contentDirectoryPath + "Text/";
         var videoDirectoryPath = contentDirectoryPath + "Video/";
         var title = (a) => imageTitlesDirectoryPath + a;
         // var image = (a: string) => imageDirectoryPath + a;

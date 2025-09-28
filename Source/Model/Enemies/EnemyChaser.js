@@ -12,7 +12,7 @@ class EnemyChaser extends Enemy {
             Enemy.killableBuild(),
             Enemy.projectileShooterBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
-            Scorable.fromPoints(100)
+            Scorable.fromPoints(150)
         ]);
         Locatable.of(this).loc.vel.overwriteWith(vel);
     }

@@ -12,7 +12,7 @@ class EnemyMinelayer extends Enemy {
             Enemy.killableBuild(),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
             Enemy.projectileShooterBuild(),
-            Scorable.fromPoints(100)
+            Scorable.fromPoints(250)
         ]);
     }
     static fromPos(pos) {
