@@ -4,8 +4,8 @@ class EnemyMarauder extends Enemy {
         super(EnemyMarauder.name, pos, [
             Actor.fromActivityDefnName(EnemyMarauder.activityDefnBuild().name),
             Carrier.create(),
-            Device.fromNameTicksToChargeAndUse("Gun", 40, // 2 seconds
-            // 2 seconds
+            Device.fromNameTicksToChargeAndUse("Gun", 60, // 3 seconds
+            // 3 seconds
             uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
             ),
             Drawable.fromVisual(EnemyMarauder.visualBuild()),
@@ -39,6 +39,11 @@ class EnemyMarauder extends Enemy {
             .toCoords()
             .multiplyScalar(jitterDistanceMax);
         Locatable.of(enemy).pos().add(randomJitter);
+        var place = uwpe.place;
+        var player = place.player();
+        if (player != null) {
+            Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
+        }
     }
     static visualBuild() {
         var colors = Color.Instances();

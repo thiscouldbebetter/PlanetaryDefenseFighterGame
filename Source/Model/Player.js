@@ -165,13 +165,13 @@ class Player extends Entity {
             ControlLabel.fromPosAndText(Coords.fromXY(80, 4), DataBinding.fromGet(() => "" + place.enemies().length)),
             // Lives in reserve.
             ControlVisual.fromPosAndVisual(Coords.fromXY(10, 30), DataBinding.fromContext(visualPlayerShip)),
-            ControlLabel.fromPosAndText(Coords.fromXY(20, 26), DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve)),
+            ControlLabel.fromPosAndText(Coords.fromXY(20, 24), DataBinding.fromGet(() => "" + Killable.of(uwpe.entity).livesInReserve)),
             // Nukes remaining.
             ControlVisual.fromPosAndVisual(Coords.fromXY(40, 30), DataBinding.fromContext(visualNukes)),
-            ControlLabel.fromPosAndText(Coords.fromXY(50, 26), DataBinding.fromGet(() => "" + ItemHolder.of(uwpe.entity).itemByDefnName("Nuke").quantity)),
+            ControlLabel.fromPosAndText(Coords.fromXY(50, 24), DataBinding.fromGet(() => "" + ItemHolder.of(uwpe.entity).itemByDefnName("Nuke").quantity)),
             // Score.
             ControlVisual.fromPosAndVisual(Coords.fromXY(70, 30), DataBinding.fromContext(visualStar)),
-            ControlLabel.fromPosAndText(Coords.fromXY(80, 26), DataBinding.fromGet(() => "" + playerStatsKeeper.score()))
+            ControlLabel.fromPosAndText(Coords.fromXY(80, 24), DataBinding.fromGet(() => "" + playerStatsKeeper.score()))
         ];
         return ControlContainer.fromPosSizeAndChildren(Coords.fromXY(0, placeSize.y - 40), // pos
         Coords.fromXY(40, 50), // size

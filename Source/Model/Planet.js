@@ -58,7 +58,7 @@ class Planet extends Entity {
     }
     static triggerLoseReactToBeingTriggered(uwpe) {
         var universe = uwpe.universe;
-        var leaderboard = Leaderboard.fromStorageHelper(universe.storageHelper);
+        var leaderboard = Leaderboard.fromStorageHelper(universe.storageHelper).secondsToShowSet(30);
         var venueMessageGameOver = VenueMessage.fromTextAndAcknowledgeNoButtons("GAME OVER", () => // acknowledge
          {
             var world = uwpe.world;

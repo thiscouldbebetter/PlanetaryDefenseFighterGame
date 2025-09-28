@@ -356,7 +356,7 @@ class Player extends Entity
 			),
 			ControlLabel.fromPosAndText
 			(
-				Coords.fromXY(20, 26),
+				Coords.fromXY(20, 24),
 				DataBinding.fromGet
 				(
 					() => "" + Killable.of(uwpe.entity).livesInReserve
@@ -371,7 +371,7 @@ class Player extends Entity
 			),
 			ControlLabel.fromPosAndText
 			(
-				Coords.fromXY(50, 26),
+				Coords.fromXY(50, 24),
 				DataBinding.fromGet
 				(
 					() => "" + ItemHolder.of(uwpe.entity).itemByDefnName("Nuke").quantity
@@ -386,7 +386,7 @@ class Player extends Entity
 			),
 			ControlLabel.fromPosAndText
 			(
-				Coords.fromXY(80, 26),
+				Coords.fromXY(80, 24),
 				DataBinding.fromGet
 				(
 					() => "" + playerStatsKeeper.score()

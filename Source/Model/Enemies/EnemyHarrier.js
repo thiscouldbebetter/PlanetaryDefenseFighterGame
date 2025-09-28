@@ -47,11 +47,12 @@ class EnemyHarrier extends Enemy {
         enemyActivity.targetEntityClear();
     }
     static generatorBuildForBox(enemyGenerationZone) {
-        var enemyHarrierGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyHarrier.name, EnemyHarrier.fromPos(Coords.create()), 800, // ticksPerGeneration = 40 seconds.
+        var enemyHarrierGenerator = EntityGenerator.fromNameEntityTicksBatchMaxesAndPosBox(EntityGenerator.name + EnemyHarrier.name, EnemyHarrier.fromPos(Coords.create()), 200, // ticksPerGeneration = 10 seconds.
         1, // entitiesPerGeneration
         1, // concurrent
         null, // all-time
         enemyGenerationZone);
+        enemyHarrierGenerator.inactivate();
         return enemyHarrierGenerator;
     }
     static visualBuild() {

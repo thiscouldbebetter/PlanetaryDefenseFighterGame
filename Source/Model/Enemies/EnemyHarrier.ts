@@ -106,12 +106,13 @@ class EnemyHarrier extends Enemy
 		(
 			EntityGenerator.name + EnemyHarrier.name,
 			EnemyHarrier.fromPos(Coords.create() ),
-			800, // ticksPerGeneration = 40 seconds.
+			200, // ticksPerGeneration = 10 seconds.
 			1, // entitiesPerGeneration
 			1, // concurrent
 			null, // all-time
 			enemyGenerationZone
 		);
+		enemyHarrierGenerator.inactivate();
 		return enemyHarrierGenerator;
 	}
 

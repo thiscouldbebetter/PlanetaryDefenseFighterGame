@@ -124,6 +124,13 @@ class EnemyRaider extends Enemy {
         enemyRaidersCount, // concurrent
         enemyRaidersCount, // all-time
         enemyGenerationZone);
+        enemyRaiderGenerator.windDownSet((uwpe) => {
+            var place = uwpe.place;
+            var generatorEntities = place.generators();
+            var generatorHarrierEntity = generatorEntities.find(x => x.name == EntityGenerator.name + EnemyHarrier.name);
+            var generatorHarrier = EntityGenerator.of(generatorHarrierEntity);
+            generatorHarrier.activate();
+        });
         return enemyRaiderGenerator;
     }
     static killableDie(uwpe) {

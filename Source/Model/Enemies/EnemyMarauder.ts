@@ -18,7 +18,7 @@ class EnemyMarauder extends Enemy
 				Device.fromNameTicksToChargeAndUse
 				(
 					"Gun",
-					40, // 2 seconds
+					60, // 3 seconds
 					uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
 				),
 
@@ -79,6 +79,12 @@ class EnemyMarauder extends Enemy
 				.multiplyScalar(jitterDistanceMax);
 		Locatable.of(enemy).pos().add(randomJitter);
 
+		var place = uwpe.place as PlacePlanet;
+		var player = place.player();
+		if (player != null)
+		{
+			Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
+		}
 	}
 
 	static visualBuild(): Visual

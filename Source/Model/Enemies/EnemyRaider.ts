@@ -250,6 +250,18 @@ class EnemyRaider extends Enemy
 			enemyRaidersCount, // all-time
 			enemyGenerationZone
 		);
+		enemyRaiderGenerator.windDownSet
+		(
+			(uwpe: UniverseWorldPlaceEntities) =>
+			{
+				var place = uwpe.place as PlacePlanet
+				var generatorEntities = place.generators();
+				var generatorHarrierEntity =
+					generatorEntities.find(x => x.name == EntityGenerator.name + EnemyHarrier.name);
+				var generatorHarrier = EntityGenerator.of(generatorHarrierEntity);
+				generatorHarrier.activate();
+			}
+		);
 		return enemyRaiderGenerator;
 	}
 

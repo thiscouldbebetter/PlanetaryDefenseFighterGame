@@ -15,7 +15,7 @@ class Game {
         var controlBuilderSettings = controlBuilder.settings;
         controlBuilderSettings
             .titleScreensOmitButtonsSet(true)
-            .titleScreenFlowNameSet("todo");
+            .titleScreenFlowNameSet(ControlBuilderSettings.TitleScreenFlowNameArcadeGameAttractMode);
         universe.initializeAndStart();
     }
     mediaLibraryBuild() {

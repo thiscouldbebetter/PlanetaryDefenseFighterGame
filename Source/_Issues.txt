@@ -2,25 +2,16 @@
 Known Issues
 ============
 
-Highest Priority
-----------------
-
-Player becomes immortal after first time being destroyed.
-
-
 Higher Priority
 ---------------
 
-Sometimes enemies carrying habitats are impossible to hit; across the wrap boundary? [Fixed?]
-Sometimes explosions do not appear, perhaps the visuals are not wrapped? [Fixed?]
-Nukes don't work across the wrap boundary. [Fixed?]
+Nukes only destroy one enemy in their radius of effect.
 Enemy explosions seem to share the player's velocity, rather than the enemy's, or being stationary. [Fixed?]
 Need to finish implementing and testing all enemy types.
 Sound effect when player fires thruster could be start noise followed by continuous drone.
 Visuals for enemies are seemingly being rendered upside down sometimes.
 Planet should be shown (and heard) exploding when the last habitat is destroyed.
 A minimap should be added that shows the entire planet, the habitats, and the enemies.
-Marauders should shoot.
 
 
 Lower Priority

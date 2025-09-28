@@ -63,6 +63,7 @@ class PlacePlanet extends PlaceBase
 				enemies =
 				[
 					EnemyObstructor.fromPos(Coords.fromXY(0, size.y / 2) ),
+					EnemyObstructor.fromPos(Coords.fromXY(0, size.y / 2).addXY(0, 30) ),
 					EnemyObstructor.fromPos(size.clone().half().addXY(0, 30) )
 				];
 			}
@@ -373,7 +374,7 @@ class PlacePlanet extends PlaceBase
 		var enemyRaidersCount: number;
 		if (universe.debugSettings.difficultyEasy() )
 		{
-			enemyRaidersCount = 0;
+			enemyRaidersCount = 2;
 		}
 		else
 		{
@@ -385,6 +386,11 @@ class PlacePlanet extends PlaceBase
 				+ enemyRaidersAdditionalPerLevel * levelIndex;
 		}
 		return enemyRaidersCount;
+	}
+
+	generators(): Entity[]
+	{
+		return this.entitiesByPropertyName(EntityGenerator.name) as Entity[];
 	}
 
 	habitats(): Habitat[]

@@ -124,7 +124,7 @@ class Planet extends Entity
 		var universe = uwpe.universe;
 
 		var leaderboard =
-			Leaderboard.fromStorageHelper(universe.storageHelper);
+			Leaderboard.fromStorageHelper(universe.storageHelper).secondsToShowSet(30);
 
 		var venueMessageGameOver = VenueMessage.fromTextAndAcknowledgeNoButtons
 		(
