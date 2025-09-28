@@ -6,18 +6,16 @@ Higher Priority
 ---------------
 
 Nukes only destroy one enemy in their radius of effect.
-Enemy explosions seem to share the player's velocity, rather than the enemy's, or being stationary. [Fixed?]
-Need to finish implementing and testing all enemy types.
 Sound effect when player fires thruster could be start noise followed by continuous drone.
 Visuals for enemies are seemingly being rendered upside down sometimes.
 Planet should be shown (and heard) exploding when the last habitat is destroyed.
 A minimap should be added that shows the entire planet, the habitats, and the enemies.
-
+Burster's visual points at player when it probably shouldn't.
+Chaser enemies seem to lose interest in player when player is out of weapons range.
 
 Lower Priority
 --------------
 Need a better producer sound effect for This Could Be Better.
-Title screen should cycle through several screens, including instructions and high scores.
-Habitats dropped from too high should be destroyed?
+Habitats dropped from too high should be destroyed, but could be caught, as in source game.
 Habitats hit by projectiles should be destroyed?
 Need to implement hyperspace shunt?

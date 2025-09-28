@@ -31,29 +31,32 @@ class Enemy extends Entity {
         var player = place.player();
         if (player != null) {
             var deviceGun = Device.of(enemy);
-            uwpe.entity2Set(enemy); // For Device.
-            var deviceGunCanBeUsed = deviceGun.canUse(uwpe);
-            if (deviceGunCanBeUsed) {
-                var playerPos = Locatable.of(player).pos();
-                var displacementToPlayer = playerPos.clone().subtract(enemyPos);
-                var distanceToPlayer = displacementToPlayer.magnitude();
-                var projectileShooter = ProjectileShooter.of(enemy);
-                var projectileGenerator = projectileShooter.generatorDefault();
-                var projectileRange = projectileGenerator.range();
-                if (distanceToPlayer < projectileRange) {
-                    var directionToPlayer = displacementToPlayer.normalize();
-                    enemyDisp.orientation.forwardSet(directionToPlayer);
-                    deviceGun.use(uwpe);
+            if (deviceGun != null) {
+                uwpe.entity2Set(enemy); // For Device.
+                var deviceGunCanBeUsed = deviceGun.canUse(uwpe);
+                if (deviceGunCanBeUsed) {
+                    var playerPos = Locatable.of(player).pos();
+                    var displacementToPlayer = playerPos.clone().subtract(enemyPos);
+                    var distanceToPlayer = displacementToPlayer.magnitude();
+                    var projectileShooter = ProjectileShooter.of(enemy);
+                    var projectileGenerator = projectileShooter.generatorDefault();
+                    var projectileRange = projectileGenerator.range();
+                    if (distanceToPlayer < projectileRange) {
+                        var directionToPlayer = displacementToPlayer.normalize();
+                        enemyDisp.orientation.forwardSet(directionToPlayer);
+                        deviceGun.use(uwpe);
+                    }
                 }
             }
         }
     }
     static activityDefnPerform_MoveTowardTarget(uwpe, targetHasBeenReached) {
         var enemy = uwpe.entity;
-        var enemyPos = Locatable.of(enemy).pos();
         var enemyActor = Actor.of(enemy);
         var enemyActivity = enemyActor.activity;
         var targetEntity = enemyActivity.targetEntity();
+        var enemyDisp = Locatable.of(enemy).loc;
+        var enemyPos = enemyDisp.pos;
         var targetPos = Locatable.of(targetEntity).loc.pos;
         var displacementToTarget = Enemy
             .displacement()
@@ -61,6 +64,7 @@ class Enemy extends Entity {
             .subtract(enemyPos);
         var distanceToTarget = displacementToTarget.magnitude();
         var directionToTarget = displacementToTarget.clone().divideScalar(distanceToTarget);
+        enemyDisp.orientation.forwardSet(directionToTarget);
         var enemyMovable = Movable.of(enemy);
         var enemyAccelerationPerTick = enemyMovable.accelerationPerTickInDirection(uwpe, directionToTarget);
         if (distanceToTarget >= enemyAccelerationPerTick) {

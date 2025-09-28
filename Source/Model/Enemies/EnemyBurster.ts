@@ -15,13 +15,6 @@ class EnemyBurster extends Enemy
 
 				Carrier.create(),
 
-				Device.fromNameTicksToChargeAndUse
-				(
-					"Gun",
-					60, // 3 seconds
-					uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
-				),
-
 				Drawable.fromVisual
 				(
 					EnemyBurster.visualBuild()
@@ -59,25 +52,23 @@ class EnemyBurster extends Enemy
 		var player = place.player();
 		if (player != null)
 		{
-			Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
+			var enemyActor = Actor.of(enemy);
+			var enemyActivity = enemyActor.activity;
+			var targetEntity = enemyActivity.targetEntity();
+
+			if (targetEntity == null)
+			{
+				targetEntity = place.player();
+			}
+
+			enemyActivity.targetEntitySet(targetEntity);
+
+			Enemy.activityDefnPerform_MoveTowardTarget
+			(
+				uwpe,
+				EnemyBurster.activityDefnPerform_MoveTowardTarget_TargetHasBeenReached
+			);
 		}
-
-		var enemyActor = Actor.of(enemy);
-		var enemyActivity = enemyActor.activity;
-		var targetEntity = enemyActivity.targetEntity();
-
-		if (targetEntity == null)
-		{
-			targetEntity = place.player();
-		}
-
-		enemyActivity.targetEntitySet(targetEntity);
-
-		Enemy.activityDefnPerform_MoveTowardTarget
-		(
-			uwpe,
-			EnemyBurster.activityDefnPerform_MoveTowardTarget_TargetHasBeenReached
-		);
 	}
 
 	static activityDefnPerform_MoveTowardTarget_TargetHasBeenReached
@@ -130,15 +121,17 @@ class EnemyBurster extends Enemy
 		var place = uwpe.place as PlacePlanet;
 		var chasersToSpawnCount = 4;
 		var distanceToGenerateChasersAt = 10;
-		var polar = Polar.fromAzimuthInTurnsAndRadius(0, distanceToGenerateChasersAt);
+		var polarForAngle = Polar.fromAzimuthInTurnsAndRadius(0, distanceToGenerateChasersAt);
 		for (var i = 0; i < chasersToSpawnCount; i++)
 		{
 			var azimuthInTurns = i / chasersToSpawnCount;
-			var chaserVel =
-				polar
+			var chaserOffset =
+				polarForAngle
 					.azimuthInTurnsSet(azimuthInTurns)
 					.toCoords();
-			var entityChaser = EnemyChaser.fromPosAndVel(entityKilledPos, chaserVel);
+			var chaserVel = chaserOffset.clone();
+			var chaserPos = entityKilledPos.clone().add(chaserOffset);
+			var entityChaser = EnemyChaser.fromPosAndVel(chaserPos, chaserVel);
 			place.entityToSpawnAdd(entityChaser);
 		}
 	}
@@ -153,8 +146,10 @@ class EnemyBurster extends Enemy
 
 		var visualBuilder = VisualBuilder.Instance();
 
-		var visual = visualBuilder.crystal(dimension, colorBody, colorHighlight);
+		var visualBody = visualBuilder.crystal(dimension, colorBody, colorHighlight) as VisualPolygon;
 
-		return visual;
+		var visualPreoriented = VisualPolygonPreoriented.fromVisualPolygonInner(visualBody);
+
+		return visualPreoriented;
 	}
 }

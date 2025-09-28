@@ -4,10 +4,6 @@ class EnemyBurster extends Enemy {
         super(EnemyBurster.name, pos, [
             Actor.fromActivityDefnName(EnemyBurster.activityDefnBuild().name),
             Carrier.create(),
-            Device.fromNameTicksToChargeAndUse("Gun", 60, // 3 seconds
-            // 3 seconds
-            uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use
-            ),
             Drawable.fromVisual(EnemyBurster.visualBuild()),
             Killable.fromDie(EnemyBurster.killableDie),
             Movable.fromAccelerationPerTickAndSpeedMax(2, 1),
@@ -26,16 +22,15 @@ class EnemyBurster extends Enemy {
         var enemy = uwpe.entity;
         var player = place.player();
         if (player != null) {
-            Enemy.activityDefnPerform_FireGunAtPlayerIfCharged(uwpe);
+            var enemyActor = Actor.of(enemy);
+            var enemyActivity = enemyActor.activity;
+            var targetEntity = enemyActivity.targetEntity();
+            if (targetEntity == null) {
+                targetEntity = place.player();
+            }
+            enemyActivity.targetEntitySet(targetEntity);
+            Enemy.activityDefnPerform_MoveTowardTarget(uwpe, EnemyBurster.activityDefnPerform_MoveTowardTarget_TargetHasBeenReached);
         }
-        var enemyActor = Actor.of(enemy);
-        var enemyActivity = enemyActor.activity;
-        var targetEntity = enemyActivity.targetEntity();
-        if (targetEntity == null) {
-            targetEntity = place.player();
-        }
-        enemyActivity.targetEntitySet(targetEntity);
-        Enemy.activityDefnPerform_MoveTowardTarget(uwpe, EnemyBurster.activityDefnPerform_MoveTowardTarget_TargetHasBeenReached);
     }
     static activityDefnPerform_MoveTowardTarget_TargetHasBeenReached(uwpe) {
         var enemy = uwpe.entity;
@@ -64,13 +59,15 @@ class EnemyBurster extends Enemy {
         var place = uwpe.place;
         var chasersToSpawnCount = 4;
         var distanceToGenerateChasersAt = 10;
-        var polar = Polar.fromAzimuthInTurnsAndRadius(0, distanceToGenerateChasersAt);
+        var polarForAngle = Polar.fromAzimuthInTurnsAndRadius(0, distanceToGenerateChasersAt);
         for (var i = 0; i < chasersToSpawnCount; i++) {
             var azimuthInTurns = i / chasersToSpawnCount;
-            var chaserVel = polar
+            var chaserOffset = polarForAngle
                 .azimuthInTurnsSet(azimuthInTurns)
                 .toCoords();
-            var entityChaser = EnemyChaser.fromPosAndVel(entityKilledPos, chaserVel);
+            var chaserVel = chaserOffset.clone();
+            var chaserPos = entityKilledPos.clone().add(chaserOffset);
+            var entityChaser = EnemyChaser.fromPosAndVel(chaserPos, chaserVel);
             place.entityToSpawnAdd(entityChaser);
         }
     }
@@ -80,7 +77,8 @@ class EnemyBurster extends Enemy {
         var colorBody = colors.Green;
         var colorHighlight = colors.Red;
         var visualBuilder = VisualBuilder.Instance();
-        var visual = visualBuilder.crystal(dimension, colorBody, colorHighlight);
-        return visual;
+        var visualBody = visualBuilder.crystal(dimension, colorBody, colorHighlight);
+        var visualPreoriented = VisualPolygonPreoriented.fromVisualPolygonInner(visualBody);
+        return visualPreoriented;
     }
 }

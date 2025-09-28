@@ -3,7 +3,6 @@ class EnemyChaser extends Enemy {
     constructor(pos, vel) {
         super(EnemyChaser.name, pos, [
             Actor.fromActivityDefnName(EnemyChaser.activityDefnBuild().name),
-            Carrier.create(),
             Device.fromNameTicksToChargeAndUse("Gun", 60, // 3 seconds
             // 3 seconds
             uwpe => ProjectileShooter.of(uwpe.entity).generatorDefault().fire(uwpe) // use

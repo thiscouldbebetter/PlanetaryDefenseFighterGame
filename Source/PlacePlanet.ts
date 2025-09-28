@@ -50,7 +50,14 @@ class PlacePlanet extends PlaceBase
 			EntityGenerator.of(enemyGeneratorRaiders).exhaust();
 			var enemies: Entity[] = [];
 
-			if (enemyTypeToTestName == EnemyEmplacement.name)
+			if (enemyTypeToTestName == EnemyBurster.name)
+			{
+				enemies =
+				[
+					EnemyBurster.fromPos(Coords.fromXY(0, size.y / 2) ),
+				];
+			}
+			else if (enemyTypeToTestName == EnemyEmplacement.name)
 			{
 				// For testing.
 				enemies =

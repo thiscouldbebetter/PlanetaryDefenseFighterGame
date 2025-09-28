@@ -181,8 +181,6 @@ class EnemyMinelayer extends Enemy
 		return shooter;
 	}
 
-
-
 	static visualBuild(): Visual
 	{
 		var dimension = 6;

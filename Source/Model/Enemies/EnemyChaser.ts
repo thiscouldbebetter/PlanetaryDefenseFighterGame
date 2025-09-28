@@ -13,8 +13,6 @@ class EnemyChaser extends Enemy
 					EnemyChaser.activityDefnBuild().name
 				),
 
-				Carrier.create(),
-
 				Device.fromNameTicksToChargeAndUse
 				(
 					"Gun",
