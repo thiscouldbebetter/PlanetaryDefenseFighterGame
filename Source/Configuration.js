@@ -2,7 +2,8 @@
 class Configuration {
     constructor() {
         this.contentDirectoryPath = "../Content/";
-        this.displaySizesAvailable = null; // [ Coords.fromXY(640, 480) ];
+        this.displaySizesAvailable = null;
+        this.displaySizeInitialIndex = 1;
     }
     static Instance() {
         if (this._instance == null) {
