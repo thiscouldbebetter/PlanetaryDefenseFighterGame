@@ -1,13 +1,16 @@
 
 class PlacePlanet extends PlaceBase
 {
+	static HorizonHeightDivisor = 6;
+
 	levelIndex: number;
 
 	enemyGenerationZone: BoxAxisAligned;
 
 	constructor(universe: Universe, levelIndex: number, player: Player, enemyTypeToTestName: string)
 	{
-		var size = Coords.fromXY(800, 300);
+		var displaySize = Coords.fromXY(400, 300);
+		var size = displaySize.clone().multiply(Coords.fromXY(2, 1) );
 
 		super
 		(
@@ -20,15 +23,20 @@ class PlacePlanet extends PlaceBase
 
 		this.levelIndex = levelIndex;
 
+		var camera = PlacePlanet.cameraEntity(size.clone() );
+
+		var planet = Planet.fromSizeAndHorizonHeight
+		(
+			size.clone(), size.y / PlacePlanet.HorizonHeightDivisor
+		);
+
 		var entitiesPlacePlanetPlayer =
 		[
-			PlacePlanet.cameraEntity(size.clone() ),
-			Planet.fromSizeAndHorizonHeight
-			(
-				size.clone(), 50
-			),
+			camera,
+			planet,
 			player
 		];
+
 		this.entitiesToSpawnAdd(entitiesPlacePlanetPlayer);
 
 		var habitats = PlacePlanet.habitatsBuild(size);
@@ -345,10 +353,12 @@ class PlacePlanet extends PlaceBase
 		var habitats: Habitat[] = [];
 		var habitatsCount = this.habitatsCountInitial();
 		var habitatSpacing = placeSize.x / habitatsCount;
+		var habitatPosY =
+			placeSize.y - placeSize.y / PlacePlanet.HorizonHeightDivisor;
 		for (var i = 0; i < habitatsCount; i++)
 		{
 			var habitat =
-				Habitat.fromPos(Coords.fromXY(i * habitatSpacing, 250) );
+				Habitat.fromPos(Coords.fromXY(i * habitatSpacing, habitatPosY) );
 			habitats.push(habitat);
 		}
 		return habitats;

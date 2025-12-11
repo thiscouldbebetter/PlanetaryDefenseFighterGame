@@ -19,7 +19,7 @@ class Habitat extends Entity
 						(
 							Plane.fromNormalAndDistanceFromOrigin
 							(
-								Coords.fromXY(0, 1), 250
+								Coords.fromXY(0, 1), pos.y
 							)
 						)
 					)

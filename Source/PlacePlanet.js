@@ -1,15 +1,18 @@
 "use strict";
 class PlacePlanet extends PlaceBase {
     constructor(universe, levelIndex, player, enemyTypeToTestName) {
-        var size = Coords.fromXY(800, 300);
+        var displaySize = Coords.fromXY(400, 300);
+        var size = displaySize.clone().multiply(Coords.fromXY(2, 1));
         super("Level " + (levelIndex + 1), PlacePlanet.defnBuild().name, null, // parentName
         size, [] // entities
         );
         this.initializeIsComplete = false;
         this.levelIndex = levelIndex;
+        var camera = PlacePlanet.cameraEntity(size.clone());
+        var planet = Planet.fromSizeAndHorizonHeight(size.clone(), size.y / PlacePlanet.HorizonHeightDivisor);
         var entitiesPlacePlanetPlayer = [
-            PlacePlanet.cameraEntity(size.clone()),
-            Planet.fromSizeAndHorizonHeight(size.clone(), 50),
+            camera,
+            planet,
             player
         ];
         this.entitiesToSpawnAdd(entitiesPlacePlanetPlayer);
@@ -171,8 +174,9 @@ class PlacePlanet extends PlaceBase {
         var habitats = [];
         var habitatsCount = this.habitatsCountInitial();
         var habitatSpacing = placeSize.x / habitatsCount;
+        var habitatPosY = placeSize.y - placeSize.y / PlacePlanet.HorizonHeightDivisor;
         for (var i = 0; i < habitatsCount; i++) {
-            var habitat = Habitat.fromPos(Coords.fromXY(i * habitatSpacing, 250));
+            var habitat = Habitat.fromPos(Coords.fromXY(i * habitatSpacing, habitatPosY));
             habitats.push(habitat);
         }
         return habitats;
@@ -228,3 +232,4 @@ class PlacePlanet extends PlaceBase {
         return this.entitiesByPropertyName(StatsKeeper.name)[0];
     }
 }
+PlacePlanet.HorizonHeightDivisor = 6;

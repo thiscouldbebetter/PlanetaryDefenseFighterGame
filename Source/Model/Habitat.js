@@ -4,7 +4,7 @@ class Habitat extends Entity {
         super(Habitat.name, [
             Constrainable.fromConstraints([
                 Constraint_Gravity.fromAccelerationPerTick(Coords.fromXY(0, .03)),
-                Constraint_ContainInHemispace.fromHemispace(Hemispace.fromPlane(Plane.fromNormalAndDistanceFromOrigin(Coords.fromXY(0, 1), 250)))
+                Constraint_ContainInHemispace.fromHemispace(Hemispace.fromPlane(Plane.fromNormalAndDistanceFromOrigin(Coords.fromXY(0, 1), pos.y)))
             ]),
             Drawable.fromVisual(Habitat.visualBuild()),
             HabitatProperty.create(),
