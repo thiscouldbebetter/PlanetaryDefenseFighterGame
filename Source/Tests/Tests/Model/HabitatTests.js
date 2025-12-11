@@ -6,7 +6,7 @@ class HabitatTests extends TestFixture {
     tests() {
         var returnValues = [
             this.whenFallingDoesNotSinkBelowPlanetSurface
-        ];
+        ].map(x => Test.fromRun(x));
         return returnValues;
     }
     // Tests.

@@ -6,19 +6,19 @@ class CameraTests extends TestFixture
 		super(CameraTests.name);
 	}
 
-	tests(): ( () => void )[]
+	tests(): Test[]
 	{
 		var returnValues =
 		[
 			this.cameraAtRightEdgeCanSeeDrawableAtLeftEdge
-		];
+		].map(x => Test.fromRun(x) );
 
 		return returnValues;
 	}
 
 	// Tests.
 
-	cameraAtRightEdgeCanSeeDrawableAtLeftEdge()
+	cameraAtRightEdgeCanSeeDrawableAtLeftEdge(): void
 	{
 		var viewSize = Coords.fromXY(400, 300);
 		var sizeToWrapTo = viewSize.clone().multiply(Coords.fromXY(2, 1) );

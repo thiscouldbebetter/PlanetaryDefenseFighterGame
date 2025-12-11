@@ -13,6 +13,6 @@ class TestRunner
 			]
 		);
 
-		testSuite.run();
+		testSuite.runThen( () => {} );
 	}
 }

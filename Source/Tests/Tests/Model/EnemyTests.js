@@ -14,7 +14,7 @@ class EnemyTests extends TestFixture {
             this.constrainableBuild,
             this.killableDie,
             this.projectileShooterBuild
-        ];
+        ].map(x => Test.fromRun(x));
         return returnValues;
     }
     // Helper methods.

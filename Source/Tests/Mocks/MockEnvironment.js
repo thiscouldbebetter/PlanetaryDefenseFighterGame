@@ -4,7 +4,7 @@ class MockEnvironment {
         this.universe = this.universeCreate();
     }
     universeCreate() {
-        var display = DisplayTest.default();
+        var display = DisplayMock.default();
         var universe = Universe.default().displaySet(display);
         universe.world = universe.worldCreate();
         universe.world.defn = WorldGame.defnBuild();

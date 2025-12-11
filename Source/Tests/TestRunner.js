@@ -6,6 +6,6 @@ class TestRunner {
             new EnemyTests(),
             new HabitatTests()
         ]);
-        testSuite.run();
+        testSuite.runThen(() => { });
     }
 }

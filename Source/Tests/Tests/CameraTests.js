@@ -6,7 +6,7 @@ class CameraTests extends TestFixture {
     tests() {
         var returnValues = [
             this.cameraAtRightEdgeCanSeeDrawableAtLeftEdge
-        ];
+        ].map(x => Test.fromRun(x));
         return returnValues;
     }
     // Tests.

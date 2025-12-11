@@ -6,7 +6,7 @@ class EnemyTests extends TestFixture
 		super(EnemyTests.name);
 	}
 
-	tests(): ( () => void )[]
+	tests(): Test[]
 	{
 		var returnValues =
 		[
@@ -19,7 +19,7 @@ class EnemyTests extends TestFixture
 			this.constrainableBuild,
 			this.killableDie,
 			this.projectileShooterBuild
-		];
+		].map(x => Test.fromRun(x) );
 
 		return returnValues;
 	}

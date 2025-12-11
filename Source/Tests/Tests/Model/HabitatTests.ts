@@ -6,12 +6,12 @@ class HabitatTests extends TestFixture
 		super(HabitatTests.name);
 	}
 
-	tests(): ( () => void )[]
+	tests(): Test[]
 	{
 		var returnValues =
 		[
 			this.whenFallingDoesNotSinkBelowPlanetSurface
-		];
+		].map(x => Test.fromRun(x) );
 
 		return returnValues;
 	}
